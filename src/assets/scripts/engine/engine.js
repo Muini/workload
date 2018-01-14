@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import Stats from 'stats.js';
 import Looper from '../vendors/looper';
+import PostProd from './postprod';
 
 const DEBUG = true;
 
@@ -22,7 +23,7 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
 
@@ -42,9 +43,28 @@ class Engine {
 
         this.bindEvents();
 
+        this.postprod = new PostProd({
+            width: this.width,
+            height: this.height,
+            pixelDensity: this.pixelDensity,
+            camera: this.mainCamera,
+            scene: this.currentScene,
+            renderer: this.renderer,
+            passes: {
+                fxaa: { enabled: true },
+                film: { enabled: false },
+                vignette: { enabled: false, options: [.6, 1.4] },
+                zoomBlur: { enabled: true, options: { center: 0.5, intensity: 0. } },
+                chromatic: { enabled: true, options: { intensity: 5.0 } },
+                bloom: { enabled: true, options: [1.0, 1.0, 0.85] },
+                sharpen: { enabled: true },
+            }
+        });
+
         if (DEBUG) {
             window.THREE = THREE;
             window.renderer = this.renderer;
+            console.log('%cEngine%c Init : width ' + this.width + 'px, height ' + this.height + 'px, pixelRatio ' + this.pixelDensity, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         }
 
         // window.Engine = this;
@@ -84,21 +104,27 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(this.pixelDensity);
 
-        // this.postprod.resize(this.width, this.height, this.pixelDensity);
+        this.postprod.resize(this.width, this.height, this.pixelDensity);
     }
 
-    setScene(scene) {
+    setScene(scene, callback) {
         this.currentScene = scene;
         if (DEBUG)
-            window.scene = this.currentScene;
+            window.scene = this.currentScene.instance;
+        this.currentScene.load(callback);
     }
 
     start() {
         if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScene(...) function';
+        if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
+        if (DEBUG)
+            console.log('%cEngine%c Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         this.loop.start();
     }
 
     stop() {
+        if (DEBUG)
+            console.log('%cEngine%c Stop', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         this.loop.stop();
     }
 
@@ -119,18 +145,25 @@ class Engine {
 
             //Adjust pixelDensity based on the fps but not on the first cycle
             if (this.performanceCycleNbr !== 0) {
+                let newPixelDensity = this.pixelDensity;
                 if (this.fpsMedian < 10) {
-                    this.pixelDensity /= 2.;
+                    newPixelDensity /= 2.;
                 } else if (this.fpsMedian < 25) {
-                    this.pixelDensity /= 1.5;
+                    newPixelDensity /= 1.5;
                 } else if (this.fpsMedian < 50) {
-                    this.pixelDensity /= 1.25;
+                    newPixelDensity /= 1.25;
                 }
-                if (this.pixelDensity <= .5)
-                    this.pixelDensity = .5;
-                //Trigger the resize
-                this.resize();
-                // console.log(this.fpsMedian, this.pixelDensity);
+                if (newPixelDensity <= .5)
+                    newPixelDensity = .5;
+
+                if (newPixelDensity != this.pixelDensity) {
+                    this.pixelDensity = newPixelDensity;
+                    //Trigger the resize
+                    this.resize();
+                    // console.log(this.fpsMedian, this.pixelDensity);
+                    if (DEBUG)
+                        console.log('%cEngine%c Adapting renderer to ' + newPixelDensity + ' pixelRatio', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+                }
             }
 
             //Reset vars to start a new cycle
@@ -152,9 +185,9 @@ class Engine {
         this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
 
         //Update & Render Post processing effects
-        // this.postprod.passes.zoomBlur.options.intensity = THREE.Math.clamp(this.cameraCurrentSpeed / 4., 0, 140);
-        // this.postprod.passes.chromatic.options.intensity = THREE.Math.clamp(this.cameraCurrentSpeed / 4., 5, 60);
         // this.postprod.update(time);
+
+        //Update all objects
         for (let i = 0; i < this.updateFunctions.length; i++) {
             this.updateFunctions[i]();
         }

@@ -15,7 +15,6 @@ if (!window.fetch) {
 
 /* Loading Vendors */
 import * as WebFont from 'webfontloader';
-import FastClick from 'fastclick'
 import UAParser from 'ua-parser-js'
 
 /* User Agent Info */
@@ -50,7 +49,6 @@ if ('serviceWorker' in navigator) {
     })
 }
 */
-FastClick.attach(document.body)
 
 // Load fonts
 WebFont.load({
