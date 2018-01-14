@@ -1,0 +1,217 @@
+/*
+*===================================
+*    RESET
+*===================================
+*/
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+input,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video,
+figure {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    box-sizing: border-box;
+    text-rendering: optimizeLegibility;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-smoothing: antialiased;
+    -webkit-text-size-adjust: none;
+    -webkit-font-variant-ligatures: common-ligatures;
+    hyphens: none;
+    &:before,
+    &:after {
+        box-sizing: border-box;
+    }
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+input,
+textarea,
+button {
+    background: transparent;
+    border: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+    display: block;
+}
+
+body {
+    line-height: 1;
+    width: 100%;
+    height: 100%;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+blockquote,
+q {
+    quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+@media print {
+    blockquote,
+    p {
+        orphans: 2;
+        widows: 2;
+    }
+    blockquote,
+    ol,
+    ul {
+        page-break-inside: avoid;
+    }
+    caption,
+    h1,
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+@-ms-viewport {
+    width: device-width;
+    zoom: 1;
+}
+
+@-o-viewport {
+    width: device-width;
+    zoom: 1;
+}
+
+@viewport {
+    width: device-width;
+    zoom: 1;
+}
+
+a img {
+    border: 0;
+}
+
+body>script {
+    display: none!important;
+}

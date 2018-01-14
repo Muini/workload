@@ -1,0 +1,14 @@
+@mixin fluid-type( $minScreen, $maxScreen, $minFont, $maxFont) {
+    & {
+        font-size: #{$minFont};
+        @media (min-width: #{$minScreen}) and (max-width: #{$maxScreen}){
+            font-size: calc(#{$minFont} + #{strip-unit($maxFont - $minFont)} * ((100vw - #{$minScreen}) / #{strip-unit($maxScreen - $minScreen)}));
+        }
+        @media (min-width: #{$maxScreen}){
+            font-size: #{$maxFont};
+        }
+    }
+}
+@function strip-unit($value) {
+    @return $value / ($value * 0 + 1);
+}

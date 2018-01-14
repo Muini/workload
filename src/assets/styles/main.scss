@@ -1,0 +1,37 @@
+// Variables & Mixin
+@import './utils/variables';
+@import './utils/ease';
+@import './utils/mediaqueries';
+@import './utils/fluid-type';
+// Styles
+@import './utils/reset';
+@import './utils/normalize';
+@import './utils/fonts';
+@import './utils/scrollbar';
+html {
+    &.wf-loading {
+        .ft {
+            font-family: sans-serif;
+        }
+        .ft_serif {
+            font-family: serif;
+        }
+    }
+}
+
+body {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#main {
+    width: 100%;
+    min-height: 100%;
+}
+
+::selection {
+    color: $c-white;
+    background: $c-black;
+    text-shadow: none;
+}

@@ -1,0 +1,36 @@
+$mq-min-width: 320px;
+$mq-small-min: 640px;
+$mq-medium-min: 960px;
+$mq-large-min: 1200px;
+$mq-xlarge-min: 1600px;
+$mq-xxlarge-min: 1920px;
+
+@mixin mq-small {
+   @media (min-width: #{$mq-small-min}){
+    @content;
+  }
+}
+
+@mixin mq-medium {
+   @media (min-width: #{$mq-medium-min}){
+    @content;
+  }
+}
+
+@mixin mq-large {
+   @media (min-width: #{$mq-large-min}){
+    @content;
+  }
+}
+
+@mixin mq-xlarge {
+   @media (min-width: #{$mq-xlarge-min}){
+    @content;
+  }
+}
+
+@mixin mq-xxlarge {
+   @media (min-width: #{$mq-xxlarge-min}){
+    @content;
+  }
+}
