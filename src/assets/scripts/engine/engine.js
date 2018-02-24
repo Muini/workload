@@ -23,7 +23,7 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; //THREE.BasicShadowMap
+        this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
 
@@ -48,15 +48,15 @@ class Engine {
             height: this.height,
             pixelDensity: this.pixelDensity,
             camera: this.mainCamera,
-            scene: this.currentScene,
+            scene: undefined,
             renderer: this.renderer,
             passes: {
                 fxaa: { enabled: true },
                 film: { enabled: false },
                 vignette: { enabled: false, options: [.6, 1.4] },
-                zoomBlur: { enabled: true, options: { center: 0.5, intensity: 0. } },
-                chromatic: { enabled: true, options: { intensity: 5.0 } },
-                bloom: { enabled: true, options: [1.0, 1.0, 0.85] },
+                zoomBlur: { enabled: false, options: { center: 0.5, intensity: 0. } },
+                chromatic: { enabled: false, options: { intensity: 5.0 } },
+                bloom: { enabled: true, options: [0.25, -1.0, 0.9] },
                 sharpen: { enabled: true },
             }
         });
@@ -108,7 +108,8 @@ class Engine {
     }
 
     setScene(scene, callback) {
-        this.currentScene = scene;
+        this.currentScene = scene
+        this.postprod.updateScene(this.currentScene.instance, this.currentScene.mainCamera);
         if (DEBUG)
             window.scene = this.currentScene.instance;
         this.currentScene.load(callback);
@@ -185,7 +186,7 @@ class Engine {
         this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
 
         //Update & Render Post processing effects
-        // this.postprod.update(time);
+        this.postprod.update(time);
 
         //Update all objects
         for (let i = 0; i < this.updateFunctions.length; i++) {

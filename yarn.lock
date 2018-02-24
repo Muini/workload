@@ -3039,6 +3039,10 @@ glsl-inject-defines@^1.0.1:
     glsl-token-string "^1.0.1"
     glsl-tokenizer "^2.0.2"
 
+glsl-lut@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/glsl-lut/-/glsl-lut-1.1.0.tgz#b4919a12ab71d40e5d7c2e4922839749e3dcb03e"
+
 glsl-resolve@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/glsl-resolve/-/glsl-resolve-0.0.1.tgz#894bef73910d792c81b5143180035d0a78af76d3"

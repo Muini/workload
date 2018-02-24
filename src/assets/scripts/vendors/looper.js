@@ -24,7 +24,7 @@ export default class Looper {
         })
     }
 
-    loop(time) {
+    loop(time, delta) {
         let i
         let l = this.actionsLength
 

@@ -3,10 +3,12 @@ import * as THREE from 'three';
 import Engine from './engine/engine';
 import Scene from './engine/scene';
 
-import Worker from './objects/worker';
+import { Worker } from './objects/worker';
 
 // Create scene
-let mainScene = new Scene({ name: 'Workload' });
+let mainScene = new Scene({
+    name: 'Workload',
+});
 
 // Create & Add camera
 let cameraController = new THREE.Group();
@@ -17,7 +19,9 @@ cameraController.position.z = 15;
 cameraController.rotation.y = (45 / 180) * 3.14;
 
 // let camera = new THREE.PerspectiveCamera(50, Engine.width / Engine.height, 1, 180000);
-let camera = new THREE.OrthographicCamera(Engine.width / -150, Engine.width / 150, Engine.height / 150, Engine.height / -150, 1, 180000);
+let cameraDistance = 150;
+let camera = new THREE.OrthographicCamera(Engine.width / -cameraDistance, Engine.width / cameraDistance, Engine.height / cameraDistance, Engine.height / -cameraDistance, 1, 180000);
+camera.distance = cameraDistance;
 camera.position.x = 0;
 camera.position.y = 0;
 camera.position.z = 0;
@@ -50,8 +54,7 @@ var ambientLight = new THREE.HemisphereLight(0x343c57, 0x323b2e, 1.);
 mainScene.instance.add(ambientLight);
 
 // Test Worker
-let worker = new Worker();
-mainScene.addObject(worker);
+let worker = new Worker({ scene: mainScene });
 
 // Load scene & Start Engine
 Engine.appendCanvas(document.getElementById('main'));
@@ -59,3 +62,8 @@ Engine.setScene(mainScene, _ => {
     // console.log(Engine.currentScene.instance)
     Engine.start();
 });
+
+function SetupScene() {
+
+
+}

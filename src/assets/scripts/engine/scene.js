@@ -1,11 +1,17 @@
 import * as THREE from 'three';
 import Engine from './engine.js';
 
+import ModelLoader from '../engine/modelLoader';
+
 export default class Scene {
     constructor(opt = {
         name,
     }) {
         this.name = opt.name || 'unamed scene';
+
+        this.assetsToLoad = 0;
+        this.assetsLoaded = 0;
+        this.callback = function() {};
 
         this.instance = new THREE.Scene();
         this.instance.updateMatrixWorld(true);
@@ -14,47 +20,62 @@ export default class Scene {
         this.mainCamera = undefined;
 
         this.objects = [];
-        this.objectsLoaded = 0;
 
         Engine.addToResize(this.resize.bind(this));
     }
 
     addObject(object) {
         this.objects.push(object);
-        object.scene = this;
     }
 
-    resize() {
-        if (!this.mainCamera) return;
-        this.mainCamera.aspect = Engine.width / Engine.height;
-        this.mainCamera.updateProjectionMatrix();
+    awakeObjects() {
+        for (let i = 0; i < this.objects.length; i++) {
+            this.objects[i].awake();
+        }
     }
 
     setCamera(camera) {
         this.mainCamera = camera;
     }
 
+    resize() {
+        if (!this.mainCamera) return;
+        if (this.mainCamera.isPerpectiveCamera) {
+            this.mainCamera.aspect = Engine.width / Engine.height;
+        } else if (this.mainCamera.isOrthographicCamera) {
+            this.mainCamera.left = Engine.width / -this.mainCamera.distance;
+            this.mainCamera.right = Engine.width / this.mainCamera.distance;
+            this.mainCamera.top = Engine.height / this.mainCamera.distance;
+            this.mainCamera.bottom = Engine.height / -this.mainCamera.distance;
+        }
+        this.mainCamera.updateProjectionMatrix();
+    }
+
     load(callback) {
+        this.callback = callback;
         // Get all entites, load their assets (sounds, models, textures)
+        this.assetsToLoad += this.objects.length;
+
         for (let i = 0; i < this.objects.length; i++) {
-            this.objects[i].preload(_ => {
-                // Add object to the scene
-                // console.log(this.objects[i])
-                // if (this.objects[i].model)
-                //     this.instance.add(this.objects[i].model);
-                // Update loader
-                this.updateLoader(callback);
+            ModelLoader.load(this.objects[i].modelUrl, this.objects[i].materials, (modelLoaded) => {
+                this.objects[i].model = modelLoaded;
+                this.updateLoader();
             });
         }
     }
 
-    updateLoader(callback) {
-        this.objectsLoaded++;
-        console.log('%cLoader%c ' + this.objectsLoaded + '/' + this.objects.length + ' loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
-        if (this.objectsLoaded >= this.objects.length) {
-            console.log('%cLoader%c Scene ' + this.name + ' loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black");
-            callback();
+    updateLoader() {
+        this.assetsLoaded++;
+        console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
+        if (this.assetsLoaded >= this.assetsToLoad) {
+            this.onLoaded();
         }
+    }
+
+    onLoaded() {
+        console.log('%cLoader%c Scene ' + this.name + ' loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black");
+        this.awakeObjects();
+        this.callback();
     }
 
     unload() {

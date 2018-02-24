@@ -2,18 +2,17 @@ import * as THREE from 'three';
 
 import Object from '../engine/object';
 
-export default class Worker extends Object {
+export const modelUrl = '/static/models/worker.dae';
+
+export class Worker extends Object {
     constructor(opt = {}) {
         super(opt);
+        this.name = 'worker';
+        this.modelUrl = modelUrl;
+        this.castShadow = true;
     }
 
     init() {
-        // Init global vars
-        this.name = 'worker';
-        this.setModel('/static/models/worker.dae');
-
-        this.castShadow = true;
-
         // Init materials
         let abs = new THREE.MeshStandardMaterial({
             name: 'ABS',

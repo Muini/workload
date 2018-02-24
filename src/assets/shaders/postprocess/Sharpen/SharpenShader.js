@@ -40,11 +40,11 @@ THREE.SharpenShader = {
             float dx = 1.0 / resolution.x;
             float dy = 1.0 / resolution.y;
             vec4 sum = vec4(0.0);
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( -.25 * dx , 0.0 * dy));
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , -.25 * dy));
+            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( -.05 * dx , 0.0 * dy));
+            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , -.05 * dy));
             sum += 5. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , 0.0 * dy));
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , .25 * dy));
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( .25 * dx , 0.0 * dy));
+            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , .05 * dy));
+            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( .05 * dx , 0.0 * dy));
 
             gl_FragColor = sum;
         }

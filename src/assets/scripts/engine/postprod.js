@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import '../../shaders/postprocess/EffectComposer';
 import '../../shaders/postprocess/ShaderPass';
 import '../../shaders/postprocess/RenderPass';
-import '../../shaders/postprocess/FilmPass';
 
 import '../../shaders/postprocess/CopyShader';
 import '../../shaders/postprocess/Convolution/ConvolutionShader';
@@ -54,12 +53,7 @@ export default class PostProd {
 
         //Film Effect
         if (this.passes.film.enabled) {
-            this.effectFilmPass = new THREE.FilmPass(
-                this.passes.film.options[0],
-                this.passes.film.options[1],
-                this.passes.film.options[2],
-                this.passes.film.options[3],
-            );
+            this.filmPass = new THREE.ShaderPass(THREE.FilmShader);
         }
 
         //Vignette
@@ -112,11 +106,14 @@ export default class PostProd {
         //Render Order
         this.composer.addPass(this.renderPassScene);
 
+        if (this.passes.sharpen.enabled) {
+            this.composer.addPass(this.sharpenPass);
+        }
         if (this.passes.fxaa.enabled) {
             this.composer.addPass(this.FXAAPass);
         }
         if (this.passes.film.enabled) {
-            this.composer.addPass(this.effectFilmPass);
+            this.composer.addPass(this.filmPass);
         }
         if (this.passes.zoomBlur.enabled) {
             this.composer.addPass(this.zoomBlurPass);
@@ -139,8 +136,19 @@ export default class PostProd {
         this.renderer.autoClearColor = true;
     }
 
-    update(time) {
+    updateScene(scene, camera) {
+        this.scene = scene;
+        this.camera = camera;
+        this.renderPassScene.scene = this.scene;
+        this.renderPassScene.camera = this.camera;
+    }
 
+    update(time) {
+        if (!this.scene || !this.camera) return;
+
+        if (this.passes.film.enabled) {
+            this.filmPass.uniforms['time'].value = time;
+        }
         if (this.passes.zoomBlur.enabled) {
             this.zoomBlurPass.uniforms['strength'].value = this.passes.zoomBlur.options.intensity;
         }
@@ -171,11 +179,5 @@ export default class PostProd {
         if (this.passes.sharpen.enabled) {
             this.sharpenPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
         }
-    }
-
-    projectionOnScreen() {
-        this.screenSpacePosition.copy(new THREE.Vector3(.0, .0, .0)).project(this.camera);
-        this.screenSpacePosition.x = (this.screenSpacePosition.x + 1) / 2;
-        this.screenSpacePosition.y = (this.screenSpacePosition.y + 1) / 2;
     }
 }
