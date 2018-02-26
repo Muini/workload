@@ -32,6 +32,7 @@ export default class Scene {
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].awake();
         }
+        console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
     }
 
     setCamera(camera) {
