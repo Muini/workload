@@ -6,8 +6,10 @@ import ModelLoader from '../engine/modelLoader';
 export default class Scene {
     constructor(opt = {
         name,
+        setup,
     }) {
         this.name = opt.name || 'unamed scene';
+        this.setup = opt.setup || function() {};
 
         this.assetsToLoad = 0;
         this.assetsLoaded = 0;
@@ -32,7 +34,8 @@ export default class Scene {
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].awake();
         }
-        console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        if (window.DEBUG)
+            console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
     }
 
     setCamera(camera) {
@@ -53,6 +56,7 @@ export default class Scene {
     }
 
     load(callback) {
+
         this.callback = callback;
         // Get all entites, load their assets (sounds, models, textures)
         this.assetsToLoad += this.objects.length;
@@ -67,19 +71,22 @@ export default class Scene {
 
     updateLoader() {
         this.assetsLoaded++;
-        console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
+        if (window.DEBUG)
+            console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' assets loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
         if (this.assetsLoaded >= this.assetsToLoad) {
             this.onLoaded();
         }
     }
 
     onLoaded() {
-        console.log('%cLoader%c Scene ' + this.name + ' loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black");
+        if (window.DEBUG)
+            console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
         this.awakeObjects();
         this.callback();
     }
 
     unload() {
-        console.log('%cLoader%c Clear loader', "color:white;background:gray;padding:2px 4px;", "color:black");
+        if (window.DEBUG)
+            console.log('%cLoader%c Clear loader', "color:white;background:gray;padding:2px 4px;", "color:black");
     }
 }

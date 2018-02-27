@@ -3,13 +3,13 @@ import Stats from 'stats.js';
 import Looper from '../vendors/looper';
 import PostProd from './postprod';
 
-const DEBUG = true;
+window.DEBUG = true;
 
 class Engine {
     constructor(opt = {}) {
         // if (window.Engine != undefined) throw 'Engine is already defined, please use it as a singleton';
 
-        if (DEBUG) {
+        if (window.DEBUG) {
             this.stats = new Stats();
             this.stats.showPanel(0);
         }
@@ -18,6 +18,8 @@ class Engine {
 
         this.width = window.innerWidth;
         this.height = window.innerHeight;
+
+        this.scenes = {};
 
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
         this.renderer.setSize(this.width, this.height);
@@ -37,6 +39,8 @@ class Engine {
 
         this.loop = new Looper();
         this.loop.add(this.update.bind(this));
+        this.hasStarted = false;
+        this.isPlaying = false;
 
         this.updateFunctions = [];
         this.resizeFunctions = [];
@@ -61,7 +65,7 @@ class Engine {
             }
         });
 
-        if (DEBUG) {
+        if (window.DEBUG) {
             window.THREE = THREE;
             window.renderer = this.renderer;
             console.log('%cEngine%c Init : width ' + this.width + 'px, height ' + this.height + 'px, pixelRatio ' + this.pixelDensity, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
@@ -72,7 +76,7 @@ class Engine {
 
     appendCanvas(container) {
         container.appendChild(this.renderer.domElement);
-        if (DEBUG)
+        if (window.DEBUG)
             container.appendChild(this.stats.dom);
     }
 
@@ -81,6 +85,32 @@ class Engine {
             this.performanceCycleNbr = 0;
             this.resize();
         }, false);
+        let isActive = true
+        document.addEventListener('visibilitychange', _ => {
+            if (document.visibilityState == 'visible') {
+                if (!isActive) {
+                    isActive = true
+                    this.play();
+                }
+            } else {
+                if (isActive) {
+                    isActive = false
+                    this.pause();
+                }
+            }
+        })
+        window.addEventListener('focus', _ => {
+            if (!isActive) {
+                isActive = true
+                this.play();
+            }
+        }, false)
+        window.addEventListener('blur', _ => {
+            if (isActive) {
+                isActive = false
+                this.pause();
+            }
+        }, false)
     }
 
     addToResize(fct) {
@@ -107,10 +137,16 @@ class Engine {
         this.postprod.resize(this.width, this.height, this.pixelDensity);
     }
 
-    setScene(scene, callback) {
-        this.currentScene = scene
+    registerScene(scene) {
+        scene.setup();
+        this.scenes[scene.name] = scene;
+    }
+
+    setScene(sceneName, callback) {
+        if (this.scenes[sceneName] === undefined) return;
+        this.currentScene = this.scenes[sceneName];
         this.postprod.updateScene(this.currentScene.instance, this.currentScene.mainCamera);
-        if (DEBUG)
+        if (window.DEBUG)
             window.scene = this.currentScene.instance;
         this.currentScene.load(callback);
     }
@@ -118,15 +154,33 @@ class Engine {
     start() {
         if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScene(...) function';
         if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
-        if (DEBUG)
-            console.log('%cEngine%c Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        if (window.DEBUG)
+            console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        this.hasStarted = true;
+        this.play();
+    }
+
+    play() {
+        if (!this.hasStarted || this.isPlaying) return;
         this.loop.start();
+        this.isPlaying = true;
+        if (window.DEBUG)
+            console.log('%cEngine%c ▶️ Play', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+    }
+
+    pause() {
+        if (!this.hasStarted || !this.isPlaying) return;
+        this.loop.stop();
+        this.isPlaying = false;
+        if (window.DEBUG)
+            console.log('%cEngine%c ⏸️ Pause', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
     }
 
     stop() {
-        if (DEBUG)
-            console.log('%cEngine%c Stop', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
-        this.loop.stop();
+        if (window.DEBUG)
+            console.log('%cEngine%c ⏹️ Stop', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        this.pause();
+        this.hasStarted = false;
     }
 
     adaptiveRenderer(time) {
@@ -162,7 +216,7 @@ class Engine {
                     //Trigger the resize
                     this.resize();
                     // console.log(this.fpsMedian, this.pixelDensity);
-                    if (DEBUG)
+                    if (window.DEBUG)
                         console.log('%cEngine%c Adapting renderer to ' + newPixelDensity + ' pixelRatio', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
                 }
             }
@@ -174,7 +228,7 @@ class Engine {
     }
 
     update(time) {
-        if (DEBUG)
+        if (window.DEBUG)
             this.stats.begin();
 
         //Check if we need to downgrade the renderer
@@ -196,7 +250,7 @@ class Engine {
         //Store lastTick
         this.lastTick = time;
 
-        if (DEBUG)
+        if (window.DEBUG)
             this.stats.end();
     }
 }

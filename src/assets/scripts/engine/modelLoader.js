@@ -45,13 +45,13 @@ class ModelLoader {
 
             if (child.material.length) {
                 for (let m = 0; m < child.material.length; m++) {
-                    console.log(child.material[m].name)
+                    // console.log(child.material[m].name)
                     if (materials[n].name == child.material[m].name) {
                         child.material[m] = materials[n];
                     }
                 }
             } else {
-                console.log(child.material.name)
+                // console.log(child.material.name)
                 if (materials[n].name == child.material.name) {
                     child.material = materials[n];
                 }

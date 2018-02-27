@@ -35,7 +35,7 @@ requestAnimationFrame(_ => {
 });
 
 // Import main scene file
-import './assets/scripts/workload';
+import './assets/scripts/main';
 
 /*
 if ('serviceWorker' in navigator) {
