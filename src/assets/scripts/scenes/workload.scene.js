@@ -18,7 +18,7 @@ export default new Scene({
         cameraController.rotation.y = (45 / 180) * 3.14;
 
         // let camera = new THREE.PerspectiveCamera(50, Engine.width / Engine.height, 1, 180000);
-        let cameraDistance = 150;
+        let cameraDistance = 150 * Engine.height / 1000;
         let camera = new THREE.OrthographicCamera(Engine.width / -cameraDistance, Engine.width / cameraDistance, Engine.height / cameraDistance, Engine.height / -cameraDistance, 1, 180000);
         camera.distance = cameraDistance;
         camera.position.x = 0;
@@ -49,7 +49,7 @@ export default new Scene({
         this.instance.add(plane);
 
         // Ambient Light
-        var ambientLight = new THREE.HemisphereLight(0x343c57, 0x323b2e, 1.);
+        var ambientLight = new THREE.HemisphereLight(0x343c57, 0x323b2e, 1.2);
         this.instance.add(ambientLight);
 
         // Test Worker

@@ -62,8 +62,9 @@ export default class Scene {
         this.assetsToLoad += this.objects.length;
 
         for (let i = 0; i < this.objects.length; i++) {
-            ModelLoader.load(this.objects[i].modelUrl, this.objects[i].materials, (modelLoaded) => {
+            ModelLoader.load(this.objects[i].modelUrl, this.objects[i].materials, this.objects[i].lights, this.objects[i].hasShadows, (modelLoaded) => {
                 this.objects[i].model = modelLoaded;
+                this.objects[i].model.name = this.objects[i].name;
                 this.updateLoader();
             });
         }
@@ -88,5 +89,9 @@ export default class Scene {
     unload() {
         if (window.DEBUG)
             console.log('%cLoader%c Clear loader', "color:white;background:gray;padding:2px 4px;", "color:black");
+        for (let i = 0; i < this.objects.length; i++) {
+            this.objects[i].destroy();
+        }
     }
+
 }

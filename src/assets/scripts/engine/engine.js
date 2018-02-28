@@ -25,7 +25,7 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.BasicShadowMap
+        this.renderer.shadowMap.type = THREE.PCFShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
 
@@ -42,7 +42,7 @@ class Engine {
         this.hasStarted = false;
         this.isPlaying = false;
 
-        this.updateFunctions = [];
+        this.updateFunctions = {};
         this.resizeFunctions = [];
 
         this.bindEvents();
@@ -120,7 +120,12 @@ class Engine {
 
     addToUpdate(fct) {
         if (typeof fct !== 'function') return;
-        this.updateFunctions.push(fct);
+        this.updateFunctions[fct.name] = fct;
+    }
+
+    removeToUpdate(fct) {
+        if (typeof fct !== 'function') return;
+        delete this.updateFunctions[fct.name];
     }
 
     resize() {
@@ -135,6 +140,13 @@ class Engine {
         this.renderer.setPixelRatio(this.pixelDensity);
 
         this.postprod.resize(this.width, this.height, this.pixelDensity);
+
+        if (!this.isPlaying && this.hasStarted) {
+            this.play();
+            requestAnimationFrame(_ => {
+                this.pause();
+            });
+        }
     }
 
     registerScene(scene) {
@@ -243,8 +255,8 @@ class Engine {
         this.postprod.update(time);
 
         //Update all objects
-        for (let i = 0; i < this.updateFunctions.length; i++) {
-            this.updateFunctions[i]();
+        for (let key in this.updateFunctions) {
+            this.updateFunctions[key]();
         }
 
         //Store lastTick
