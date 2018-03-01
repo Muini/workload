@@ -17,9 +17,12 @@ export default new Scene({
         cameraController.position.z = 15;
         cameraController.rotation.y = (45 / 180) * 3.14;
 
-        // let camera = new THREE.PerspectiveCamera(50, Engine.width / Engine.height, 1, 180000);
+        // let camera = new THREE.PerspectiveCamera(20, Engine.width / Engine.height, 1, 180000);
         let cameraDistance = 150 * Engine.height / 1000;
-        let camera = new THREE.OrthographicCamera(Engine.width / -cameraDistance, Engine.width / cameraDistance, Engine.height / cameraDistance, Engine.height / -cameraDistance, 1, 180000);
+        let camera = new THREE.OrthographicCamera(Engine.width / -cameraDistance, Engine.width / cameraDistance, Engine.height / cameraDistance, Engine.height / -cameraDistance, 1, 1500);
+        Engine.addToResize(_ => {
+            camera.distance = 150 * Engine.height / 1000;
+        })
         camera.distance = cameraDistance;
         camera.position.x = 0;
         camera.position.y = 0;
@@ -29,31 +32,30 @@ export default new Scene({
 
         cameraController.add(camera);
 
-        // mainScene.addObject(cameraController);
         this.setCamera(camera);
         this.instance.add(cameraController);
 
         // Floor
-        var floorGeometry = new THREE.PlaneGeometry(100, 100, 1, 1);
-        var floorMaterial = new THREE.MeshStandardMaterial({
+        let floorGeometry = new THREE.PlaneGeometry(100, 100, 1, 1);
+        let floorMaterial = new THREE.MeshStandardMaterial({
             name: 'Floor',
             color: new THREE.Color(0x383733),
             roughness: .9,
             metalness: .0,
             dithering: true,
         })
-        var plane = new THREE.Mesh(floorGeometry, floorMaterial);
+        let plane = new THREE.Mesh(floorGeometry, floorMaterial);
         plane.rotation.x = -3.14 / 2;
         plane.castShadow = true;
         plane.receiveShadow = true;
         this.instance.add(plane);
 
         // Ambient Light
-        var ambientLight = new THREE.HemisphereLight(0x343c57, 0x323b2e, 1.2);
+        let ambientLight = new THREE.HemisphereLight(0x343c57, 0x323b2e, 1.2);
         this.instance.add(ambientLight);
 
         // Test Worker
-        let worker = new Worker({ scene: this });
+        let worker = new Worker({ parent: this });
 
     },
 });

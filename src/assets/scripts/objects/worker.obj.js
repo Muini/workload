@@ -2,13 +2,13 @@ import * as THREE from 'three';
 
 import Object from '../engine/object';
 
-export const modelUrl = '/static/models/worker.glb';
+import { PaperBlock } from './paperBlock.obj';
 
 export class Worker extends Object {
-    constructor(opt = {}) {
+    constructor(opt) {
         super(opt);
         this.name = 'worker';
-        this.modelUrl = modelUrl;
+        this.modelName = 'worker.model';
         this.hasShadows = true;
     }
 
@@ -52,6 +52,8 @@ export class Worker extends Object {
         this.lights['Desk_Spot'].castShadow = true;
 
         super.init();
+
+        this.paperBlock = new PaperBlock({ parent: this.scene });
     }
 
     awake() {

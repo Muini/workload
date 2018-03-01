@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Engine from './engine.js';
 
-import ModelLoader from '../engine/modelLoader';
+import AssetsManager from '../engine/assetsManager';
 
 export default class Scene {
     constructor(opt = {
@@ -18,6 +18,8 @@ export default class Scene {
         this.instance = new THREE.Scene();
         this.instance.updateMatrixWorld(true);
         this.instance.name = this.name;
+
+        this.isScene = true;
 
         this.mainCamera = undefined;
 
@@ -57,38 +59,20 @@ export default class Scene {
 
     load(callback) {
 
-        this.callback = callback;
         // Get all entites, load their assets (sounds, models, textures)
         this.assetsToLoad += this.objects.length;
 
-        for (let i = 0; i < this.objects.length; i++) {
-            ModelLoader.load(this.objects[i].modelUrl, this.objects[i].materials, this.objects[i].lights, this.objects[i].hasShadows, (modelLoaded) => {
-                this.objects[i].model = modelLoaded;
-                this.objects[i].model.name = this.objects[i].name;
-                this.updateLoader();
-            });
-        }
-    }
-
-    updateLoader() {
-        this.assetsLoaded++;
-        if (window.DEBUG)
-            console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' assets loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
-        if (this.assetsLoaded >= this.assetsToLoad) {
-            this.onLoaded();
-        }
-    }
-
-    onLoaded() {
-        if (window.DEBUG)
-            console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
-        this.awakeObjects();
-        this.callback();
+        AssetsManager.loadAssetsFromScene(this.name, _ => {
+            if (window.DEBUG)
+                console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
+            this.awakeObjects();
+            callback();
+        });
     }
 
     unload() {
         if (window.DEBUG)
-            console.log('%cLoader%c Clear loader', "color:white;background:gray;padding:2px 4px;", "color:black");
+            console.log('%cEngine%c Clear scene %c' + this.name, "color:white;background:gray;padding:2px 4px;", "color:black", "color:DodgerBlue");
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].destroy();
         }

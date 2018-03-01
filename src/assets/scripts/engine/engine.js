@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import Looper from '../vendors/looper';
 import PostProd from './postprod';
+import SoundEngine from './soundEngine';
 
 window.DEBUG = true;
 
 class Engine {
     constructor(opt = {}) {
-        // if (window.Engine != undefined) throw 'Engine is already defined, please use it as a singleton';
 
         if (window.DEBUG) {
             this.stats = new Stats();
@@ -70,8 +70,6 @@ class Engine {
             window.renderer = this.renderer;
             console.log('%cEngine%c Init : width ' + this.width + 'px, height ' + this.height + 'px, pixelRatio ' + this.pixelDensity, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         }
-
-        // window.Engine = this;
     }
 
     appendCanvas(container) {
