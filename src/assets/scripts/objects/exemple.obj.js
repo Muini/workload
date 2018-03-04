@@ -5,12 +5,14 @@ import Object from '../engine/object';
 export class Exemple extends Object {
     constructor(opt = {}) {
         super(opt);
-        this.name = 'exemple';
-        this.modelName = 'exemple.model';
-        this.hasShadows = true;
     }
 
     init() {
+        //Init variables
+        this.name = 'exemple';
+        this.modelName = 'exemple.model';
+        this.hasShadows = true;
+
         // Init materials to be overwrite by name
         this.materials['ExempleMaterial'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0xCFCFCF),
@@ -34,6 +36,6 @@ export class Exemple extends Object {
         // Is fired when the object is added to the scene
     }
 
-    update(time) {}
+    update(time, delta) {}
 
 }

@@ -26,7 +26,8 @@ export default class Object {
 
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
 
-        Engine.addToUpdate(this.update.bind(this));
+        this.updateUID = '';
+        Engine.addToUpdate(this.update.bind(this), (uid) => { this.updateUID = uid });
         this._isUpdating = true;
 
         this.init();
@@ -42,9 +43,7 @@ export default class Object {
         }
         //If the engine has started, it means it's an instanciation
         if (Engine.hasStarted) {
-            requestAnimationFrame(_ => {
-                this.awake();
-            });
+            this.awake();
         }
     }
 
@@ -57,12 +56,12 @@ export default class Object {
         this.isActive = bool;
         if (this.isActive) {
             if (!this._isUpdating) {
-                Engine.addToUpdate(this.update.bind(this));
+                Engine.addToUpdate(this.update.bind(this), (uid) => { this.updateUID = uid });
                 this._isUpdating = true;
             }
         } else {
             if (this._isUpdating) {
-                Engine.removeToUpdate(this.update.bind(this));
+                Engine.removeToUpdate(this.updateUID);
                 this._isUpdating = false;
             }
         }
@@ -142,7 +141,7 @@ export default class Object {
         this.model.name = this.name;
     }
 
-    update(time) {}
+    update(time, delta) {}
 
     onClicked() {
         if (!this.isActive) return;
@@ -151,7 +150,7 @@ export default class Object {
     destroy() {
         this.setActive(false);
         if (this._isUpdating) {
-            Engine.removeToUpdate(this.update.bind(this));
+            Engine.removeToUpdate(this.updateUID);
             this._isUpdating = false;
         }
         this.name = null;

@@ -3,6 +3,7 @@ import Stats from 'stats.js';
 import Looper from '../vendors/looper';
 import PostProd from './postprod';
 import SoundEngine from './soundEngine';
+import * as TWEEN from 'es6-tween';
 
 window.DEBUG = true;
 
@@ -28,6 +29,10 @@ class Engine {
         this.renderer.shadowMap.type = THREE.PCFShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
+        this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
+        this.renderer.physicallyCorrectLights = false;
+        this.renderer.gammaInput = true;
+        this.renderer.gammaOutput = true;
 
         this.startTick = undefined;
         this.lastTick = undefined;
@@ -56,11 +61,11 @@ class Engine {
             renderer: this.renderer,
             passes: {
                 fxaa: { enabled: true },
-                film: { enabled: false },
+                film: { enabled: true },
                 vignette: { enabled: false, options: [.6, 1.4] },
                 zoomBlur: { enabled: false, options: { center: 0.5, intensity: 0. } },
                 chromatic: { enabled: false, options: { intensity: 5.0 } },
-                bloom: { enabled: true, options: [0.25, -1.0, 0.9] },
+                bloom: { enabled: true, options: [0.25, -1.0, 0.95] },
                 sharpen: { enabled: true },
             }
         });
@@ -70,6 +75,12 @@ class Engine {
             window.renderer = this.renderer;
             console.log('%cEngine%c Init : width ' + this.width + 'px, height ' + this.height + 'px, pixelRatio ' + this.pixelDensity, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         }
+    }
+
+    uuid() {
+        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        )
     }
 
     appendCanvas(container) {
@@ -116,14 +127,22 @@ class Engine {
         this.resizeFunctions.push(fct);
     }
 
-    addToUpdate(fct) {
+    addToUpdate(fct, callback) {
         if (typeof fct !== 'function') return;
-        this.updateFunctions[fct.name] = fct;
+        let uid = this.uuid();
+        this.updateFunctions[uid] = fct;
+        callback(uid);
     }
 
-    removeToUpdate(fct) {
-        if (typeof fct !== 'function') return;
-        delete this.updateFunctions[fct.name];
+    waitNextTick(fct) {
+        requestAnimationFrame(_ => {
+            fct();
+        });
+    }
+
+    removeToUpdate(uid) {
+        if (!this.updateFunctions[uid]) return;
+        delete this.updateFunctions[uid];
     }
 
     resize() {
@@ -141,7 +160,7 @@ class Engine {
 
         if (!this.isPlaying && this.hasStarted) {
             this.play();
-            requestAnimationFrame(_ => {
+            this.waitNextTick(_ => {
                 this.pause();
             });
         }
@@ -193,7 +212,7 @@ class Engine {
         this.hasStarted = false;
     }
 
-    adaptiveRenderer(time) {
+    adaptiveRenderer(time, delta) {
         if (this.lastTick == null) return;
         if (this.performanceCycleNbr >= this.performanceCycleLength) return;
 
@@ -237,12 +256,12 @@ class Engine {
         }
     }
 
-    update(time) {
+    update(time, delta) {
         if (window.DEBUG)
             this.stats.begin();
 
         //Check if we need to downgrade the renderer
-        this.adaptiveRenderer(time);
+        this.adaptiveRenderer(time, delta);
 
         //Render the scene
         //this.renderer.clear();
@@ -250,11 +269,13 @@ class Engine {
         this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
 
         //Update & Render Post processing effects
-        this.postprod.update(time);
+        this.postprod.update(time, delta);
+
+        TWEEN.update(time);
 
         //Update all objects
         for (let key in this.updateFunctions) {
-            this.updateFunctions[key]();
+            this.updateFunctions[key](time, delta);
         }
 
         //Store lastTick

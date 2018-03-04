@@ -15,6 +15,8 @@ export default class Looper {
         this.actions = []
         this.actionsName = []
         this.actionsLength = 0
+
+        this.lastTime = 0;
     }
 
     bind(arr) {
@@ -24,16 +26,21 @@ export default class Looper {
         })
     }
 
-    loop(time, delta) {
+    loop(time) {
         let i
         let l = this.actionsLength
 
         if (l.length === 0) return
 
+        let now = Date.now(),
+            dt = now - (this.lastTime || now);
+
+        this.lastTime = now;
+
         const actionsCall = function() {
             for (i = 0; i < l; i++) {
                 if (i > l) return
-                this.actions[i].call(this, time)
+                this.actions[i].call(this, time, dt)
             }
         }
 
@@ -51,7 +58,7 @@ export default class Looper {
                     throw new Error('onStart is not a function.')
                 }
             }
-            this.then = Date.now()
+            this.lastTime = Date.now();
             requestAnimationFrame(time => this.loop(time))
         }
     }

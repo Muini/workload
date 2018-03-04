@@ -19,7 +19,8 @@
  * This version is provided under a Creative Commons Attribution 3.0 License
  * http://creativecommons.org/licenses/by/3.0/
  */
-import * as THREE from 'three';
+
+import * as THREE from 'three'
 
 THREE.FilmShader = {
 
@@ -27,8 +28,8 @@ THREE.FilmShader = {
 
         "tDiffuse": { value: null },
         "time": { value: 0.0 },
-        "nIntensity": { value: 0.1 },
-        "sIntensity": { value: 0 },
+        "nIntensity": { value: 0.05 },
+        "sIntensity": { value: 0.0 },
         "sCount": { value: 4096 },
         "grayscale": { value: 0 }
 

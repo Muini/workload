@@ -12,7 +12,8 @@ THREE.SharpenShader = {
     uniforms: {
 
         "tDiffuse": { value: null },
-        "resolution": { value: new THREE.Vector2(1 / 1024, 1 / 512) }
+        "resolution": { value: new THREE.Vector2(1 / 1024, 1 / 512) },
+        "uLookup": { value: null },
 
     },
 
@@ -29,27 +30,6 @@ THREE.SharpenShader = {
 
     ].join("\n"),
 
-    fragmentShader: [
-        `
-        uniform sampler2D tDiffuse;
-        uniform vec2 resolution;
-        varying vec2 vUv;
-
-        void main() {
-
-            float dx = 1.0 / resolution.x;
-            float dy = 1.0 / resolution.y;
-            vec4 sum = vec4(0.0);
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( -.05 * dx , 0.0 * dy));
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , -.05 * dy));
-            sum += 5. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , 0.0 * dy));
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , .05 * dy));
-            sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( .05 * dx , 0.0 * dy));
-
-            gl_FragColor = sum;
-        }
-
-        `
-    ].join("\n"),
+    fragmentShader: require('./sharpen.frag'),
 
 };

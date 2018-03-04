@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "element-resize-detector": "^1.1.12",
+        "es6-tween": "^5.1.0",
         "fastclick": "^1.0.6",
         "glsl-lut": "^1.1.0",
         "howler": "^2.0.7",

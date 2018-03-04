@@ -81,6 +81,10 @@ export default class PostProd {
         //Sharpen
         if (this.passes.sharpen.enabled) {
             this.sharpenPass = new THREE.ShaderPass(THREE.SharpenShader);
+            let lutTexture = new THREE.TextureLoader().load('/static/img/lut-gamma.png');
+            lutTexture.minFilter = THREE.NearestFilter;
+            lutTexture.magFilter = THREE.NearestFilter;
+            this.sharpenPass.uniforms['uLookup'].value = lutTexture;
             this.sharpenPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
         }
 
@@ -106,14 +110,9 @@ export default class PostProd {
         //Render Order
         this.composer.addPass(this.renderPassScene);
 
-        if (this.passes.sharpen.enabled) {
-            this.composer.addPass(this.sharpenPass);
-        }
+
         if (this.passes.fxaa.enabled) {
             this.composer.addPass(this.FXAAPass);
-        }
-        if (this.passes.film.enabled) {
-            this.composer.addPass(this.filmPass);
         }
         if (this.passes.zoomBlur.enabled) {
             this.composer.addPass(this.zoomBlurPass);
@@ -121,14 +120,17 @@ export default class PostProd {
         if (this.passes.chromatic.enabled) {
             this.composer.addPass(this.rgbSplitPass);
         }
-        if (this.passes.sharpen.enabled) {
-            this.composer.addPass(this.sharpenPass);
+        if (this.passes.vignette.enabled) {
+            this.composer.addPass(this.vignettePass);
         }
         if (this.passes.bloom.enabled) {
             this.composer.addPass(this.bloomPass);
         }
-        if (this.passes.vignette.enabled) {
-            this.composer.addPass(this.vignettePass);
+        if (this.passes.film.enabled) {
+            this.composer.addPass(this.filmPass);
+        }
+        if (this.passes.sharpen.enabled) {
+            this.composer.addPass(this.sharpenPass);
         }
         this.composer.addPass(this.copyShader);
 
@@ -143,11 +145,11 @@ export default class PostProd {
         this.renderPassScene.camera = this.camera;
     }
 
-    update(time) {
+    update(time, delta) {
         if (!this.scene || !this.camera) return;
 
         if (this.passes.film.enabled) {
-            this.filmPass.uniforms['time'].value = time;
+            this.filmPass.uniforms['time'].value = Math.sin(time);
         }
         if (this.passes.zoomBlur.enabled) {
             this.zoomBlurPass.uniforms['strength'].value = this.passes.zoomBlur.options.intensity;
@@ -157,7 +159,7 @@ export default class PostProd {
             this.rgbSplitPass.uniforms['delta'].value.y = this.passes.chromatic.options.intensity;
         }
 
-        this.composer.render(time);
+        this.composer.render(delta);
 
     }
 

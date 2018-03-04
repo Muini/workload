@@ -7,12 +7,14 @@ import { PaperBlock } from './paperBlock.obj';
 export class Worker extends Object {
     constructor(opt) {
         super(opt);
-        this.name = 'worker';
-        this.modelName = 'worker.model';
-        this.hasShadows = true;
     }
 
     init() {
+        //Init variables
+        this.name = 'worker';
+        this.modelName = 'worker.model';
+        this.hasShadows = true;
+
         // Init materials
         this.materials['ABS'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0x494742),
@@ -61,7 +63,7 @@ export class Worker extends Object {
 
     }
 
-    update(time) {
+    update(time, delta) {
         this.materials['Screen'].emissiveIntensity = THREE.Math.randFloat(0.9, 1.);
         this.lights['Desk_Screen_Light'].intensity = THREE.Math.randFloat(1.9, 2.1);
     }
