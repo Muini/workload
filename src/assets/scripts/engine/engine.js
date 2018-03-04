@@ -61,12 +61,8 @@ class Engine {
             renderer: this.renderer,
             passes: {
                 fxaa: { enabled: true },
-                film: { enabled: true },
-                vignette: { enabled: false, options: [.6, 1.4] },
-                zoomBlur: { enabled: false, options: { center: 0.5, intensity: 0. } },
-                chromatic: { enabled: false, options: { intensity: 5.0 } },
                 bloom: { enabled: true, options: [0.25, -1.0, 0.95] },
-                sharpen: { enabled: true },
+                filmic: { enabled: true },
             }
         });
 

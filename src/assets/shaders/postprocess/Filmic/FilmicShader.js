@@ -7,13 +7,26 @@
  */
 import * as THREE from 'three';
 
-THREE.SharpenShader = {
+THREE.FilmicShader = {
 
     uniforms: {
 
         "tDiffuse": { value: null },
         "resolution": { value: new THREE.Vector2(1 / 1024, 1 / 512) },
-        "uLookup": { value: null },
+
+        "time": { value: 0.0 },
+
+        "sharpenStrength": { value: 0.1 },
+
+        "noiseStrength": { value: 0.05 },
+
+        "rgbSplitStrength": { value: 5.0 },
+
+        "vignetteStrength": { value: 1.0 },
+        "vignetteOffset": { value: 1.0 },
+
+        "LUTtexture": { value: null },
+        "LUTstrength": { value: 1.0 },
 
     },
 
@@ -30,6 +43,6 @@ THREE.SharpenShader = {
 
     ].join("\n"),
 
-    fragmentShader: require('./sharpen.frag'),
+    fragmentShader: require('./filmic.frag'),
 
 };

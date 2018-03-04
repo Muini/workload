@@ -8,11 +8,7 @@ import '../../shaders/postprocess/Convolution/ConvolutionShader';
 import '../../shaders/postprocess/LuminosityHighPass/LuminosityHighPassShader';
 import '../../shaders/postprocess/FXAA/FXAAShader';
 import '../../shaders/postprocess/Bloom/BloomShader';
-import '../../shaders/postprocess/RGBSplit/RGBShiftShader';
-import '../../shaders/postprocess/FilmShader/FilmShader';
-import '../../shaders/postprocess/Vignette/VignetteShader';
-import '../../shaders/postprocess/ZoomBlur/ZoomBlurShader';
-import '../../shaders/postprocess/Sharpen/SharpenShader';
+import '../../shaders/postprocess/Filmic/FilmicShader';
 
 export default class PostProd {
     constructor(opt = {
@@ -32,12 +28,8 @@ export default class PostProd {
         this.renderer = opt.renderer;
         this.passes = opt.passes || {
             fxaa: { enabled: false },
-            film: { enabled: false, options: [-1.5, 1.5, 648, true] },
-            vignette: { enabled: false, options: [.5, 1.4] },
-            zoomBlur: { enabled: false, options: { center: .5, intensity: 20. } },
-            chromatic: { enabled: false, options: { intensity: 10. } },
             bloom: { enabled: false, options: [1.0, 3.0, 0.85] },
-            sharpen: { enabled: false },
+            filmic: { enabled: false },
         }
 
         /*
@@ -51,41 +43,14 @@ export default class PostProd {
 
         this.composer = new THREE.EffectComposer(this.renderer);
 
-        //Film Effect
-        if (this.passes.film.enabled) {
-            this.filmPass = new THREE.ShaderPass(THREE.FilmShader);
-        }
-
-        //Vignette
-        if (this.passes.vignette.enabled) {
-            this.vignettePass = new THREE.ShaderPass(THREE.VignetteShader)
-            this.vignettePass.uniforms['offset'].value = this.passes.vignette.options[0];
-            this.vignettePass.uniforms['darkness'].value = this.passes.vignette.options[1];
-        }
-
-        //ZoomBlur
-        if (this.passes.zoomBlur.enabled) {
-            this.zoomBlurPass = new THREE.ShaderPass(THREE.ZoomBlurShader)
-            this.zoomBlurPass.uniforms['center'].value = new THREE.Vector2(this.passes.zoomBlur.options.center, this.passes.zoomBlur.options.center);
-            this.zoomBlurPass.uniforms['strength'].value = this.passes.zoomBlur.options.intensity;
-            this.zoomBlurPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
-        }
-
-        //RGB Split (Chromatic aberation)
-        if (this.passes.chromatic.enabled) {
-            this.rgbSplitPass = new THREE.ShaderPass(THREE.RGBShiftShader);
-            this.rgbSplitPass.uniforms['delta'].value = new THREE.Vector2(this.passes.chromatic.options.intensity, this.passes.chromatic.options.intensity);
-            this.rgbSplitPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
-        }
-
-        //Sharpen
-        if (this.passes.sharpen.enabled) {
-            this.sharpenPass = new THREE.ShaderPass(THREE.SharpenShader);
+        //filmic
+        if (this.passes.filmic.enabled) {
+            this.filmicPass = new THREE.ShaderPass(THREE.FilmicShader);
             let lutTexture = new THREE.TextureLoader().load('/static/img/lut-gamma.png');
             lutTexture.minFilter = THREE.NearestFilter;
             lutTexture.magFilter = THREE.NearestFilter;
-            this.sharpenPass.uniforms['uLookup'].value = lutTexture;
-            this.sharpenPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+            this.filmicPass.uniforms['LUTtexture'].value = lutTexture;
+            this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
         }
 
         //Bloom
@@ -114,23 +79,11 @@ export default class PostProd {
         if (this.passes.fxaa.enabled) {
             this.composer.addPass(this.FXAAPass);
         }
-        if (this.passes.zoomBlur.enabled) {
-            this.composer.addPass(this.zoomBlurPass);
-        }
-        if (this.passes.chromatic.enabled) {
-            this.composer.addPass(this.rgbSplitPass);
-        }
-        if (this.passes.vignette.enabled) {
-            this.composer.addPass(this.vignettePass);
+        if (this.passes.filmic.enabled) {
+            this.composer.addPass(this.filmicPass);
         }
         if (this.passes.bloom.enabled) {
             this.composer.addPass(this.bloomPass);
-        }
-        if (this.passes.film.enabled) {
-            this.composer.addPass(this.filmPass);
-        }
-        if (this.passes.sharpen.enabled) {
-            this.composer.addPass(this.sharpenPass);
         }
         this.composer.addPass(this.copyShader);
 
@@ -148,15 +101,8 @@ export default class PostProd {
     update(time, delta) {
         if (!this.scene || !this.camera) return;
 
-        if (this.passes.film.enabled) {
-            this.filmPass.uniforms['time'].value = Math.sin(time);
-        }
-        if (this.passes.zoomBlur.enabled) {
-            this.zoomBlurPass.uniforms['strength'].value = this.passes.zoomBlur.options.intensity;
-        }
-        if (this.passes.chromatic.enabled) {
-            this.rgbSplitPass.uniforms['delta'].value.x = this.passes.chromatic.options.intensity;
-            this.rgbSplitPass.uniforms['delta'].value.y = this.passes.chromatic.options.intensity;
+        if (this.passes.filmic.enabled) {
+            this.filmicPass.uniforms['time'].value = Math.sin(time);
         }
 
         this.composer.render(delta);
@@ -169,17 +115,11 @@ export default class PostProd {
         this.pixelDensity = pixelDensity;
         this.composer.setSize(this.width * this.pixelDensity, this.height * this.pixelDensity);
 
-        if (this.passes.chromatic.enabled) {
-            this.rgbSplitPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
-        }
         if (this.passes.fxaa.enabled) {
             this.FXAAPass.uniforms['resolution'].value = new THREE.Vector2(1 / this.width, 1 / this.height);
         }
-        if (this.passes.zoomBlur.enabled) {
-            this.zoomBlurPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
-        }
-        if (this.passes.sharpen.enabled) {
-            this.sharpenPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+        if (this.passes.filmic.enabled) {
+            this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
         }
     }
 }

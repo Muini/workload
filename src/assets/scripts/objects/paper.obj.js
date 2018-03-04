@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import Object from '../engine/object';
 
 import { Tween } from 'es6-tween';
-import 'es6tween-plugin-three';
 
 export class Paper extends Object {
     constructor(opt = {}) {
