@@ -7,10 +7,9 @@ class ModelLoader {
 
     load(modelUrl, callback) {
         this.loader.load(modelUrl,
-            (data) => {
-                // console.log(data);
-                data.scene.children[0].rotation.z = 3.14 * 2;
-                callback(data.scene.children[0]);
+            (gltf) => {
+                console.log(modelUrl, gltf);
+                callback(gltf);
             });
     }
 }

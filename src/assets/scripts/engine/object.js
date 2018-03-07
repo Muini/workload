@@ -1,16 +1,19 @@
 import * as THREE from 'three';
 import Engine from './engine';
 import AssetsManager from './assetsManager';
+import Animator from './animator';
 
 export default class Object {
     constructor(opt = {
         parent,
         position,
+        rotation,
     }) {
         this.name = 'unnamed object';
 
         this.model = undefined;
         this.modelName = undefined;
+        this.animator = undefined;
 
         this.materials = {};
         this.lights = {};
@@ -20,11 +23,12 @@ export default class Object {
         this.isVisible = true;
 
         this.parent = opt.parent || undefined;
-        if (!this.parent) throw 'Object parameter "parent" is mandatory and should be a Object type';
+        if (!this.parent) throw 'Object parameter "parent" is mandatory and should be a Object or Scene type';
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.scene.addObject(this);
 
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
+        this.rotation = opt.rotation || new THREE.Vector3(0, 0, 0);
 
         this.updateUID = '';
         Engine.addToUpdate(this.update.bind(this), (uid) => { this.updateUID = uid });
@@ -70,11 +74,23 @@ export default class Object {
 
     // Awake happen when the scene is loaded into the engine & started to be used
     awake() {
-        this.model = this.modelName ? AssetsManager.getAsset('model', this.modelName) : new THREE.Object3D();
-        this.overwriteModelParameters();
-        this.model.position.x = this.position.x;
-        this.model.position.y = this.position.y;
-        this.model.position.z = this.position.z;
+        if (this.modelName) {
+            const asset = AssetsManager.getAsset('model', this.modelName);
+            this.model = asset.model;
+            if (asset.animations.length) {
+                this.animator = new Animator({ model: this.model, animations: asset.animations });
+            }
+            this.overwriteModelParameters();
+        } else {
+            this.model = new THREE.Object3D();
+            this.rotation.x += Math.PI / 2; //hack inverted axis
+        }
+        this.model.position.x += this.position.x;
+        this.model.position.y += this.position.y;
+        this.model.position.z += this.position.z;
+        this.model.rotation.x += this.rotation.x;
+        this.model.rotation.y += this.rotation.y;
+        this.model.rotation.z += this.rotation.z;
         if (this.parent.isScene) {
             this.scene.instance.add(this.model);
         } else {
@@ -84,13 +100,13 @@ export default class Object {
 
     overwriteModelParameters() {
         function updateLights(child, lights) {
-            if (child.type != 'SpotLight' && child.type != 'PointLight' && child.type != 'DirectionalLight') return;
+            if (child.isSpotLight && !child.isPointLight && child.isDirectionalLight) return;
 
             child.decay = 2;
             child.penumbra = 0.8;
             child.angle /= 2.;
 
-            if (child.type == 'PointLight') {
+            if (child.isPointLight) {
                 child.distance = 5.0;
             }
             //Overwrite lights
@@ -98,8 +114,9 @@ export default class Object {
                 if (child.name == light) {
                     child.color = lights[light].color;
                     child.intensity = lights[light].intensity;
+                    child.power = lights[light].power;
                     child.castShadow = lights[light].castShadow;
-                    if (child.type == 'PointLight') {
+                    if (child.isPointLight) {
                         child.distance = lights[light].distance;
                     }
                     lights[light] = child;
@@ -109,20 +126,22 @@ export default class Object {
         }
 
         function updateMaterials(child, materials) {
-            if (child.type !== 'Mesh') return
-
             //Overwrite materials
             for (let material in materials) {
                 if (child.material.length) {
                     for (let m = 0; m < child.material.length; m++) {
                         // console.log(child.material[m].name)
                         if (material == child.material[m].name) {
+                            if (child.isSkinnedMesh)
+                                materials[material].skinning = true;
                             child.material[m] = materials[material];
                         }
                     }
                 } else {
                     // console.log(child.material.name)
                     if (material == child.material.name) {
+                        if (child.isSkinnedMesh)
+                            materials[material].skinning = true;
                         child.material = materials[material];
                     }
                 }
@@ -130,7 +149,7 @@ export default class Object {
         }
 
         this.model.traverse((child) => {
-            if (child.isMesh) {
+            if (child.isMesh || child.isSkinnedMesh) {
                 child.castShadow = this.hasShadows;
                 child.receiveShadow = true;
                 updateMaterials(child, this.materials);
@@ -141,7 +160,10 @@ export default class Object {
         this.model.name = this.name;
     }
 
-    update(time, delta) {}
+    update(time, delta) {
+        if (this.animator)
+            this.animator.update(time, delta);
+    }
 
     onClicked() {
         if (!this.isActive) return;
@@ -153,6 +175,9 @@ export default class Object {
             Engine.removeToUpdate(this.updateUID);
             this._isUpdating = false;
         }
+        if (this.animator)
+            this.animator.destroy();
+        this.animator = null;
         this.name = null;
         this.model = null;
         this.modelUrl = null;

@@ -17,6 +17,7 @@ class Engine {
 
         this.currentScene = undefined;
 
+        // this.fixedRatio = (16 / 9);
         this.width = window.innerWidth;
         this.height = window.innerHeight;
 
@@ -30,6 +31,7 @@ class Engine {
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
+        this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
         this.renderer.physicallyCorrectLights = false;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
@@ -61,8 +63,17 @@ class Engine {
             renderer: this.renderer,
             passes: {
                 fxaa: { enabled: true },
-                bloom: { enabled: true, options: [0.25, -1.0, 0.95] },
-                filmic: { enabled: true },
+                bloom: { enabled: true, options: [0.5, 1.0, 0.95] },
+                filmic: {
+                    enabled: true,
+                    sharpen: 0.1,
+                    noise: 0.05,
+                    rgbSplit: 5.0,
+                    vignette: 10.0,
+                    vignetteOffset: 0.2,
+                    lut: .7,
+                    lutURL: '/static/img/lut-gamma.png',
+                },
             }
         });
 
@@ -134,6 +145,12 @@ class Engine {
         requestAnimationFrame(_ => {
             fct();
         });
+    }
+
+    wait(fct, timeToWait) {
+        setTimeout(_ => {
+            this.waitNextTick(fct);
+        }, timeToWait);
     }
 
     removeToUpdate(uid) {

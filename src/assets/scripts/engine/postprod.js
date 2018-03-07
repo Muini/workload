@@ -29,7 +29,16 @@ export default class PostProd {
         this.passes = opt.passes || {
             fxaa: { enabled: false },
             bloom: { enabled: false, options: [1.0, 3.0, 0.85] },
-            filmic: { enabled: false },
+            filmic: {
+                enabled: false,
+                sharpen: 0.1,
+                noise: 0.05,
+                rgbSplit: 5.0,
+                vignette: 1.0,
+                vignetteOffset: 1.0,
+                lut: 1.0,
+                lutURL: '/static/img/lut.png',
+            },
         }
 
         /*
@@ -46,11 +55,22 @@ export default class PostProd {
         //filmic
         if (this.passes.filmic.enabled) {
             this.filmicPass = new THREE.ShaderPass(THREE.FilmicShader);
-            let lutTexture = new THREE.TextureLoader().load('/static/img/lut-gamma.png');
+            this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+
+            this.filmicPass.uniforms['sharpenStrength'].value = this.passes.filmic.sharpen;
+
+            this.filmicPass.uniforms['noiseStrength'].value = this.passes.filmic.noise;
+
+            this.filmicPass.uniforms['rgbSplitStrength'].value = this.passes.filmic.rgbSplit;
+
+            this.filmicPass.uniforms['vignetteStrength'].value = this.passes.filmic.vignette;
+            this.filmicPass.uniforms['vignetteOffset'].value = this.passes.filmic.vignetteOffset;
+
+            let lutTexture = new THREE.TextureLoader().load(this.passes.filmic.lutURL);
             lutTexture.minFilter = THREE.NearestFilter;
             lutTexture.magFilter = THREE.NearestFilter;
             this.filmicPass.uniforms['LUTtexture'].value = lutTexture;
-            this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+            this.filmicPass.uniforms['LUTstrength'].value = this.passes.filmic.lut;
         }
 
         //Bloom
@@ -79,11 +99,11 @@ export default class PostProd {
         if (this.passes.fxaa.enabled) {
             this.composer.addPass(this.FXAAPass);
         }
-        if (this.passes.filmic.enabled) {
-            this.composer.addPass(this.filmicPass);
-        }
         if (this.passes.bloom.enabled) {
             this.composer.addPass(this.bloomPass);
+        }
+        if (this.passes.filmic.enabled) {
+            this.composer.addPass(this.filmicPass);
         }
         this.composer.addPass(this.copyShader);
 

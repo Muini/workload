@@ -51,7 +51,7 @@ export default new Scene({
         this.instance.add(plane);
 
         // Ambient Light
-        let ambientLight = new THREE.HemisphereLight(0x343c57, 0x323b2e, 1.2);
+        let ambientLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 5);
         this.instance.add(ambientLight);
 
         // Test Worker

@@ -39,7 +39,7 @@ void main() {
         sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , sharpenStrength * dy));
         sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( sharpenStrength * dx , 0.0 * dy));
 
-        gl_FragColor.rgb = sum.rgb;
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, sum.rgb, 1.0);
     }
 
     if(rgbSplitStrength > 0.0){

@@ -36,6 +36,8 @@ export class Exemple extends Object {
         // Is fired when the object is added to the scene
     }
 
-    update(time, delta) {}
+    update(time, delta) {
+        super.update(time, delta);
+    }
 
 }
