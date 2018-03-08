@@ -30,6 +30,15 @@ body {
     min-height: 100%;
 }
 
+.hud-test {
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    color: greenyellow;
+    font-size: 30px;
+    font-weight: bold;
+}
+
 ::selection {
     color: $c-white;
     background: $c-black;

@@ -6,10 +6,14 @@ import AssetsManager from '../engine/assetsManager';
 export default class Scene {
     constructor(opt = {
         name,
+        data,
         setup,
+        onStart,
     }) {
         this.name = opt.name || 'unamed scene';
+        this.data = opt.data || {};
         this.setup = opt.setup || function() {};
+        this.onStart = opt.onStart || function() {};
 
         this.assetsToLoad = 0;
         this.assetsLoaded = 0;

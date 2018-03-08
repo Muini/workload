@@ -7,6 +7,60 @@ import * as TWEEN from 'es6-tween';
 
 window.DEBUG = true;
 
+/*
+ * object.watch polyfill
+ *
+ * 2012-04-03
+ *
+ * By Eli Grey, http://eligrey.com
+ * Public Domain.
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ */
+
+// object.watch
+if (!Object.prototype.watch) {
+    Object.defineProperty(Object.prototype, "watch", {
+        enumerable: false,
+        configurable: true,
+        writable: false,
+        value: function(prop, handler) {
+            var
+                oldval = this[prop],
+                newval = oldval,
+                getter = function() {
+                    return newval;
+                },
+                setter = function(val) {
+                    oldval = newval;
+                    return newval = handler.call(this, prop, oldval, val);
+                };
+
+            if (delete this[prop]) { // can't watch constants
+                Object.defineProperty(this, prop, {
+                    get: getter,
+                    set: setter,
+                    enumerable: true,
+                    configurable: true
+                });
+            }
+        }
+    });
+}
+
+// object.unwatch
+if (!Object.prototype.unwatch) {
+    Object.defineProperty(Object.prototype, "unwatch", {
+        enumerable: false,
+        configurable: true,
+        writable: false,
+        value: function(prop) {
+            var val = this[prop];
+            delete this[prop]; // remove accessors
+            this[prop] = val;
+        }
+    });
+}
+
 class Engine {
     constructor(opt = {}) {
 
@@ -27,7 +81,7 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFShadowMap; //THREE.BasicShadowMap
+        this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
@@ -66,9 +120,9 @@ class Engine {
                 bloom: { enabled: true, options: [0.5, 1.0, 0.95] },
                 filmic: {
                     enabled: true,
-                    sharpen: 0.1,
+                    sharpen: 0.2,
                     noise: 0.05,
-                    rgbSplit: 5.0,
+                    rgbSplit: 1.0,
                     vignette: 10.0,
                     vignetteOffset: 0.2,
                     lut: .7,
@@ -198,6 +252,7 @@ class Engine {
         if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
         if (window.DEBUG)
             console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        this.currentScene.onStart();
         this.hasStarted = true;
         this.play();
     }

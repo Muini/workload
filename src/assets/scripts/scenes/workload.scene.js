@@ -5,9 +5,12 @@ import Scene from '../engine/scene';
 
 import { Worker } from '../objects/worker.obj';
 
+import { ExempleDom } from '../objects/exemple.dom.obj';
+
 // Create scene
 export default new Scene({
     name: 'workload',
+    data: {},
     setup: function() {
         // Create & Add camera
         let cameraController = new THREE.Group();
@@ -17,7 +20,7 @@ export default new Scene({
         cameraController.position.z = 15;
         cameraController.rotation.y = (45 / 180) * 3.14;
 
-        // let camera = new THREE.PerspectiveCamera(20, Engine.width / Engine.height, 1, 180000);
+        // let camera = new THREE.PerspectiveCamera(10, Engine.width / Engine.height, 1, 180000);
         let cameraDistance = 150 * Engine.height / 1000;
         let camera = new THREE.OrthographicCamera(Engine.width / -cameraDistance, Engine.width / cameraDistance, Engine.height / cameraDistance, Engine.height / -cameraDistance, 1, 1500);
         Engine.addToResize(_ => {
@@ -55,7 +58,11 @@ export default new Scene({
         this.instance.add(ambientLight);
 
         // Test Worker
-        let worker = new Worker({ parent: this });
+        this.worker = new Worker({ parent: this });
+
+        this.testdom = new ExempleDom({ parent: this });
+
 
     },
+    onStart: function() {}
 });

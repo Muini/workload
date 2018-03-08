@@ -8,7 +8,7 @@ class ModelLoader {
     load(modelUrl, callback) {
         this.loader.load(modelUrl,
             (gltf) => {
-                console.log(modelUrl, gltf);
+                // console.log(modelUrl, gltf);
                 callback(gltf);
             });
     }

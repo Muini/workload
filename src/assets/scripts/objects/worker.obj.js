@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../engine/engine';
 
+import Sound from '../engine/sound';
 import Object from '../engine/object';
 
 import { PaperBlock } from './paperBlock.obj';
@@ -67,6 +68,13 @@ export class Worker extends Object {
         this.paperBlock = new PaperBlock({ parent: this });
         this.papersCount = 0;
         this.cashPile = new CashPile({ parent: this });
+
+        this.paperSound = new Sound({
+            name: 'paperSound',
+            parent: this,
+            loop: false,
+            volume: 1.0,
+        });
     }
 
     awake() {

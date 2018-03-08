@@ -22,6 +22,8 @@ export default class Object {
         this.isActive = true;
         this.isVisible = true;
 
+        this.isObject = true;
+
         this.parent = opt.parent || undefined;
         if (!this.parent) throw 'Object parameter "parent" is mandatory and should be a Object or Scene type';
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
