@@ -11,8 +11,6 @@ varying vec2 vUv;
 
 uniform float time;
 
-uniform float sharpenStrength;
-
 uniform float noiseStrength;
 
 uniform float rgbSplitStrength;
@@ -29,18 +27,6 @@ void main() {
     float dy = 1.0 / resolution.y;
 
     gl_FragColor = texture2D(tDiffuse, vUv);
-
-    /*if(sharpenStrength > 0.0){
-
-        vec4 sum = vec4(0.0);
-        sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( -sharpenStrength * dx , 0.0 * dy));
-        sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , -sharpenStrength * dy));
-        sum += 5. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , 0.0 * dy));
-        sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( 0.0 * dx , sharpenStrength * dy));
-        sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( sharpenStrength * dx , 0.0 * dy));
-
-        gl_FragColor.rgb = mix(gl_FragColor.rgb, sum.rgb, 1.0);
-    }*/
     
     if(rgbSplitStrength > 0.0){
         
@@ -75,22 +61,5 @@ void main() {
     
     vec3 lut = lut(gl_FragColor, LUTtexture).rgb;
     gl_FragColor.rgb = mix(gl_FragColor.rgb, lut, LUTstrength);
-
-    /*
-    float h = 0.005;
-    vec4 sum = vec4(0.0);
-	sum += texture2D(tDiffuse, vec2(vUv.x - 4.0*h, vUv.y) ) * 0.05;
-	sum += texture2D(tDiffuse, vec2(vUv.x - 3.0*h, vUv.y) ) * 0.09;
-	sum += texture2D(tDiffuse, vec2(vUv.x - 2.0*h, vUv.y) ) * 0.12;
-	sum += texture2D(tDiffuse, vec2(vUv.x - 1.0*h, vUv.y) ) * 0.15;
-	sum += texture2D(tDiffuse, vec2(vUv.x + 0.0*h, vUv.y) ) * 0.16;
-	sum += texture2D(tDiffuse, vec2(vUv.x + 1.0*h, vUv.y) ) * 0.15;
-	sum += texture2D(tDiffuse, vec2(vUv.x + 2.0*h, vUv.y) ) * 0.12;
-	sum += texture2D(tDiffuse, vec2(vUv.x + 3.0*h, vUv.y) ) * 0.09;
-	sum += texture2D(tDiffuse, vec2(vUv.x + 4.0*h, vUv.y) ) * 0.05;
-    sum.rgb = sum.rgb/0.98; // normalize
-    
-    // gl_FragColor.rgb = sum.rgb;
-    gl_FragColor.rgb += (sum.rgb * smoothstep(0.6, 1.0, sum.rgb)) ;*/
     
 }

@@ -32,11 +32,16 @@ body {
 
 .hud-test {
     position: absolute;
-    right: 5%;
-    top: 5%;
-    color: greenyellow;
+    right: 55%;
+    top: 50%;
+    transform: translate(-50%, -50);
+    color: white;
     font-size: 30px;
-    font-weight: bold;
+    font-weight: 100;
+    letter-spacing: .05em;
+    padding: .5em 1em;
+    border-right: 2px solid rgba(255, 255, 255, .6);
+    visibility: hidden;
 }
 
 ::selection {

@@ -7,28 +7,30 @@
  */
 import * as THREE from 'three';
 
-THREE.FilmicShader = {
+THREE.BlurSharpenShader = {
 
     uniforms: {
 
         "tDiffuse": { value: null },
         "resolution": { value: new THREE.Vector2(1 / 1024, 1 / 512) },
 
-        "blurPoints": { value: [] },
+        "blurPos": {
+            type: 'v4v',
+            value: [
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0)
+            ]
+        },
 
-        "time": { value: 0.0 },
+        "blurStrength": { value: 0.5 },
 
         "sharpenStrength": { value: 0.1 },
 
-        "noiseStrength": { value: 0.05 },
+        "blurRgbSplitStrength": { value: 1.5 },
 
-        "rgbSplitStrength": { value: 5.0 },
-
-        "vignetteStrength": { value: 1.0 },
-        "vignetteOffset": { value: 1.0 },
-
-        "LUTtexture": { value: null },
-        "LUTstrength": { value: 1.0 },
+        "gain": { value: 1.0 },
 
     },
 
@@ -45,6 +47,6 @@ THREE.FilmicShader = {
 
     ].join("\n"),
 
-    fragmentShader: require('./filmic.frag'),
+    fragmentShader: require('./blurSharpen.frag'),
 
 };

@@ -95,6 +95,7 @@ export class Worker extends Object {
     die() {
         if (this.isWorking)
             this.stopWorking();
+        this.animator.stop();
         this.materials['Screen'].emissive.r = .7;
         this.materials['Screen'].emissive.g = .01;
         this.materials['Screen'].emissive.b = 0;

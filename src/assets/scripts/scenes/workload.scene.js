@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 
+// Engine
 import Engine from '../engine/engine';
 import Scene from '../engine/scene';
 
+// Objects
 import { Worker } from '../objects/worker.obj';
 
+// Dom Objects
 import { ExempleDom } from '../objects/exemple.dom.obj';
 
 // Create scene

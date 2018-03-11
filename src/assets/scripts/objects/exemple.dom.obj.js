@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 
-import DomObject from '../engine/domObject';
+import { BlurDom } from './blur.dom.obj';
 
-
-export class ExempleDom extends DomObject {
+export class ExempleDom extends BlurDom {
     constructor(opt = {}) {
         super(opt);
     }
 
     init() {
+
         //Init variables
         this.name = 'test';
         this.selector = '.hud-test';

@@ -30,6 +30,8 @@ export default class DomObject {
         Engine.addToUpdate(this.update.bind(this), (uid) => { this.updateUID = uid });
         this._isUpdating = true;
 
+        this.onDataChanged = function() {};
+
         this.init();
     }
 
@@ -80,6 +82,8 @@ export default class DomObject {
                 return newval;
             });
         }
+
+        this.setVisibility(true);
     }
 
     parseDom() {
@@ -106,7 +110,7 @@ export default class DomObject {
         // find class vars
         let classes = this.dom.querySelectorAll('*[class]');
 
-        console.log(this._vars);
+        // console.log(this._vars);
 
         this._shouldUpdateVars = true;
     }
@@ -120,6 +124,7 @@ export default class DomObject {
             });
             this._vars[data][i].node.textContent = phrase;
         }
+        this.onDataChanged();
     }
 
     update(time, delta) {}

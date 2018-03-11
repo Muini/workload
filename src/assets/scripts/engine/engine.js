@@ -81,7 +81,7 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.BasicShadowMap
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
@@ -120,7 +120,6 @@ class Engine {
                 bloom: { enabled: true, options: [0.5, 1.0, 0.95] },
                 filmic: {
                     enabled: true,
-                    sharpen: 0.2,
                     noise: 0.05,
                     rgbSplit: 1.0,
                     vignette: 10.0,
@@ -128,6 +127,13 @@ class Engine {
                     lut: .7,
                     lutURL: '/static/img/lut-gamma.png',
                 },
+                blur: {
+                    enabled: true,
+                    strength: 0.4,
+                    sharpen: 0.15,
+                    blurRgbSplit: 1.15,
+                    gain: 1.25,
+                }
             }
         });
 

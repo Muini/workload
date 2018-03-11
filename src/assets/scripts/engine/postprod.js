@@ -4,11 +4,11 @@ import '../../shaders/postprocess/ShaderPass';
 import '../../shaders/postprocess/RenderPass';
 
 import '../../shaders/postprocess/CopyShader';
-import '../../shaders/postprocess/Convolution/ConvolutionShader';
 import '../../shaders/postprocess/LuminosityHighPass/LuminosityHighPassShader';
 import '../../shaders/postprocess/FXAA/FXAAShader';
 import '../../shaders/postprocess/Bloom/BloomShader';
 import '../../shaders/postprocess/Filmic/FilmicShader';
+import '../../shaders/postprocess/BlurSharpen/BlurSharpenShader';
 
 export default class PostProd {
     constructor(opt = {
@@ -31,14 +31,20 @@ export default class PostProd {
             bloom: { enabled: false, options: [1.0, 3.0, 0.85] },
             filmic: {
                 enabled: false,
-                sharpen: 0.1,
                 noise: 0.05,
-                rgbSplit: 5.0,
+                rgbSplit: 1.0,
                 vignette: 1.0,
                 vignetteOffset: 1.0,
                 lut: 1.0,
                 lutURL: '/static/img/lut.png',
             },
+            blur: {
+                enabled: false,
+                strength: 0.5,
+                sharpen: 0.1,
+                blurRgbSplit: 1.5,
+                gain: 1.05,
+            }
         }
 
         /*
@@ -57,8 +63,6 @@ export default class PostProd {
             this.filmicPass = new THREE.ShaderPass(THREE.FilmicShader);
             this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
 
-            this.filmicPass.uniforms['sharpenStrength'].value = this.passes.filmic.sharpen;
-
             this.filmicPass.uniforms['noiseStrength'].value = this.passes.filmic.noise;
 
             this.filmicPass.uniforms['rgbSplitStrength'].value = this.passes.filmic.rgbSplit;
@@ -71,6 +75,30 @@ export default class PostProd {
             lutTexture.magFilter = THREE.NearestFilter;
             this.filmicPass.uniforms['LUTtexture'].value = lutTexture;
             this.filmicPass.uniforms['LUTstrength'].value = this.passes.filmic.lut;
+        }
+
+        // Blur & Sharpen
+        if (this.passes.blur.enabled) {
+            this.blurDomElems = [];
+            this.blurPos = [
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
+                new THREE.Vector4(0.0, 0.0, 0.0, 0.0)
+            ];
+
+            this.blurPass = new THREE.ShaderPass(THREE.BlurSharpenShader);
+            this.blurPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+
+            this.blurPass.uniforms['blurPos'].value = this.blurPos;
+
+            this.blurPass.uniforms['blurStrength'].value = this.passes.blur.strength;
+
+            this.blurPass.uniforms['sharpenStrength'].value = this.passes.blur.sharpen;
+
+            this.blurPass.uniforms['blurRgbSplitStrength'].value = this.passes.blur.blurRgbSplit;
+
+            this.blurPass.uniforms['gain'].value = this.passes.blur.gain;
         }
 
         //Bloom
@@ -105,10 +133,35 @@ export default class PostProd {
         if (this.passes.filmic.enabled) {
             this.composer.addPass(this.filmicPass);
         }
+        if (this.passes.blur.enabled) {
+            this.composer.addPass(this.blurPass);
+        }
         this.composer.addPass(this.copyShader);
 
 
         this.renderer.autoClearColor = true;
+    }
+
+    addBlurPosition(domblur) {
+        if (!this.passes.blur.enabled) return;
+        this.blurDomElems.push(domblur);
+        this.updateBlurPositions();
+    }
+
+    updateBlurPositions() {
+        if (!this.passes.blur.enabled) return;
+
+        for (let i = 0; i < 4; i++) {
+            if (this.blurDomElems[i]) {
+                this.blurPos[i].set(
+                    this.blurDomElems[i].x / this.width,
+                    1.0 - (this.blurDomElems[i].y / this.height),
+                    (this.blurDomElems[i].x + this.blurDomElems[i].width) / this.width,
+                    1.0 - (this.blurDomElems[i].y / this.height) - (this.blurDomElems[i].height / this.height),
+                );
+            }
+        }
+        this.blurPass.uniforms['blurPos'].value = this.blurPos;
     }
 
     updateScene(scene, camera) {
@@ -123,6 +176,9 @@ export default class PostProd {
 
         if (this.passes.filmic.enabled) {
             this.filmicPass.uniforms['time'].value = Math.sin(time);
+        }
+        if (this.passes.blur.enabled) {
+            this.updateBlurPositions();
         }
 
         this.composer.render(delta);
@@ -141,5 +197,9 @@ export default class PostProd {
         if (this.passes.filmic.enabled) {
             this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
         }
+        if (this.passes.blur.enabled) {
+            this.blurPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+        }
+
     }
 }
