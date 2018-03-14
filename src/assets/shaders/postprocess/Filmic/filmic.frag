@@ -44,6 +44,12 @@ void main() {
         gl_FragColor.rgb = mix(gl_FragColor.rgb, rgbSplitColor.rgb, 1.0);
     }
 
+    if(vignetteStrength > 0.0){
+
+        vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( vignetteOffset );
+        gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3( 1.0 - vignetteStrength ), dot( uv, uv ) );
+    }
+
     if(noiseStrength > 0.0){
         float dx = rand( vUv + time );
         vec3 noiseColor = gl_FragColor.rgb + gl_FragColor.rgb * clamp( 0.1 + dx, 0.0, 1.0 );
@@ -51,12 +57,6 @@ void main() {
         noiseColor = gl_FragColor.rgb + clamp( noiseStrength, 0.0,1.0 ) * ( noiseColor - gl_FragColor.rgb );
 
         gl_FragColor.rgb = noiseColor;
-    }
-
-    if(vignetteStrength > 0.0){
-
-        vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( vignetteOffset );
-        gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3( 1.0 - vignetteStrength ), dot( uv, uv ) );
     }
     
     vec3 lut = lut(gl_FragColor, LUTtexture).rgb;

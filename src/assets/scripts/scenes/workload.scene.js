@@ -18,22 +18,22 @@ export default new Scene({
         // Create & Add camera
         let cameraController = new THREE.Group();
         cameraController.name = 'CameraController';
-        cameraController.position.x = 15;
-        cameraController.position.y = 15;
-        cameraController.position.z = 15;
+        cameraController.position.x = 10;
+        cameraController.position.y = 8;
+        cameraController.position.z = 10;
         cameraController.rotation.y = (45 / 180) * 3.14;
 
-        // let camera = new THREE.PerspectiveCamera(10, Engine.width / Engine.height, 1, 180000);
-        let cameraDistance = 150 * Engine.height / 1000;
+        let camera = new THREE.PerspectiveCamera(30, Engine.width / Engine.height, 1, 100);
+        /*let cameraDistance = 150 * Engine.height / 1000;
         let camera = new THREE.OrthographicCamera(Engine.width / -cameraDistance, Engine.width / cameraDistance, Engine.height / cameraDistance, Engine.height / -cameraDistance, 1, 1500);
         Engine.addToResize(_ => {
             camera.distance = 150 * Engine.height / 1000;
         })
-        camera.distance = cameraDistance;
+        camera.distance = cameraDistance;*/
         camera.position.x = 0;
         camera.position.y = 0;
         camera.position.z = 0;
-        camera.rotation.x = -(30 / 180) * 3.14;
+        camera.rotation.x = -(20 / 180) * 3.14;
         camera.name = 'Camera';
 
         cameraController.add(camera);
@@ -42,7 +42,7 @@ export default new Scene({
         this.instance.add(cameraController);
 
         // Floor
-        let floorGeometry = new THREE.PlaneGeometry(100, 100, 1, 1);
+        let floorGeometry = new THREE.PlaneGeometry(150, 150, 1, 1);
         let floorMaterial = new THREE.MeshStandardMaterial({
             name: 'Floor',
             color: new THREE.Color(0x383733),
@@ -62,6 +62,10 @@ export default new Scene({
 
         // Test Worker
         this.worker = new Worker({ parent: this });
+
+        let work3 = new Worker({ parent: this, position: new THREE.Vector3(-10.0, 0.0, -10.0) });
+
+        let work5 = new Worker({ parent: this, position: new THREE.Vector3(-20.0, 0.0, -20.0) });
 
         this.testdom = new ExempleDom({ parent: this });
 

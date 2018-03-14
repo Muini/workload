@@ -37,10 +37,15 @@ export class BlurDom extends DomObject {
         super.awake();
 
         Engine.addToResize(_ => {
-            this.updatePositions();
+            Engine.waitNextTick(_ => {
+                this.updatePositions();
+            });
         });
 
-        Engine.postprod.addBlurPosition(this);
+        if (Engine.postprod)
+            Engine.postprod.addBlurPosition(this);
+        else
+            console.warn('Blur Dom Objects require postprocessing effects on')
 
         // Is fired when the object is added to the scene
     }

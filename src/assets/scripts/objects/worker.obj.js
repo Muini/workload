@@ -80,6 +80,8 @@ export class Worker extends Object {
     awake() {
         super.awake();
 
+        this.lights['Desk_Spot'].target = this.model;
+
         Engine.wait(_ => {
             for (let i = 0; i < 5; i++) {
                 this.papersCount++;

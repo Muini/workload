@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import '../../shaders/postprocess/EffectComposer';
+// import { ShaderPass } from 'three/examples/js/postprocessing/ShaderPass';
 import '../../shaders/postprocess/ShaderPass';
 import '../../shaders/postprocess/RenderPass';
 
@@ -8,6 +9,7 @@ import '../../shaders/postprocess/LuminosityHighPass/LuminosityHighPassShader';
 import '../../shaders/postprocess/FXAA/FXAAShader';
 import '../../shaders/postprocess/Bloom/BloomShader';
 import '../../shaders/postprocess/Filmic/FilmicShader';
+import '../../shaders/postprocess/BokehDOF/BokehShader';
 import '../../shaders/postprocess/BlurSharpen/BlurSharpenShader';
 
 export default class PostProd {
@@ -38,6 +40,9 @@ export default class PostProd {
                 lut: 1.0,
                 lutURL: '/static/img/lut.png',
             },
+            bokehdof: {
+                enabled: false,
+            },
             blur: {
                 enabled: false,
                 strength: 0.5,
@@ -47,16 +52,62 @@ export default class PostProd {
             }
         }
 
-        /*
-        this.occlusion = new THREE.WebGLRenderTarget(this.width * this.pixelDensity / 2, this.height * this.pixelDensity / 2, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat });
+        if (!this.renderer.extensions.get('WEBGL_depth_texture')) {
 
-        this.screenSpacePosition = new THREE.Vector3(.0, .0, .0);
-        this.screenSpacePosition.copy(new THREE.Vector3(.0, .0, .0)).project(this.camera);
-        this.screenSpacePosition.x = (this.screenSpacePosition.x + 1) / 2;
-        this.screenSpacePosition.y = (this.screenSpacePosition.y + 1) / 2;
-        */
+            supportsExtension = false;
+            throw "WEBGL_depth_texture not supported";
+            return;
 
-        this.composer = new THREE.EffectComposer(this.renderer);
+        }
+
+        this.renderTarget = new THREE.WebGLRenderTarget(this.width, this.height);
+        this.renderTarget.texture.format = THREE.RGBAFormat;
+        this.renderTarget.texture.minFilter = THREE.LinearFilter;
+        this.renderTarget.texture.magFilter = THREE.LinearFilter;
+
+        this.composer = new THREE.EffectComposer(this.renderer, this.renderTarget);
+
+        this.depthRenderTarget = this.renderTarget.clone();
+        this.depthRenderTarget.texture.minFilter = THREE.NearestFilter;
+        this.depthRenderTarget.texture.magFilter = THREE.NearestFilter;
+        this.depthRenderTarget.texture.generateMipmaps = false;
+        this.depthRenderTarget.depthBuffer = true;
+        this.depthRenderTarget.depthTexture = new THREE.DepthTexture();
+        this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
+        this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
+
+    }
+
+    updateComposer() {
+        this.composer.reset();
+        this.depthComposer.reset();
+
+        // Bokeh DOF
+        if (this.passes.bokehdof.enabled) {
+            this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
+            this.bokehPass.name = "Bokeh DOF";
+            this.bokehPass.uniforms['nearClip'].value = this.camera.near;
+            this.bokehPass.uniforms['farClip'].value = this.camera.far;
+            this.bokehPass.uniforms['focalLength'].value = this.camera.getFocalLength();
+            console.log(this.bokehPass.uniforms['focalLength'].value)
+            this.bokehPass.uniforms['focusDistance'].value = 25.0;
+            this.bokehPass.uniforms['aperture'].value = 0.9;
+            this.bokehPass.uniforms['maxblur'].value = 1.25;
+            this.bokehPass.uniforms['tDepth'].value = this.depthRenderTarget.depthTexture;
+        }
+
+        //FXAA
+        if (this.passes.fxaa.enabled) {
+            this.FXAAPass = new THREE.ShaderPass(THREE.FXAAShader);
+            this.FXAAPass.name = "FXAA";
+            this.FXAAPass.uniforms['resolution'].value = new THREE.Vector2(1 / this.width, 1 / this.height);
+        }
+
+        //Bloom
+        if (this.passes.bloom.enabled) {
+            this.bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(this.width, this.height), this.passes.bloom.options[0], this.passes.bloom.options[1], this.passes.bloom.options[2]); //1.0, 9, 0.5, 512);
+            this.bloomPass.name = "Bloom";
+        }
 
         //filmic
         if (this.passes.filmic.enabled) {
@@ -75,6 +126,7 @@ export default class PostProd {
             lutTexture.magFilter = THREE.NearestFilter;
             this.filmicPass.uniforms['LUTtexture'].value = lutTexture;
             this.filmicPass.uniforms['LUTstrength'].value = this.passes.filmic.lut;
+            this.filmicPass.name = "Filmic";
         }
 
         // Blur & Sharpen
@@ -99,31 +151,26 @@ export default class PostProd {
             this.blurPass.uniforms['blurRgbSplitStrength'].value = this.passes.blur.blurRgbSplit;
 
             this.blurPass.uniforms['gain'].value = this.passes.blur.gain;
-        }
-
-        //Bloom
-        if (this.passes.bloom.enabled) {
-            this.bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(this.width, this.height), this.passes.bloom.options[0], this.passes.bloom.options[1], this.passes.bloom.options[2]); //1.0, 9, 0.5, 512);
-        }
-
-        //FXAA
-        if (this.passes.fxaa.enabled) {
-            this.FXAAPass = new THREE.ShaderPass(THREE.FXAAShader);
-            this.FXAAPass.uniforms['resolution'].value = new THREE.Vector2(1 / this.width, 1 / this.height);
+            this.blurPass.name = "Blur & Sharpen";
         }
 
         //Copy Shader
         this.copyShader = new THREE.ShaderPass(THREE.CopyShader);
+        this.copyShader.name = "Final Copy Shader";
         this.copyShader.renderToScreen = true;
 
         //Scene Render
         this.renderPassScene = new THREE.RenderPass(this.scene, this.camera);
-
-
-        //Render Order
+        this.renderPassScene.name = "Scene Render";
         this.composer.addPass(this.renderPassScene);
+        this.depthComposer.addPass(this.renderPassScene);
 
 
+
+        if (this.passes.bokehdof.enabled) {
+            this.bokehPass.uniforms['tDiffuse'].value = this.renderTarget.texture;
+            this.composer.addPass(this.bokehPass);
+        }
         if (this.passes.fxaa.enabled) {
             this.composer.addPass(this.FXAAPass);
         }
@@ -138,8 +185,7 @@ export default class PostProd {
         }
         this.composer.addPass(this.copyShader);
 
-
-        this.renderer.autoClearColor = true;
+        // console.table(this.composer.passes)
     }
 
     addBlurPosition(domblur) {
@@ -167,8 +213,8 @@ export default class PostProd {
     updateScene(scene, camera) {
         this.scene = scene;
         this.camera = camera;
-        this.renderPassScene.scene = this.scene;
-        this.renderPassScene.camera = this.camera;
+
+        this.updateComposer();
     }
 
     update(time, delta) {
@@ -181,6 +227,7 @@ export default class PostProd {
             this.updateBlurPositions();
         }
 
+        this.depthComposer.render(delta);
         this.composer.render(delta);
 
     }

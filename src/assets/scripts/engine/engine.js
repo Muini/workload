@@ -87,6 +87,7 @@ class Engine {
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
         this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
         this.renderer.physicallyCorrectLights = false;
+        this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
 
@@ -95,8 +96,8 @@ class Engine {
         this.fpsMedian = 0;
         this.tickNbr = 0;
         this.performanceCycleNbr = 0;
-        this.performanceCycleLength = 8; //Every 8 frames
-        this.maxPerformanceCycle = 3; //3 Cycles
+        this.performanceCycleLength = 10; //Every 8 frames
+        this.maxPerformanceCycle = 6; //3 Cycles
 
         this.loop = new Looper();
         this.loop.add(this.update.bind(this));
@@ -117,22 +118,25 @@ class Engine {
             renderer: this.renderer,
             passes: {
                 fxaa: { enabled: true },
-                bloom: { enabled: true, options: [0.5, 1.0, 0.95] },
+                bloom: { enabled: true, options: [0.5, 1.0, 0.9] },
                 filmic: {
                     enabled: true,
                     noise: 0.05,
-                    rgbSplit: 1.0,
+                    rgbSplit: 5.0,
                     vignette: 10.0,
                     vignetteOffset: 0.2,
                     lut: .7,
                     lutURL: '/static/img/lut-gamma.png',
+                },
+                bokehdof: {
+                    enabled: true,
                 },
                 blur: {
                     enabled: true,
                     strength: 0.4,
                     sharpen: 0.15,
                     blurRgbSplit: 1.15,
-                    gain: 1.25,
+                    gain: 1.6,
                 }
             }
         });
@@ -140,7 +144,7 @@ class Engine {
         if (window.DEBUG) {
             window.THREE = THREE;
             window.renderer = this.renderer;
-            console.log('%cEngine%c Init : width ' + this.width + 'px, height ' + this.height + 'px, pixelRatio ' + this.pixelDensity, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+            console.log('%cEngine%c Init - width: ' + this.width + 'px - height: ' + this.height + 'px - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         }
     }
 
@@ -288,7 +292,7 @@ class Engine {
 
     adaptiveRenderer(time, delta) {
         if (this.lastTick == null) return;
-        if (this.performanceCycleNbr >= this.performanceCycleLength) return;
+        if (this.performanceCycleNbr >= this.maxPerformanceCycle) return;
 
         this.tickNbr++;
 

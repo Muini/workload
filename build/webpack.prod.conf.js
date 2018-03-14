@@ -6,16 +6,15 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 var FaviconsWebpackPlugin = require('favicons-webpack-plugin')
-var PrerendererWebpackPlugin = require('prerenderer-webpack-plugin')
-var BrowserRenderer = PrerendererWebpackPlugin.BrowserRenderer // or JSDOMRenderer, or ChromeRenderer
-var SitemapPlugin = require('sitemap-webpack-plugin').default;
 
 var env = config.build.env
 
 var webpackConfig = merge(baseWebpackConfig, {
+    mode: 'production',
     module: {
         rules: utils.styleLoaders({
             sourceMap: config.build.productionSourceMap,
@@ -29,16 +28,13 @@ var webpackConfig = merge(baseWebpackConfig, {
         chunkFilename: utils.assetsPath('js/[id].js')
     },
     plugins: [
-        // http://vuejs.github.io/vue-loader/en/workflow/production.html
         new webpack.DefinePlugin({
             'process.env': env,
-            'prerenderPaths': [],
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            sourceMap: true
+        new UglifyJSPlugin({
+            sourceMap: true,
+            parallel: true,
+            cache: true
         }),
         // extract css into its own file
         new ExtractTextPlugin({
@@ -82,7 +78,7 @@ var webpackConfig = merge(baseWebpackConfig, {
                 }
             })
         }),*/
-
+        /*
         // split vendor js into its own file
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
@@ -97,6 +93,7 @@ var webpackConfig = merge(baseWebpackConfig, {
                 )
             }
         }),
+        */
         // extract webpack runtime and module manifest to its own file in order to
         // prevent vendor hash from being updated whenever app bundle is updated
         /*new webpack.optimize.CommonsChunkPlugin({
@@ -118,6 +115,7 @@ var webpackConfig = merge(baseWebpackConfig, {
             ignore: ['.*']
         }]),
 
+        /*
         new FaviconsWebpackPlugin({
             // Your source logo
             logo: config.build.assetsRoot + '/../static/img/favicon.png',
@@ -150,14 +148,7 @@ var webpackConfig = merge(baseWebpackConfig, {
                 yandex: false,
                 windows: false
             }
-        }),
-
-        new SitemapPlugin('https://site.com', prerenderPaths, {
-            fileName: 'sitemap.xml',
-            lastMod: true,
-            changeFreq: 'monthly',
-            priority: '0.4'
-        }),
+        }),*/
 
 
     ]

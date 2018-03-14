@@ -18,7 +18,7 @@ export class ExempleDom extends BlurDom {
         // Define & init here custom variables
 
         this.data = {
-            score: 0,
+            score: '0',
         }
     }
 

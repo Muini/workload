@@ -50,9 +50,9 @@ export default class Scene {
 
     resize() {
         if (!this.mainCamera) return;
-        if (this.mainCamera.isPerpectiveCamera) {
+        if (!this.mainCamera.isOrthographicCamera) {
             this.mainCamera.aspect = Engine.width / Engine.height;
-        } else if (this.mainCamera.isOrthographicCamera) {
+        } else {
             this.mainCamera.left = Engine.width / -this.mainCamera.distance;
             this.mainCamera.right = Engine.width / this.mainCamera.distance;
             this.mainCamera.top = Engine.height / this.mainCamera.distance;

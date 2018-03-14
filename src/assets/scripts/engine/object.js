@@ -118,6 +118,7 @@ export default class Object {
                     child.intensity = lights[light].intensity;
                     child.power = lights[light].power;
                     child.castShadow = lights[light].castShadow;
+                    child.visible = lights[light].visible;
                     if (child.isPointLight) {
                         child.distance = lights[light].distance;
                     }

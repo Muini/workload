@@ -3,7 +3,9 @@
  *
  * Full-screen textured quad shader
  */
+
 import * as THREE from 'three';
+
 THREE.CopyShader = {
 
     uniforms: {
