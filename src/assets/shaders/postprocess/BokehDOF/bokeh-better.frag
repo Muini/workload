@@ -9,7 +9,7 @@ uniform float farClip;
 
 bool uUseAutofocus = true; // disable if you use external uFocalDepth value
 float uFocalDepth; // external focal point value, but you may use autofocus option below
-vec2 uAutofocusCenter = vec2(0.5, 0.4); // (0.0,0.0 - left lower corner, 1.0,1.0 - upper right)
+vec2 uAutofocusCenter = vec2(0.7, 0.2); // (0.0,0.0 - left lower corner, 1.0,1.0 - upper right)
 
 uniform float aperture; // controls the focal range
 uniform float maxblur;

@@ -119,6 +119,7 @@ export default class Object {
                     child.power = lights[light].power;
                     child.castShadow = lights[light].castShadow;
                     child.visible = lights[light].visible;
+                    child.needsUpdate = false;
                     if (child.isPointLight) {
                         child.distance = lights[light].distance;
                     }
@@ -138,6 +139,7 @@ export default class Object {
                             if (child.isSkinnedMesh)
                                 materials[material].skinning = true;
                             child.material[m] = materials[material];
+                            child.material[m].needsUpdate = false;
                         }
                     }
                 } else {
@@ -146,6 +148,7 @@ export default class Object {
                         if (child.isSkinnedMesh)
                             materials[material].skinning = true;
                         child.material = materials[material];
+                        child.material.needsUpdate = false;
                     }
                 }
             }
@@ -155,6 +158,7 @@ export default class Object {
             if (child.isMesh || child.isSkinnedMesh) {
                 child.castShadow = this.hasShadows;
                 child.receiveShadow = true;
+                child.needsUpdate = false;
                 updateMaterials(child, this.materials);
             } else {
                 updateLights(child, this.lights);

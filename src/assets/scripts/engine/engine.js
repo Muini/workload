@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+// import '../vendors/WebGLDeferredRenderer';
 import Stats from 'stats.js';
 import Looper from '../vendors/looper';
 import PostProd from './postprod';
@@ -78,10 +79,11 @@ class Engine {
         this.scenes = {};
 
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+        // this.renderer = new THREE.WebGLDeferredRenderer();
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; //THREE.BasicShadowMap
+        this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.BasicShadowMap
         this.pixelDensity = window.devicePixelRatio;
         this.renderer.setPixelRatio(this.pixelDensity);
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping

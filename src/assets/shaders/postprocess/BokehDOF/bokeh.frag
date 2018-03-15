@@ -17,14 +17,14 @@ uniform float maxblur; // max blur amount
 // by David Hoskins.
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. (https://www.shadertoy.com/view/4d2Xzw)
 // Modified by SolarLiner
-// Modified by Muini for three.js integration
+// Modified by Corentin Flach for WebGL (three.js) integration with dynamic iterations & weighted layers based on this paper : https://www.jvrb.org/past-issues/10.2013/3819
 
 // The Golden Angle is (3.-sqrt(5.0))*PI radians, which doesn't precompiled for some reason.
 // The compiler is a dunce I tells-ya!!
 #define GOLDEN_ANGLE 2.39996323
 
-#define ITERATIONS 32
-// #define ITERATIONS 512
+// #define ITERATIONS 32
+#define ITERATIONS 64
 
 #define DISTORTION_ANAMORPHIC	0.0;
 #define DISTORTION_BARREL       0.3;
@@ -48,7 +48,7 @@ float readDepth( const in vec2 coord ) {
         float cameraFarMinusNear = farClip - nearClip;
         float cameraCoef = 2.0 * nearClip;
 
-        return cameraCoef / ( cameraFarPlusNear - texture2D( tDepth, coord ).x * cameraFarMinusNear );
+        return cameraCoef / ( cameraFarPlusNear - texture2D(tDepth, coord ).r * cameraFarMinusNear );
 }
 
 // Additions by SolarLiner ------------------------------------------------------------------
@@ -67,8 +67,25 @@ vec2 GetDistOffset(vec2 uv, vec2 pxoffset)
         return rotated.xy;
 }
 
+float getFocus(float blur, float depth, float mult){
+        float edge = 0.002*mult*depth; //distance based edge smoothing
+        float focus = clamp(smoothstep(0.0,edge,blur),0.0,1.0);
+        return focus;
+}
+
+vec3 debugFocus(vec3 col, float blur, float depth) {
+        float focus = getFocus(blur, depth, 3.0);
+        col = mix(col,vec3(0.0,0.5,1.0),(focus)*0.05);
+        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focus)*0.2);
+        return col;
+}
+
+float Remap (float value, float from1, float to1, float from2, float to2) {
+    return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+}
+
 //-------------------------------------------------------------------------------------------
-vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount)
+vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount, float pixelDepth)
 {
         vec3 acc = vec3(0.0);
         vec3 div = vec3(0.0);
@@ -76,49 +93,49 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount)
         vec2 vangle = vec2(0.0,radius); // Start angle
         mat2 rot = rotMatrix(GOLDEN_ANGLE);
     
-        amount += radius*5000.0;
-        
+        amount += radius*500.0;
+
+        //Background        
         for (int j = 0; j < ITERATIONS; j++)
-        {  
+        {
+                if(float(j) > float(ITERATIONS) * (1.0 - radius)) break;
                 r += 1. / r;
                 vangle = rot * vangle;
                 // (r-1.0) here is the equivalent to sqrt(0, 1, 2, 3...)
                 vec2 pos = GetDistOffset(uv, uv*(r-1.)*vangle);
                 
-                // #ifdef USE_MIPMAP
-                        vec3 col = texture2D(tex, uv + pos, radius*1.25).xyz;
-                /*#else
-                        vec3 col = texture2D(tex, uv + pos).xyz;
-                #endif*/
+                float tapDepth = readDepth(uv + pos);
+                float leakingDepthThreshold = pixelDepth * radius * 160.0;
+                if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold) {
+                        continue;
+                }
+                vec3 col = texture2D(tex, uv + pos).xyz;
+                // col = mix(vec3(0.0), col, vec3(pixelDepth));
                 vec3 bokeh = pow(col, vec3(9.0)) * amount+.4;
                 acc += col * bokeh;
                 div += bokeh;
         }
-        return acc / div;
-}
+        // In focus
 
-vec3 debugFocus(vec3 col, float blur, float depth) {
-        float edge = 0.002*depth; //distance based edge smoothing
-        float focus = clamp(smoothstep(0.0,edge,blur),0.0,1.0);
-        col = mix(col,vec3(0.0,0.5,1.0),(focus)*0.1);
-        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focus)*0.3);
-        return col;
+
+        // Foreground
+
+
+        return acc / div;
 }
 
 void main() {
 
-        vec4 diffuse = texture2D(tDiffuse, vUv);
-
         float depth = readDepth(vUv);
 
-        float CoC = 0.03; //circle of confusion size in mm (35mm film = 0.03mm)
-        float fDepth = 1.0;
+        float CoC = 0.029; //circle of confusion size in mm (35mm film = 0.029mm)
 
         // // Autofocus
+        // float fDepth = 1.0;
         // vec2 focusCoords = vec2(0.5,0.5);
         // fDepth = readDepth(focusCoords);
         
-        float f = focalLength / 9000.0; // focal length in mm
+        float f = focalLength / 6000.0; // focal length in mm
         float d = (focusDistance - nearClip) / farClip; // focal plane in mm
         float o = depth; // depth in mm
 
@@ -127,24 +144,33 @@ void main() {
         float c = (d-f)/(d*aperture*CoC);
 
         float blur = abs(a-b)*c;
-
+        /*
+        float layerSeparatorSharpness = 1.0;
+        float focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness));
+        float foregroundDepth = depth < d ? depth : 0.0;
+        foregroundDepth -= focusDepth;
+        float backgroundDepth = depth >= d ? depth : 0.0;
+        backgroundDepth -= focusDepth;
+        focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness + 0.5));
+        */
         blur = clamp(blur,0.0,1.0);
         
         vec4 col = vec4(0.0);
         
-        float amount = 1.0;
-        col = vec4(Bokeh(tDiffuse, vUv, blur, amount), 1.0);
+        float amount = 40.0;
+        
+        // vec4 backgroudColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
+        // vec4 foregroudColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
+        vec4 focusColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
 
-        // col.rgb = debugFocus(col.rgb, blur, depth);
 
-        /*if(vUv.x < 0.33){
-                gl_FragColor = diffuse;
-        }else if(vUv.x < 0.66){
-                gl_FragColor = col;
-        }else{
-                gl_FragColor = vec4(depth, depth, depth, 1.0);
-        }*/
-        // gl_FragColor = vec4(depth, depth, depth, 1.0);
-        gl_FragColor = col;
+        // gl_FragColor = vec4(focusDepth, foregroundDepth, backgroundDepth, 1.0);
+
+        // focusColor.rgb = debugFocus(focusColor.rgb, blur, depth);
+
+        gl_FragColor = focusColor;
+
+        // float focus = 1.0 - getFocus(blur, depth, 3.0);
+        // gl_FragColor = vec4(focus, focus, focus, 1.0);
 
 }

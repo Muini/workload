@@ -67,31 +67,32 @@ export default class PostProd {
 
         this.composer = new THREE.EffectComposer(this.renderer, this.renderTarget);
 
-        this.depthRenderTarget = this.renderTarget.clone();
-        this.depthRenderTarget.texture.minFilter = THREE.NearestFilter;
-        this.depthRenderTarget.texture.magFilter = THREE.NearestFilter;
-        this.depthRenderTarget.texture.generateMipmaps = false;
-        this.depthRenderTarget.depthBuffer = true;
-        this.depthRenderTarget.depthTexture = new THREE.DepthTexture();
-        this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
-        this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
+        if (this.passes.bokehdof.enabled) {
+            this.depthRenderTarget = this.renderTarget.clone();
+            this.depthRenderTarget.texture.minFilter = THREE.NearestFilter;
+            this.depthRenderTarget.texture.magFilter = THREE.NearestFilter;
+            this.depthRenderTarget.texture.generateMipmaps = false;
+            this.depthRenderTarget.depthBuffer = true;
+            this.depthRenderTarget.depthTexture = new THREE.DepthTexture();
+            this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
+            this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
+        }
 
     }
 
     updateComposer() {
         this.composer.reset();
-        this.depthComposer.reset();
 
         // Bokeh DOF
         if (this.passes.bokehdof.enabled) {
+            this.depthComposer.reset();
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";
             this.bokehPass.uniforms['nearClip'].value = this.camera.near;
             this.bokehPass.uniforms['farClip'].value = this.camera.far;
             this.bokehPass.uniforms['focalLength'].value = this.camera.getFocalLength();
-            console.log(this.bokehPass.uniforms['focalLength'].value)
-            this.bokehPass.uniforms['focusDistance'].value = 25.0;
-            this.bokehPass.uniforms['aperture'].value = 0.9;
+            this.bokehPass.uniforms['focusDistance'].value = this.camera.focusDistance || 25.0;
+            this.bokehPass.uniforms['aperture'].value = this.camera.aperture || 1.2;
             this.bokehPass.uniforms['maxblur'].value = 1.25;
             this.bokehPass.uniforms['tDepth'].value = this.depthRenderTarget.depthTexture;
         }
@@ -163,11 +164,9 @@ export default class PostProd {
         this.renderPassScene = new THREE.RenderPass(this.scene, this.camera);
         this.renderPassScene.name = "Scene Render";
         this.composer.addPass(this.renderPassScene);
-        this.depthComposer.addPass(this.renderPassScene);
-
-
 
         if (this.passes.bokehdof.enabled) {
+            this.depthComposer.addPass(this.renderPassScene);
             this.bokehPass.uniforms['tDiffuse'].value = this.renderTarget.texture;
             this.composer.addPass(this.bokehPass);
         }
@@ -226,8 +225,9 @@ export default class PostProd {
         if (this.passes.blur.enabled) {
             this.updateBlurPositions();
         }
-
-        this.depthComposer.render(delta);
+        if (this.passes.bokehdof.enabled) {
+            this.depthComposer.render(delta);
+        }
         this.composer.render(delta);
 
     }
@@ -238,6 +238,12 @@ export default class PostProd {
         this.pixelDensity = pixelDensity;
         this.composer.setSize(this.width * this.pixelDensity, this.height * this.pixelDensity);
 
+        if (this.passes.bokehdof.enabled) {
+            this.depthComposer.setSize(this.width * this.pixelDensity, this.height * this.pixelDensity);
+            this.depthRenderTarget.depthTexture.width = this.width;
+            this.depthRenderTarget.depthTexture.height = this.height;
+            this.depthRenderTarget.depthTexture.needsUpdate = true;
+        }
         if (this.passes.fxaa.enabled) {
             this.FXAAPass.uniforms['resolution'].value = new THREE.Vector2(1 / this.width, 1 / this.height);
         }
