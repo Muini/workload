@@ -105,8 +105,8 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount, float pixelDepth)
                 vec2 pos = GetDistOffset(uv, uv*(r-1.)*vangle);
                 
                 float tapDepth = readDepth(uv + pos);
-                float leakingDepthThreshold = pixelDepth * radius * 160.0;
-                if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold) {
+                float leakingDepthThreshold = pixelDepth * pow(radius, 0.5) * 15.0;
+                if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold && tapDepth < pixelDepth) {
                         continue;
                 }
                 vec3 col = texture2D(tex, uv + pos).xyz;
@@ -171,6 +171,6 @@ void main() {
         gl_FragColor = focusColor;
 
         // float focus = 1.0 - getFocus(blur, depth, 3.0);
-        // gl_FragColor = vec4(focus, focus, focus, 1.0);
+        // gl_FragColor = vec4(depth, depth, depth, 1.0);
 
 }

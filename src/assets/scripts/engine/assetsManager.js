@@ -81,7 +81,7 @@ class AssetsManager {
     }
 
     getAsset(assetType, assetName) {
-        if (!this.assets[assetName].isLoaded) return console.log('%cEngine%c Model has not been loaded ! Make sure it is in assets.js with the correct name. %c' + this.assetName, "color:white;background:red;padding:2px 4px;", "color:red", "color:DodgerBlue");
+        if (!this.assets[assetName] || !this.assets[assetName].isLoaded) return console.log(`%cEngine%c Asset ${assetName} has not been loaded ! Make sure it is in assets.js with the correct name. %c` + assetType, "color:white;background:red;padding:2px 4px;", "color:red", "color:DodgerBlue");
 
         switch (assetType) {
             case 'model':

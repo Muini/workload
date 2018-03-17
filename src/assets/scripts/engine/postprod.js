@@ -53,11 +53,8 @@ export default class PostProd {
         }
 
         if (!this.renderer.extensions.get('WEBGL_depth_texture')) {
-
-            supportsExtension = false;
             throw "WEBGL_depth_texture not supported";
             return;
-
         }
 
         this.renderTarget = new THREE.WebGLRenderTarget(this.width, this.height);
@@ -77,22 +74,16 @@ export default class PostProd {
             this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
             this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
         }
-
-    }
-
-    updateComposer() {
-        this.composer.reset();
-
         // Bokeh DOF
         if (this.passes.bokehdof.enabled) {
-            this.depthComposer.reset();
+            // this.depthComposer.reset();
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";
-            this.bokehPass.uniforms['nearClip'].value = this.camera.near;
-            this.bokehPass.uniforms['farClip'].value = this.camera.far;
-            this.bokehPass.uniforms['focalLength'].value = this.camera.getFocalLength();
-            this.bokehPass.uniforms['focusDistance'].value = this.camera.focusDistance || 25.0;
-            this.bokehPass.uniforms['aperture'].value = this.camera.aperture || 1.2;
+            this.bokehPass.uniforms['nearClip'].value = this.camera ? this.camera.near : 1.0;
+            this.bokehPass.uniforms['farClip'].value = this.camera ? this.camera.far : 100.0;
+            this.bokehPass.uniforms['focalLength'].value = this.camera ? this.camera.getFocalLength() : 30.0;
+            this.bokehPass.uniforms['focusDistance'].value = this.camera ? this.camera.focus : 25.0;
+            this.bokehPass.uniforms['aperture'].value = this.camera ? this.camera.aperture : 1.2;
             this.bokehPass.uniforms['maxblur'].value = 1.25;
             this.bokehPass.uniforms['tDepth'].value = this.depthRenderTarget.depthTexture;
         }
@@ -184,6 +175,23 @@ export default class PostProd {
         }
         this.composer.addPass(this.copyShader);
 
+    }
+
+    updateComposer() {
+        // this.composer.reset();
+
+        if (this.passes.bokehdof.enabled) {
+            this.composer.reset();
+            this.bokehPass.uniforms['nearClip'].value = this.camera.near;
+            this.bokehPass.uniforms['farClip'].value = this.camera.far;
+            this.bokehPass.uniforms['focalLength'].value = this.camera.getFocalLength();
+            this.bokehPass.uniforms['focusDistance'].value = this.camera.focus || 25.0;
+            this.bokehPass.uniforms['aperture'].value = this.camera.aperture || 1.2;
+        }
+
+        this.renderPassScene.scene = this.scene;
+        this.renderPassScene.camera = this.camera;
+
         // console.table(this.composer.passes)
     }
 
@@ -212,7 +220,6 @@ export default class PostProd {
     updateScene(scene, camera) {
         this.scene = scene;
         this.camera = camera;
-
         this.updateComposer();
     }
 

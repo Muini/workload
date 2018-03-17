@@ -1,5 +1,13 @@
 export default {
     //Scene name
+    'intro.plan1': {
+        models: {
+            'city.model': '/static/models/city.glb',
+        },
+        textures: {
+
+        }
+    },
     'workload': {
         models: {
             'worker.model': '/static/models/worker.glb',
@@ -9,5 +17,5 @@ export default {
         textures: {
 
         }
-    }
+    },
 }

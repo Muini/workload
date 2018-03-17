@@ -8,10 +8,11 @@ export default class Object {
         parent,
         position,
         rotation,
+        active,
     }) {
         this.name = 'unnamed object';
 
-        this.model = undefined;
+        this.model = new THREE.Group();
         this.modelName = undefined;
         this.animator = undefined;
 
@@ -19,8 +20,8 @@ export default class Object {
         this.lights = {};
         this.hasShadows = false;
 
-        this.isActive = true;
-        this.isVisible = true;
+        this.isActive = opt.active || true;
+        this.isVisible = false;
 
         this.isObject = true;
 
@@ -33,14 +34,15 @@ export default class Object {
         this.rotation = opt.rotation || new THREE.Vector3(0, 0, 0);
 
         this.updateUID = '';
-        Engine.addToUpdate(this.update.bind(this), (uid) => { this.updateUID = uid });
-        this._isUpdating = true;
+        this._isUpdating = false;
 
-        this.init();
+        this.init(opt);
+
+        this.secondUpdate = false;
     }
 
     // Init happen when the entire project is loaded
-    init() {
+    init(opt) {
         for (let material in this.materials) {
             this.materials[material].name = material;
         }
@@ -84,9 +86,11 @@ export default class Object {
             }
             this.overwriteModelParameters();
         } else {
-            this.model = new THREE.Object3D();
-            this.rotation.x += Math.PI / 2; //hack inverted axis
+            this.model.name = this.name;
+            if (!this.isCamera)
+                this.rotation.x += Math.PI / 2; //hack inverted axis
         }
+
         this.model.position.x += this.position.x;
         this.model.position.y += this.position.y;
         this.model.position.z += this.position.z;
@@ -98,6 +102,8 @@ export default class Object {
         } else {
             this.parent.model.add(this.model);
         }
+
+        this.setActive(this.isActive);
     }
 
     overwriteModelParameters() {
@@ -119,7 +125,6 @@ export default class Object {
                     child.power = lights[light].power;
                     child.castShadow = lights[light].castShadow;
                     child.visible = lights[light].visible;
-                    child.needsUpdate = false;
                     if (child.isPointLight) {
                         child.distance = lights[light].distance;
                     }
@@ -139,7 +144,6 @@ export default class Object {
                             if (child.isSkinnedMesh)
                                 materials[material].skinning = true;
                             child.material[m] = materials[material];
-                            child.material[m].needsUpdate = false;
                         }
                     }
                 } else {
@@ -148,7 +152,6 @@ export default class Object {
                         if (child.isSkinnedMesh)
                             materials[material].skinning = true;
                         child.material = materials[material];
-                        child.material.needsUpdate = false;
                     }
                 }
             }
@@ -158,7 +161,6 @@ export default class Object {
             if (child.isMesh || child.isSkinnedMesh) {
                 child.castShadow = this.hasShadows;
                 child.receiveShadow = true;
-                child.needsUpdate = false;
                 updateMaterials(child, this.materials);
             } else {
                 updateLights(child, this.lights);
@@ -170,6 +172,14 @@ export default class Object {
     update(time, delta) {
         if (this.animator)
             this.animator.update(time, delta);
+
+        if (this.scene.envMap)
+            for (let material in this.materials) {
+                if (this.materials[material].isMeshStandardMaterial) {
+                    this.materials[material].envMap = this.scene.envMap;
+                }
+
+            }
     }
 
     onClicked() {
@@ -178,18 +188,14 @@ export default class Object {
 
     destroy() {
         this.setActive(false);
-        if (this._isUpdating) {
-            Engine.removeToUpdate(this.updateUID);
-            this._isUpdating = false;
-        }
         if (this.animator)
             this.animator.destroy();
         this.animator = null;
         this.name = null;
         this.model = null;
         this.modelUrl = null;
-        this.scene = null;
         this.materials = null;
         this.lights = null;
+        this.scene = null;
     }
 }

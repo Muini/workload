@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+import Engine from '../engine/engine';
+
 import Object from '../engine/object';
 
 export class Exemple extends Object {
@@ -7,7 +9,7 @@ export class Exemple extends Object {
         super(opt);
     }
 
-    init() {
+    init(opt) {
         //Init variables
         this.name = 'exemple';
         this.modelName = 'exemple.model';
@@ -25,7 +27,7 @@ export class Exemple extends Object {
         this.lights['ExempleLight'] = new THREE.PointLight(0xE7B47F, 3, 5);
         this.lights['ExempleLight'].castShadow = false;
 
-        super.init();
+        super.init(opt);
 
         // Define & init here custom variables
     }

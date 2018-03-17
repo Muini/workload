@@ -55,7 +55,7 @@ export class Worker extends Object {
 
         this.lights['Desk_Spot'] = new THREE.SpotLight(0xDFEEFF);
         this.lights['Desk_Spot'].power = 6;
-        this.lights['Desk_Spot'].castShadow = true;
+        this.lights['Desk_Spot'].castShadow = Engine.isMobile ? false : true;
 
         super.init();
 

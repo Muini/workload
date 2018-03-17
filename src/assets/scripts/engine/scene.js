@@ -46,6 +46,13 @@ export default class Scene {
 
     setCamera(camera) {
         this.mainCamera = camera;
+        this.mainCamera.updateProjectionMatrix();
+        if (Engine.postprod)
+            Engine.postprod.updateScene(this.instance, this.mainCamera);
+    }
+
+    setEnvMap(envmap) {
+        this.envMap = envmap;
     }
 
     resize() {

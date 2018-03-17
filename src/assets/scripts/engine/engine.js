@@ -72,19 +72,32 @@ class Engine {
 
         this.currentScene = undefined;
 
-        // this.fixedRatio = (16 / 9);
+        this.fixedRatio = (16 / 9);
+        this.hasFixedRatio = false;
         this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        if (this.hasFixedRatio)
+            this.height = this.width / this.fixedRatio;
+        else
+            this.height = window.innerHeight;
 
         this.scenes = {};
+
+        this.isMobile = (navigator.userAgent.match(/Android/i) ||
+            navigator.userAgent.match(/webOS/i) ||
+            navigator.userAgent.match(/iPhone/i) ||
+            navigator.userAgent.match(/iPad/i) ||
+            navigator.userAgent.match(/iPod/i) ||
+            navigator.userAgent.match(/BlackBerry/i) ||
+            navigator.userAgent.match(/Windows Phone/i)
+        );
 
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
         // this.renderer = new THREE.WebGLDeferredRenderer();
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.BasicShadowMap
-        this.pixelDensity = window.devicePixelRatio;
+        this.renderer.shadowMap.type = this.isMobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+        this.pixelDensity = this.isMobile ? (window.devicePixelRatio > 2.0 ? 2.0 : window.devicePixelRatio) : (window.devicePixelRatio);
         this.renderer.setPixelRatio(this.pixelDensity);
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
         this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
@@ -92,14 +105,13 @@ class Engine {
         this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
-
         this.startTick = undefined;
         this.lastTick = undefined;
         this.fpsMedian = 0;
         this.tickNbr = 0;
         this.performanceCycleNbr = 0;
         this.performanceCycleLength = 10; //Every 8 frames
-        this.maxPerformanceCycle = 6; //3 Cycles
+        this.maxPerformanceCycle = 5; //3 Cycles
 
         this.loop = new Looper();
         this.loop.add(this.update.bind(this));
@@ -111,37 +123,40 @@ class Engine {
 
         this.bindEvents();
 
-        this.postprod = new PostProd({
-            width: this.width,
-            height: this.height,
-            pixelDensity: this.pixelDensity,
-            camera: this.mainCamera,
-            scene: undefined,
-            renderer: this.renderer,
-            passes: {
-                fxaa: { enabled: true },
-                bloom: { enabled: true, options: [0.5, 1.0, 0.9] },
-                filmic: {
-                    enabled: true,
-                    noise: 0.05,
-                    rgbSplit: 5.0,
-                    vignette: 10.0,
-                    vignetteOffset: 0.2,
-                    lut: .7,
-                    lutURL: '/static/img/lut-gamma.png',
-                },
-                bokehdof: {
-                    enabled: true,
-                },
-                blur: {
-                    enabled: true,
-                    strength: 0.4,
-                    sharpen: 0.15,
-                    blurRgbSplit: 1.15,
-                    gain: 1.6,
+        this.hasPostProd = true;
+        if (this.hasPostProd) {
+            this.postprod = new PostProd({
+                width: this.width,
+                height: this.height,
+                pixelDensity: this.pixelDensity,
+                camera: this.mainCamera,
+                scene: undefined,
+                renderer: this.renderer,
+                passes: {
+                    fxaa: { enabled: this.isMobile ? false : true },
+                    bloom: { enabled: this.isMobile ? false : true, options: [0.5, 1.0, 0.9] },
+                    filmic: {
+                        enabled: true,
+                        noise: 0.025,
+                        rgbSplit: Engine.isMobile ? 0.0 : 5.0,
+                        vignette: 10.0,
+                        vignetteOffset: 0.2,
+                        lut: 0.75,
+                        lutURL: '/static/img/lut-gamma.png',
+                    },
+                    bokehdof: {
+                        enabled: this.isMobile ? false : true,
+                    },
+                    blur: {
+                        enabled: true,
+                        strength: 0.4,
+                        sharpen: this.isMobile ? 0.05 : 0.15,
+                        blurRgbSplit: 1.15,
+                        gain: 1.6,
+                    }
                 }
-            }
-        });
+            });
+        }
 
         if (window.DEBUG) {
             window.THREE = THREE;
@@ -160,6 +175,12 @@ class Engine {
         container.appendChild(this.renderer.domElement);
         if (window.DEBUG)
             container.appendChild(this.stats.dom);
+    }
+
+    setFixedRatio(ratio) {
+        this.fixedRatio = ratio;
+        this.hasFixedRatio = true;
+        this.resize();
     }
 
     bindEvents() {
@@ -226,7 +247,10 @@ class Engine {
 
     resize() {
         this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        if (this.hasFixedRatio)
+            this.height = this.width / this.fixedRatio;
+        else
+            this.height = window.innerHeight;
 
         for (let i = 0; i < this.resizeFunctions.length; i++) {
             this.resizeFunctions[i]();
@@ -235,7 +259,8 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(this.pixelDensity);
 
-        this.postprod.resize(this.width, this.height, this.pixelDensity);
+        if (this.hasPostProd)
+            this.postprod.resize(this.width, this.height, this.pixelDensity);
 
         if (!this.isPlaying && this.hasStarted) {
             this.play();
@@ -251,9 +276,8 @@ class Engine {
     }
 
     setScene(sceneName, callback) {
-        if (this.scenes[sceneName] === undefined) return;
+        if (this.scenes[sceneName] === undefined) throw `Engine : Scene ${sceneName} is not registered`;
         this.currentScene = this.scenes[sceneName];
-        this.postprod.updateScene(this.currentScene.instance, this.currentScene.mainCamera);
         if (window.DEBUG)
             window.scene = this.currentScene.instance;
         this.currentScene.load(callback);
@@ -261,10 +285,10 @@ class Engine {
 
     start() {
         if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScene(...) function';
-        if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
         if (window.DEBUG)
             console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         this.currentScene.onStart();
+        if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
         this.hasStarted = true;
         this.play();
     }
@@ -307,23 +331,26 @@ class Engine {
             //Get the mediam FPS of the cycle
             this.fpsMedian /= this.performanceCycleLength;
 
+            let hasBeenResized = false;
+
             //Adjust pixelDensity based on the fps but not on the first cycle
             if (this.performanceCycleNbr !== 0) {
                 let newPixelDensity = this.pixelDensity;
                 if (this.fpsMedian < 10) {
-                    newPixelDensity /= 2.;
-                } else if (this.fpsMedian < 25) {
                     newPixelDensity /= 1.5;
-                } else if (this.fpsMedian < 50) {
+                } else if (this.fpsMedian < 25) {
                     newPixelDensity /= 1.25;
+                } else if (this.fpsMedian < 50) {
+                    newPixelDensity /= 1.1;
                 }
-                if (newPixelDensity <= .5)
-                    newPixelDensity = .5;
+                if (newPixelDensity <= .75)
+                    newPixelDensity = .75;
 
                 if (newPixelDensity != this.pixelDensity) {
                     this.pixelDensity = newPixelDensity;
                     //Trigger the resize
                     this.resize();
+                    hasBeenResized = true;
                     // console.log(this.fpsMedian, this.pixelDensity);
                     if (window.DEBUG)
                         console.log('%cEngine%c Adapting renderer to ' + newPixelDensity + ' pixelRatio', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
@@ -331,7 +358,8 @@ class Engine {
             }
 
             //Reset vars to start a new cycle
-            this.performanceCycleNbr++;
+            if (!hasBeenResized)
+                this.performanceCycleNbr++;
             this.fpsMedian = 0;
         }
     }
@@ -340,16 +368,14 @@ class Engine {
         if (window.DEBUG)
             this.stats.begin();
 
+        if (!this.currentScene || !this.currentScene.mainCamera) return;
+
         //Check if we need to downgrade the renderer
         this.adaptiveRenderer(time, delta);
 
-        //Render the scene
-        //this.renderer.clear();
-        // if (this.currentScene && this.currentScene.mainCamera)
-        this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
-
         //Update & Render Post processing effects
-        this.postprod.update(time, delta);
+        if (this.hasPostProd)
+            this.postprod.update(time, delta);
 
         TWEEN.update(time);
 
@@ -357,6 +383,9 @@ class Engine {
         for (let key in this.updateFunctions) {
             this.updateFunctions[key](time, delta);
         }
+
+        //Render the scene
+        this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
 
         //Store lastTick
         this.lastTick = time;
