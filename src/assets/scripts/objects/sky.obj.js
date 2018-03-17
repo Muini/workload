@@ -15,7 +15,7 @@ export class Sky extends Object {
         this.name = 'sky';
 
         this.sky = new THREE.Sky();
-        this.sky.scale.setScalar(450);
+        this.sky.scale.setScalar(opt.size || 500);
         this.sky.name = 'Sky';
         this.model.add(this.sky);
 

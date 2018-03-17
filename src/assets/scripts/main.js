@@ -15,6 +15,6 @@ Engine.registerScene(WorkloadScene);
 //================
 Engine.setFixedRatio(16 / 9);
 Engine.appendCanvas(document.getElementById('main'));
-Engine.setScene('workload', _ => {
+Engine.setScene('intro.plan1', _ => {
     Engine.start();
 });

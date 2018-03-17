@@ -57,6 +57,15 @@ export default class PostProd {
             return;
         }
 
+        this.isMobile = (navigator.userAgent.match(/Android/i) ||
+            navigator.userAgent.match(/webOS/i) ||
+            navigator.userAgent.match(/iPhone/i) ||
+            navigator.userAgent.match(/iPad/i) ||
+            navigator.userAgent.match(/iPod/i) ||
+            navigator.userAgent.match(/BlackBerry/i) ||
+            navigator.userAgent.match(/Windows Phone/i)
+        );
+
         this.renderTarget = new THREE.WebGLRenderTarget(this.width, this.height);
         this.renderTarget.texture.format = THREE.RGBAFormat;
         this.renderTarget.texture.minFilter = THREE.LinearFilter;
@@ -77,6 +86,7 @@ export default class PostProd {
         // Bokeh DOF
         if (this.passes.bokehdof.enabled) {
             // this.depthComposer.reset();
+            THREE.BokehShader.defines.ITERATIONS = this.isMobile ? 12 : 32;
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";
             this.bokehPass.uniforms['nearClip'].value = this.camera ? this.camera.near : 1.0;
@@ -123,6 +133,7 @@ export default class PostProd {
 
         // Blur & Sharpen
         if (this.passes.blur.enabled) {
+            THREE.BokehShader.defines.SAMPLE = this.isMobile ? 8 : 12;
             this.blurDomElems = [];
             this.blurPos = [
                 new THREE.Vector4(0.0, 0.0, 0.0, 0.0),

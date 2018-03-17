@@ -18,14 +18,15 @@ export class Cubemap extends Object {
         this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
         this.model.add(this.cubeCamera1);
 
-        this.cubeCamera2 = this.cubeCamera1.clone();
+        this.cubeCamera2 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, opt.resolution || 128);
+        this.cubeCamera2.name = 'Cubemap CubeCamera1';
         this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
         this.model.add(this.cubeCamera2);
 
         this.texture = this.cubeCamera2.renderTarget.texture;
 
         this.shouldUpdate = opt.shouldUpdate;
-        this.tickRate = opt.tickRate || 1;
+        this.tickRate = opt.tickRate || 2;
         this.tick = 0;
 
         this.hasBeenRendered = false;
@@ -56,23 +57,21 @@ export class Cubemap extends Object {
 
         super.update(time, delta);
 
-        if (this.tick % this.tickRate === 0) {
-            if (this.tick % 2 === 0) {
-                this.texture = this.cubeCamera2.renderTarget.texture;
-                this.cubeCamera2.visible = false;
-                this.cubeCamera1.visible = true;
-                this.cubeCamera1.update(Engine.renderer, this.scene.instance);
-            } else {
-                this.texture = this.cubeCamera1.renderTarget.texture;
-                this.cubeCamera1.visible = false;
-                this.cubeCamera2.visible = true;
-                this.cubeCamera2.update(Engine.renderer, this.scene.instance);
-                if (!this.shouldUpdate)
-                    this.hasBeenRendered = true;
-            }
-            // this.debugMaterial.envMap = this.texture;
-            this.scene.setEnvMap(this.texture);
+        if (this.tick % (this.tickRate < 2 ? 2 : this.tickRate) === 0) {
+            this.texture = this.cubeCamera2.renderTarget.texture;
+            this.cubeCamera2.visible = false;
+            this.cubeCamera1.visible = true;
+            this.cubeCamera1.update(Engine.renderer, this.scene.instance);
+        } else {
+            this.texture = this.cubeCamera1.renderTarget.texture;
+            this.cubeCamera1.visible = false;
+            this.cubeCamera2.visible = true;
+            this.cubeCamera2.update(Engine.renderer, this.scene.instance);
+            if (!this.shouldUpdate)
+                this.hasBeenRendered = true;
         }
+        // this.debugMaterial.envMap = this.texture;
+        this.scene.setEnvMap(this.texture);
 
         this.tick++;
     }

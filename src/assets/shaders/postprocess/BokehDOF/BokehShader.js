@@ -9,6 +9,10 @@ import * as THREE from 'three';
 
 THREE.BokehShader = {
 
+    defines: {
+        ITERATIONS: 32,
+    },
+
     uniforms: {
 
         "tDiffuse": { value: null },

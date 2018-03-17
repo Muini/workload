@@ -24,7 +24,7 @@ export default new Scene({
             position: new THREE.Vector3(0, 22, 48),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 40,
-            aperture: 2.8,
+            aperture: 4.0,
             focus: 76.0, //76.0 //32.0
             far: 500,
         });
@@ -33,10 +33,10 @@ export default new Scene({
             parent: this,
             near: 1,
             far: 500,
-            resolution: Engine.isMobile ? 16 : 32,
-            position: new THREE.Vector3(0, 26, 25),
+            resolution: Engine.isMobile ? 16 : 64,
+            position: new THREE.Vector3(0, 35, 30),
             shouldUpdate: false,
-            tickRate: 1,
+            tickRate: 4,
         });
 
 
@@ -46,7 +46,7 @@ export default new Scene({
         this.instance.add(ambiantLight);
 
         // Sun
-        this.sun = new THREE.DirectionalLight(0xFFF4E6, 10.0);
+        this.sun = new THREE.DirectionalLight(0xFFF4E6, 8.0);
         this.sun.name = "Sun";
         this.sun.position.x = 0;
         this.sun.position.y = 100;
@@ -67,10 +67,15 @@ export default new Scene({
 
         let sky = new Sky({
             parent: this,
-            sunPosition: this.sun.position
+            size: 1000,
+            sunPosition: this.sun.position,
+            turbidity: 2.5,
+            rayleight: 2.5,
+            mieCoefficient: 0.005,
+            mieDirectionalG: 0.9
         })
 
-        this.instance.fog = new THREE.FogExp2(0xC9D3DF, 0.0075);
+        this.instance.fog = new THREE.FogExp2(0xd3dee5, 0.006);
 
         this.city = new City({ parent: this });
 
@@ -86,15 +91,16 @@ export default new Scene({
         this.instance.add(sunTarget);
         this.sun.target = sunTarget;
 
-        let tween = new Tween({ z: 48 })
-            .to({ z: 44 }, 3000)
+        /*let tween = new Tween({ y: 30, z: 48 })
+            .to({ y: 22, z: 44 }, 3000)
             .repeat(Infinity)
             .yoyo(true)
             .easing(Easing.Cubic.InOut)
-            .on('update', ({ z }) => {
+            .on('update', ({ y, z }) => {
+                this.camera.model.position.y = y;
                 this.camera.model.position.z = z;
                 this.camera.focus = 48 * 76 / z
             })
-            .start();
+            .start();*/
     }
 })

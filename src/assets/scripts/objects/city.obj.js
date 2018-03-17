@@ -4,6 +4,8 @@ import Engine from '../engine/engine';
 
 import Object from '../engine/object';
 
+import SwayShader from '../../shaders/sway/SwayShader';
+
 export class City extends Object {
     constructor(opt = {}) {
         super(opt);
@@ -28,12 +30,18 @@ export class City extends Object {
             metalness: .0,
             dithering: true,
         });
-        this.materials['Leafs'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x91C55C),
-            roughness: .6,
-            metalness: .0,
+        this.materials['Leafs'] = new SwayShader({
             dithering: true,
+        }, {
+            "diffuse": { value: new THREE.Color(0x91C55C) },
+            "roughness": { value: .7 },
+            "metalness": { value: .0 },
+            "time": { value: 1.0 },
+            "swaySpeed": { value: 1.0 },
+            "swayDirection": { value: new THREE.Vector3(30, -20) },
+            "swayAngle": { value: 5.0 },
         });
+        // console.log(this.materials['Leafs']);
         this.materials['Concrete'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0x9E9B96),
             roughness: .9,
@@ -51,20 +59,21 @@ export class City extends Object {
             roughness: .7,
             metalness: 1.0,
             dithering: true,
+            envMapIntensity: 5.,
         });
         this.materials['Glass'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0xC4D8D8),
             roughness: .2,
             metalness: 0.9,
             dithering: true,
-            envMapIntensity: 5.,
+            envMapIntensity: 6.,
         });
         this.materials['Glass2'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0xBCCCD4),
-            roughness: .2,
-            metalness: 0.9,
+            roughness: .15,
+            metalness: 0.95,
             dithering: true,
-            envMapIntensity: 5.,
+            envMapIntensity: 6.,
         });
 
         super.init();
@@ -80,6 +89,8 @@ export class City extends Object {
 
     update(time, delta) {
         super.update(time, delta);
+
+        this.materials['Leafs'].uniforms['time'].value = time;
     }
 
 }

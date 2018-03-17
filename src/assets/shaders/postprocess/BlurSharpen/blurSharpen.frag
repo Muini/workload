@@ -53,7 +53,7 @@ void main() {
     vec2 uv = vUv.xy;
     vec2 PixelOffset = 1.0 / resolution.xy;
     
-    const float Sample = 12.0;
+    const float Sample = float(SAMPLE);
     float Start = 2.0 / Sample;
     vec2 Scale = blurStrength * Sample * 2.0 * PixelOffset.xy;
     

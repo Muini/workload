@@ -23,8 +23,7 @@ uniform float maxblur; // max blur amount
 // The compiler is a dunce I tells-ya!!
 #define GOLDEN_ANGLE 2.39996323
 
-// #define ITERATIONS 32
-#define ITERATIONS 64
+// #define ITERATIONS 64
 
 #define DISTORTION_ANAMORPHIC	0.0;
 #define DISTORTION_BARREL       0.3;
@@ -90,7 +89,7 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount, float pixelDepth)
         vec3 acc = vec3(0.0);
         vec3 div = vec3(0.0);
         float r = 1.0;
-        vec2 vangle = vec2(0.0,radius); // Start angle
+        vec2 vangle = vec2(0.0,radius / float(ITERATIONS) * 128.0); // Start angle
         mat2 rot = rotMatrix(GOLDEN_ANGLE);
     
         amount += radius*500.0;

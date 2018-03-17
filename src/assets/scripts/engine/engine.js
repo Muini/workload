@@ -133,11 +133,11 @@ class Engine {
                 scene: undefined,
                 renderer: this.renderer,
                 passes: {
-                    fxaa: { enabled: this.isMobile ? false : true },
+                    fxaa: { enabled: true },
                     bloom: { enabled: this.isMobile ? false : true, options: [0.5, 1.0, 0.9] },
                     filmic: {
                         enabled: true,
-                        noise: 0.025,
+                        noise: Engine.isMobile ? 0.0 : 0.025,
                         rgbSplit: Engine.isMobile ? 0.0 : 5.0,
                         vignette: 10.0,
                         vignetteOffset: 0.2,
@@ -145,7 +145,7 @@ class Engine {
                         lutURL: '/static/img/lut-gamma.png',
                     },
                     bokehdof: {
-                        enabled: this.isMobile ? false : true,
+                        enabled: true,
                     },
                     blur: {
                         enabled: true,
@@ -263,9 +263,8 @@ class Engine {
             this.postprod.resize(this.width, this.height, this.pixelDensity);
 
         if (!this.isPlaying && this.hasStarted) {
-            this.play();
             this.waitNextTick(_ => {
-                this.pause();
+                this.update();
             });
         }
     }

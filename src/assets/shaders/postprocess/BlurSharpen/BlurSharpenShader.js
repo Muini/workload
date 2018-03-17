@@ -9,6 +9,10 @@ import * as THREE from 'three';
 
 THREE.BlurSharpenShader = {
 
+    defines: {
+        SAMPLE: 12,
+    },
+
     uniforms: {
 
         "tDiffuse": { value: null },

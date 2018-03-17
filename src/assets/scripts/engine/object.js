@@ -103,6 +103,8 @@ export default class Object {
             this.parent.model.add(this.model);
         }
 
+        this.updateEnvMap();
+
         this.setActive(this.isActive);
     }
 
@@ -169,17 +171,22 @@ export default class Object {
         this.model.name = this.name;
     }
 
+    updateEnvMap() {
+        // Update envMap
+        if (!this.scene.envMap) return;
+        for (let material in this.materials) {
+            if (this.materials[material].isMeshStandardMaterial) {
+                this.materials[material].envMap = this.scene.envMap;
+            }
+
+        }
+    }
+
     update(time, delta) {
         if (this.animator)
             this.animator.update(time, delta);
 
-        if (this.scene.envMap)
-            for (let material in this.materials) {
-                if (this.materials[material].isMeshStandardMaterial) {
-                    this.materials[material].envMap = this.scene.envMap;
-                }
-
-            }
+        this.updateEnvMap();
     }
 
     onClicked() {
