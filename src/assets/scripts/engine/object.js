@@ -10,6 +10,7 @@ export default class Object {
         rotation,
         active,
     }) {
+        this.uuid = Engine.uuid();
         this.name = 'unnamed object';
 
         this.model = new THREE.Group();
@@ -33,12 +34,9 @@ export default class Object {
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
         this.rotation = opt.rotation || new THREE.Vector3(0, 0, 0);
 
-        this.updateUID = '';
         this._isUpdating = false;
 
         this.init(opt);
-
-        this.secondUpdate = false;
     }
 
     // Init happen when the entire project is loaded
@@ -64,12 +62,12 @@ export default class Object {
         this.isActive = bool;
         if (this.isActive) {
             if (!this._isUpdating) {
-                Engine.addToUpdate(this.update.bind(this), (uid) => { this.updateUID = uid });
+                Engine.addToUpdate(this.uuid, this.update.bind(this));
                 this._isUpdating = true;
             }
         } else {
             if (this._isUpdating) {
-                Engine.removeToUpdate(this.updateUID);
+                Engine.removeFromUpdate(this.uuid);
                 this._isUpdating = false;
             }
         }

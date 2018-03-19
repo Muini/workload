@@ -1,3 +1,5 @@
+import Engine from './engine';
+
 import Assets from '../assets';
 import ModelLoader from './modelLoader';
 
@@ -8,6 +10,7 @@ class AssetsManager {
 
         this.assetsLoaded = 0;
         this.assetsToLoad = 0;
+        this.assetPercent = 0;
 
         this.onSceneLoaded = function() {};
 
@@ -52,11 +55,20 @@ class AssetsManager {
         for (let modelName in Assets[sceneName].models) {
             if (!this.assets[modelName].isLoaded) {
                 this.assetsToLoad++;
-                ModelLoader.load(this.assets[modelName].url, (modelLoaded) => {
-                    this.assets[modelName].asset = modelLoaded;
-                    this.assets[modelName].isLoaded = true;
-                    this.updateLoader();
-                });
+                this.assetPercent = 0;
+                ModelLoader.load(
+                    this.assets[modelName].url,
+                    (modelLoaded) => {
+                        this.assets[modelName].asset = modelLoaded;
+                        this.assets[modelName].isLoaded = true;
+                        this.updateLoader();
+                    },
+                    (loaded, total) => {
+                        this.assetPercent = loaded / total * 100;
+                        if (Engine.Loader)
+                            Engine.Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
+                    }
+                );
             }
         }
         for (let textureName in Assets[sceneName].textures) {
@@ -73,6 +85,8 @@ class AssetsManager {
 
     updateLoader() {
         this.assetsLoaded++;
+        if (Engine.Loader)
+            Engine.Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
         if (window.DEBUG)
             console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' assets loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
         if (this.assetsLoaded >= this.assetsToLoad) {

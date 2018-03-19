@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import GLTFLoader from '../vendors/GLTFLoader';
 
 class ModelLoader {
@@ -5,12 +7,19 @@ class ModelLoader {
         this.loader = new THREE.GLTFLoader();
     }
 
-    load(modelUrl, callback) {
+    load(modelUrl, onFinished, onUpdate) {
         this.loader.load(modelUrl,
             (gltf) => {
                 // console.log(modelUrl, gltf);
-                callback(gltf);
-            });
+                onFinished(gltf);
+            },
+            (xhr) => {
+                onUpdate(xhr.loaded, xhr.total);
+            },
+            (error) => {
+                console.error('GLTF Loader error :', error);
+            },
+        );
     }
 }
 

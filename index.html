@@ -58,9 +58,16 @@
 
 <body>
     <main id="main" role="main">
-        <div class="hud-test">
-            <p>Score : {{ score }}</p>
-        </div>
+        <section id="film">
+
+            <div class="hud-test">
+                <p>Score : {{ score }}</p>
+            </div>
+        </section>
+        <section class="loader">
+            <div class="animation"></div>
+            <div class="percent">{{ percentage }}%</div>
+        </section>
     </main>
     <!-- built files will be auto injected -->
 </body>

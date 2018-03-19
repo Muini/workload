@@ -18,9 +18,8 @@ varying vec3 vViewPosition;
 #include <clipping_planes_pars_vertex>
 
 uniform float time;
-uniform float swaySpeed;
-uniform vec2 swayDirection;
-uniform float swayAngle;
+uniform float swayBlend;
+uniform vec2 windForce;
 
 void main() {
 	#include <uv_vertex>
@@ -39,27 +38,17 @@ void main() {
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
 
-	float dx = 0.0;
-	float dz = 0.0;
 	vec3 displacedVertex = vec3(0.0);
-	float fBendScale = 0.01;
 
-	float fLength = length(transformed);
-
-	float fBF = transformed.z * fBendScale * fLength;
+	float fBF = transformed.z * swayBlend * length(transformed);
 	fBF += 1.0;
 	fBF *= fBF;
 	fBF = fBF * fBF - fBF;
 
-	// dx = (swayDirection.x / 10.0) * cos( time * 0.01 * swaySpeed) * fBF;
-	dx = (swayDirection.x / 10.0) * cos( time * 0.001 * swaySpeed ) * fBF;
-	// dz = (swayDirection.y / 10.0) * sin( time * 0.01 * swaySpeed * (normalize(abs(transformed.y)) * 0.0001) ) * fBF;
-	dz = (swayDirection.y / 10.0) * sin( time * 0.001 * swaySpeed ) * fBF;
+	displacedVertex.x = (windForce.x / 10.0) * cos( time * 0.00005 * length(windForce) + transformed.x ) * fBF;
+	displacedVertex.z = (windForce.y / 10.0) * sin( time * 0.00005 * length(windForce) + transformed.y ) * fBF;
 
-	displacedVertex.x = dx;
-	displacedVertex.z = dz;
-
-	// transformed *= displacedVertex;
+	transformed -= displacedVertex;
 
 	vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 ) + vec4( displacedVertex, 0.0 );
 

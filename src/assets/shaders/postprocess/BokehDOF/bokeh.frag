@@ -67,15 +67,15 @@ vec2 GetDistOffset(vec2 uv, vec2 pxoffset)
 }
 
 float getFocus(float blur, float depth, float mult){
-        float edge = 0.002*mult*depth; //distance based edge smoothing
+        float edge = 0.00025*mult*depth; //distance based edge smoothing
         float focus = clamp(smoothstep(0.0,edge,blur),0.0,1.0);
         return focus;
 }
 
 vec3 debugFocus(vec3 col, float blur, float depth) {
         float focus = getFocus(blur, depth, 3.0);
-        col = mix(col,vec3(0.0,0.5,1.0),(focus)*0.05);
-        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focus)*0.2);
+        col = mix(col,vec3(0.0,0.5,1.0),(focus)*0.25);
+        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focus)*0.5);
         return col;
 }
 
@@ -130,17 +130,20 @@ void main() {
         float CoC = 0.029; //circle of confusion size in mm (35mm film = 0.029mm)
 
         // // Autofocus
-        // float fDepth = 1.0;
+        float fDepth = 1.0;
         // vec2 focusCoords = vec2(0.5,0.5);
         // fDepth = readDepth(focusCoords);
+
+        // No Autofocus
+        fDepth = ((focusDistance - nearClip) / farClip) * 2.0;
         
-        float f = focalLength / 6000.0; // focal length in mm
-        float d = (focusDistance - nearClip) / farClip; // focal plane in mm
-        float o = depth; // depth in mm
+        float f = focalLength; // focal length in mm
+        float d = fDepth * 1000.0; // focal plane in mm
+        float o = depth * 1000.0; // depth in mm
 
         float a = (o*f)/(o-f);
         float b = (d*f)/(d-f);
-        float c = (d-f)/(d*aperture*CoC);
+        float c = (d-f)/(d*aperture*CoC*50000.0);
 
         float blur = abs(a-b)*c;
         /*
@@ -161,7 +164,6 @@ void main() {
         // vec4 backgroudColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
         // vec4 foregroudColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
         vec4 focusColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
-
 
         // gl_FragColor = vec4(focusDepth, foregroundDepth, backgroundDepth, 1.0);
 

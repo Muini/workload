@@ -51,6 +51,7 @@ void main() {
     }
     
     if(noiseStrength > 0.0){
+
         float dx = rand( vUv + time );
         vec3 noiseColor = gl_FragColor.rgb + gl_FragColor.rgb * clamp( 0.1 + dx, 0.0, 1.0 );
 

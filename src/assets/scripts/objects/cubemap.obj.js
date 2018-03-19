@@ -23,7 +23,7 @@ export class Cubemap extends Object {
         this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
         this.model.add(this.cubeCamera2);
 
-        this.texture = this.cubeCamera2.renderTarget.texture;
+        this.texture = this.cubeCamera1.renderTarget.texture;
 
         this.shouldUpdate = opt.shouldUpdate;
         this.tickRate = opt.tickRate || 2;
@@ -58,17 +58,18 @@ export class Cubemap extends Object {
         super.update(time, delta);
 
         if (this.tick % (this.tickRate < 2 ? 2 : this.tickRate) === 0) {
-            this.texture = this.cubeCamera2.renderTarget.texture;
             this.cubeCamera2.visible = false;
             this.cubeCamera1.visible = true;
-            this.cubeCamera1.update(Engine.renderer, this.scene.instance);
+            this.cubeCamera2.update(Engine.renderer, this.scene.instance);
+            this.texture = this.cubeCamera2.renderTarget.texture;
+            if (!this.shouldUpdate) {
+                this.hasBeenRendered = true;
+            }
         } else {
-            this.texture = this.cubeCamera1.renderTarget.texture;
             this.cubeCamera1.visible = false;
             this.cubeCamera2.visible = true;
-            this.cubeCamera2.update(Engine.renderer, this.scene.instance);
-            if (!this.shouldUpdate)
-                this.hasBeenRendered = true;
+            this.cubeCamera1.update(Engine.renderer, this.scene.instance);
+            this.texture = this.cubeCamera1.renderTarget.texture;
         }
         // this.debugMaterial.envMap = this.texture;
         this.scene.setEnvMap(this.texture);

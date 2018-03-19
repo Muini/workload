@@ -22,7 +22,8 @@ export default new Scene({
             position: new THREE.Vector3(10, 11, 10),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 50,
-            aperture: 2.8,
+            focus: 16.0,
+            aperture: 3.5,
         });
 
         // Floor

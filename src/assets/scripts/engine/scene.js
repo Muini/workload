@@ -10,6 +10,7 @@ export default class Scene {
         setup,
         onStart,
     }) {
+        this.uuid = Engine.uuid();
         this.name = opt.name || 'unamed scene';
         this.data = opt.data || {};
         this.setup = opt.setup || function() {};
@@ -25,11 +26,12 @@ export default class Scene {
 
         this.isScene = true;
 
+        this.hasLoaded = false;
+        this.isLoading = false;
+
         this.mainCamera = undefined;
 
         this.objects = [];
-
-        Engine.addToResize(this.resize.bind(this));
     }
 
     addObject(object) {
@@ -46,7 +48,7 @@ export default class Scene {
 
     setCamera(camera) {
         this.mainCamera = camera;
-        this.mainCamera.updateProjectionMatrix();
+        this.resize();
         if (Engine.postprod)
             Engine.postprod.updateScene(this.instance, this.mainCamera);
     }
@@ -68,17 +70,27 @@ export default class Scene {
         this.mainCamera.updateProjectionMatrix();
     }
 
-    load(callback) {
-
+    preload(callback) {
+        this.isLoading = true;
         // Get all entites, load their assets (sounds, models, textures)
         this.assetsToLoad += this.objects.length;
+
+        this.callback = callback;
 
         AssetsManager.loadAssetsFromScene(this.name, _ => {
             if (window.DEBUG)
                 console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
-            this.awakeObjects();
-            callback();
+            this.isLoading = false;
+            this.hasLoaded = true;
+            this.start();
+            this.callback();
         });
+    }
+
+    start() {
+        Engine.addToResize(this.resize.bind(this));
+        this.resize();
+        this.awakeObjects();
     }
 
     unload() {
@@ -87,6 +99,7 @@ export default class Scene {
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].destroy();
         }
+        Engine.removeToResize(this.uuid);
     }
 
 }

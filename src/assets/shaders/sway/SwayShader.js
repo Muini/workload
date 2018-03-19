@@ -11,9 +11,8 @@ export default class SwayShader {
         var standardShader = THREE.ShaderLib['standard'];
         var swayUniforms = {
             "time": { value: 1.0 },
-            "swaySpeed": { value: 1.0 },
-            "swayDirection": { value: new THREE.Vector2(0, 0) },
-            "swayAngle": { value: 10.0 },
+            "swayBlend": { value: 0.005 },
+            "windForce": { value: new THREE.Vector2(0, 0) },
         }
 
         var material = new THREE.ShaderMaterial({
@@ -32,8 +31,6 @@ export default class SwayShader {
         });
 
         material.setValues(parameters);
-
-        console.log(material.uniforms)
 
         return material;
 

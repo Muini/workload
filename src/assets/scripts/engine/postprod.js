@@ -133,7 +133,7 @@ export default class PostProd {
 
         // Blur & Sharpen
         if (this.passes.blur.enabled) {
-            THREE.BokehShader.defines.SAMPLE = this.isMobile ? 8 : 12;
+            THREE.BlurSharpenShader.defines.SAMPLE = this.isMobile ? 8 : 12;
             this.blurDomElems = [];
             this.blurPos = [
                 new THREE.Vector4(0.0, 0.0, 0.0, 0.0),

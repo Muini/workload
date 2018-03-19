@@ -5,6 +5,7 @@ import Looper from '../vendors/looper';
 import PostProd from './postprod';
 import SoundEngine from './soundEngine';
 import * as TWEEN from 'es6-tween';
+import Loader from './loader';
 
 window.DEBUG = true;
 
@@ -91,6 +92,8 @@ class Engine {
             navigator.userAgent.match(/Windows Phone/i)
         );
 
+        this.container = undefined;
+        this.containerBoundingBox = undefined;
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
         // this.renderer = new THREE.WebGLDeferredRenderer();
         this.renderer.setSize(this.width, this.height);
@@ -119,11 +122,26 @@ class Engine {
         this.isPlaying = false;
 
         this.updateFunctions = {};
-        this.resizeFunctions = [];
+        this.resizeFunctions = {};
+
+        this.Tween = TWEEN.Tween;
+        this.Easing = TWEEN.Easing;
+
+        this.Loader = undefined;
 
         this.bindEvents();
 
         this.hasPostProd = true;
+        this.postprod = undefined;
+
+        if (window.DEBUG) {
+            window.THREE = THREE;
+            window.renderer = this.renderer;
+            console.log('%cEngine%c Init - width: ' + this.width + 'px - height: ' + this.height + 'px - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        }
+    }
+
+    init(container) {
         if (this.hasPostProd) {
             this.postprod = new PostProd({
                 width: this.width,
@@ -137,20 +155,20 @@ class Engine {
                     bloom: { enabled: this.isMobile ? false : true, options: [0.5, 1.0, 0.9] },
                     filmic: {
                         enabled: true,
-                        noise: Engine.isMobile ? 0.0 : 0.025,
-                        rgbSplit: Engine.isMobile ? 0.0 : 5.0,
+                        noise: 0.03,
+                        rgbSplit: this.isMobile ? 0.0 : 5.0,
                         vignette: 10.0,
                         vignetteOffset: 0.2,
                         lut: 0.75,
                         lutURL: '/static/img/lut-gamma.png',
                     },
                     bokehdof: {
-                        enabled: true,
+                        enabled: this.isMobile ? false : true,
                     },
                     blur: {
                         enabled: true,
                         strength: 0.4,
-                        sharpen: this.isMobile ? 0.05 : 0.15,
+                        sharpen: this.isMobile ? 0.0 : 0.15,
                         blurRgbSplit: 1.15,
                         gain: 1.6,
                     }
@@ -158,23 +176,18 @@ class Engine {
             });
         }
 
-        if (window.DEBUG) {
-            window.THREE = THREE;
-            window.renderer = this.renderer;
-            console.log('%cEngine%c Init - width: ' + this.width + 'px - height: ' + this.height + 'px - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
-        }
+        this.Loader = new Loader();
+
+        this.container = container;
+        this.container.appendChild(this.renderer.domElement);
+        if (window.DEBUG)
+            this.container.appendChild(this.stats.dom);
     }
 
     uuid() {
         return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
             (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
         )
-    }
-
-    appendCanvas(container) {
-        container.appendChild(this.renderer.domElement);
-        if (window.DEBUG)
-            container.appendChild(this.stats.dom);
     }
 
     setFixedRatio(ratio) {
@@ -188,6 +201,7 @@ class Engine {
             this.performanceCycleNbr = 0;
             this.resize();
         }, false);
+        // if (window.DEBUG) return;
         let isActive = true
         document.addEventListener('visibilitychange', _ => {
             if (document.visibilityState == 'visible') {
@@ -216,16 +230,24 @@ class Engine {
         }, false)
     }
 
-    addToResize(fct) {
-        if (typeof fct !== 'function') return;
-        this.resizeFunctions.push(fct);
+    addToResize(uuid, fct) {
+        if (typeof fct !== 'function' || uuid === undefined) return;
+        this.resizeFunctions[uuid] = fct;
     }
 
-    addToUpdate(fct, callback) {
-        if (typeof fct !== 'function') return;
-        let uid = this.uuid();
-        this.updateFunctions[uid] = fct;
-        callback(uid);
+    addToUpdate(uuid, fct) {
+        if (typeof fct !== 'function' || uuid === undefined) return;
+        this.updateFunctions[uuid] = fct;
+    }
+
+    removeFromUpdate(uid) {
+        if (!this.updateFunctions[uid]) return;
+        delete this.updateFunctions[uid];
+    }
+
+    removeFromResize(uid) {
+        if (!this.resizeFunctions[uid]) return;
+        delete this.resizeFunctions[uid];
     }
 
     waitNextTick(fct) {
@@ -240,24 +262,28 @@ class Engine {
         }, timeToWait);
     }
 
-    removeToUpdate(uid) {
-        if (!this.updateFunctions[uid]) return;
-        delete this.updateFunctions[uid];
-    }
-
     resize() {
         this.width = window.innerWidth;
-        if (this.hasFixedRatio)
+        if (this.hasFixedRatio) {
             this.height = this.width / this.fixedRatio;
-        else
+            if (window.innerHeight < this.height) {
+                this.height = window.innerHeight;
+                this.width = this.height * this.fixedRatio;
+            }
+        } else {
             this.height = window.innerHeight;
-
-        for (let i = 0; i < this.resizeFunctions.length; i++) {
-            this.resizeFunctions[i]();
         }
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(this.pixelDensity);
+
+        this.container.style['width'] = this.width + 'px';
+        this.container.style['height'] = this.height + 'px';
+        this.containerBoundingBox = this.container.getBoundingClientRect();
+
+        for (let key in this.resizeFunctions) {
+            this.resizeFunctions[key]();
+        }
 
         if (this.hasPostProd)
             this.postprod.resize(this.width, this.height, this.pixelDensity);
@@ -279,7 +305,19 @@ class Engine {
         this.currentScene = this.scenes[sceneName];
         if (window.DEBUG)
             window.scene = this.currentScene.instance;
-        this.currentScene.load(callback);
+        if (this.currentScene.hasLoaded) {
+            // If the scene is already loaded, start it
+            callback();
+        } else {
+            if (this.currentScene.isLoading) {
+                // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
+                Engine.Loader.show();
+                this.currentScene.callback = callback;
+            } else {
+                // Else load the scene, then start it
+                this.currentScene.preload(callback);
+            }
+        }
     }
 
     start() {
