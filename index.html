@@ -59,13 +59,21 @@
 <body>
     <main id="main" role="main">
         <section id="film">
-
-            <div class="hud-test">
+            <div class="hud hud-test">
                 <p>Score : {{ score }}</p>
+            </div>
+            <div class="hud title">
+                <h1>.Workload</h1>
+            </div>
+            <div class="hud subtitle">
+                <p>An interactive short film by <span>Corentin FLACH</span></p>
             </div>
         </section>
         <section class="loader">
-            <div class="animation"></div>
+            <div class="animation">
+                <div><span class="part part1"></span></div>
+                <div><span class="part part2"></span></div>
+            </div>
             <div class="percent">{{ percentage }}%</div>
         </section>
     </main>

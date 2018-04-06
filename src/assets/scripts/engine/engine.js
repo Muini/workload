@@ -91,6 +91,36 @@ class Engine {
             navigator.userAgent.match(/BlackBerry/i) ||
             navigator.userAgent.match(/Windows Phone/i)
         );
+        this.quality = this.isMobile ? 2 : 4;
+
+        function factorial(num) {
+            if (num < 0) {
+                throw new Error("Number cannot be negative.");
+            }
+            if (num % 1 !== 0) {
+                throw new Error("Number must be an integer.");
+            }
+            if (num === 0 || num === 1) {
+                return 1;
+            }
+            return num * factorial(num - 1);
+        }
+        const iterations = this.isMobile ? 10000 : 100000;
+        let startTime = performance.now();
+        for (let i = 1; i < iterations; i++) {
+            factorial(20);
+        }
+        let durationTime = performance.now() - startTime;
+        startTime = performance.now();
+        for (let i = 1; i < iterations; i++) {
+            factorial(20);
+        }
+        durationTime = (durationTime + (performance.now() - startTime)) / 2;
+        if (window.DEBUG) {
+            console.log('Performance Test: ' + durationTime + ' ms');
+        }
+        if (durationTime > 22)
+            this.quality--;
 
         this.container = undefined;
         this.containerBoundingBox = undefined;
@@ -98,11 +128,17 @@ class Engine {
         // this.renderer = new THREE.WebGLDeferredRenderer();
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = this.isMobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+        if (this.quality < 3) {
+            this.renderer.shadowMap.enabled = this.quality > 1 ? true : false;
+            this.renderer.shadowMap.type = THREE.BasicShadowMap;
+        } else {
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = this.quality > 3 ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
+        }
         this.pixelDensity = this.isMobile ? (window.devicePixelRatio > 2.0 ? 2.0 : window.devicePixelRatio) : (window.devicePixelRatio);
         this.renderer.setPixelRatio(this.pixelDensity);
-        this.renderer.toneMapping = THREE.Uncharted2ToneMapping; //THREE.ACESToneMapping
+        this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
+        // this.renderer.toneMapping = THREE.CineonToneMapping; //THREE.ACESToneMapping
         this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
         this.renderer.physicallyCorrectLights = false;
         this.renderer.gammaFactor = 2.2;
@@ -137,7 +173,7 @@ class Engine {
         if (window.DEBUG) {
             window.THREE = THREE;
             window.renderer = this.renderer;
-            console.log('%cEngine%c Init - width: ' + this.width + 'px - height: ' + this.height + 'px - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+            console.log('%cEngine%c Init - width: ' + this.width + 'px - height: ' + this.height + 'px - Quality: ' + this.quality + ' - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         }
     }
 
@@ -151,26 +187,27 @@ class Engine {
                 scene: undefined,
                 renderer: this.renderer,
                 passes: {
-                    fxaa: { enabled: true },
-                    bloom: { enabled: this.isMobile ? false : true, options: [0.5, 1.0, 0.9] },
+                    fxaa: { enabled: this.quality < 2 ? true : true },
+                    bloom: { enabled: this.quality < 3 ? false : true, options: [0.5, 1.0, 0.9] },
                     filmic: {
                         enabled: true,
-                        noise: 0.03,
-                        rgbSplit: this.isMobile ? 0.0 : 5.0,
-                        vignette: 10.0,
+                        noise: 0.1,
+                        useStaticNoise: true,
+                        rgbSplit: this.quality < 3 ? 0.0 : 5.0,
+                        vignette: this.quality < 2 ? 0.0 : 10.0,
                         vignetteOffset: 0.2,
                         lut: 0.75,
                         lutURL: '/static/img/lut-gamma.png',
                     },
                     bokehdof: {
-                        enabled: this.isMobile ? false : true,
+                        enabled: this.quality < 3 ? false : true,
                     },
                     blur: {
                         enabled: true,
-                        strength: 0.4,
-                        sharpen: this.isMobile ? 0.0 : 0.15,
-                        blurRgbSplit: 1.15,
-                        gain: 1.6,
+                        strength: 5.0,
+                        sharpen: this.quality < 3 ? 0.05 : 0.15,
+                        blurRgbSplit: 1.5,
+                        gain: 1.10,
                     }
                 }
             });
@@ -182,6 +219,10 @@ class Engine {
         this.container.appendChild(this.renderer.domElement);
         if (window.DEBUG)
             this.container.appendChild(this.stats.dom);
+
+        requestAnimationFrame(_ => {
+            this.containerBoundingBox = this.container.getBoundingClientRect();
+        });
     }
 
     uuid() {
@@ -290,14 +331,19 @@ class Engine {
 
         if (!this.isPlaying && this.hasStarted) {
             this.waitNextTick(_ => {
-                this.update();
+                this.play();
+                this.waitNextTick(_ => {
+                    this.pause();
+                });
             });
         }
     }
 
     registerScene(scene) {
-        scene.setup();
         this.scenes[scene.name] = scene;
+        if (this.scenes[scene.name]) {
+            this.scenes[scene.name].setup();
+        }
     }
 
     setScene(sceneName, callback) {
@@ -307,6 +353,7 @@ class Engine {
             window.scene = this.currentScene.instance;
         if (this.currentScene.hasLoaded) {
             // If the scene is already loaded, start it
+            this.performanceCycleNbr = 0;
             callback();
         } else {
             if (this.currentScene.isLoading) {
@@ -327,7 +374,9 @@ class Engine {
         this.currentScene.onStart();
         if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
         this.hasStarted = true;
-        this.play();
+        requestAnimationFrame(_ => {
+            this.play();
+        });
     }
 
     play() {

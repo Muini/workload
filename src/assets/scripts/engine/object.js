@@ -15,8 +15,10 @@ export default class Object {
 
         this.model = new THREE.Group();
         this.modelName = undefined;
+        this.modelUrl = undefined;
         this.animator = undefined;
 
+        this.sounds = {};
         this.materials = {};
         this.lights = {};
         this.hasShadows = false;
@@ -72,6 +74,12 @@ export default class Object {
             }
         }
         this.setVisibility(bool);
+    }
+
+    stopAllSounds() {
+        for (key in this.sounds) {
+            this.sounds[key].stop();
+        }
     }
 
     // Awake happen when the scene is loaded into the engine & started to be used
@@ -193,6 +201,9 @@ export default class Object {
 
     destroy() {
         this.setActive(false);
+        for (key in this.sounds) {
+            this.sounds[key].destroy();
+        }
         if (this.animator)
             this.animator.destroy();
         this.animator = null;

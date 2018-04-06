@@ -69,12 +69,12 @@ export class Worker extends Object {
         this.papersCount = 0;
         this.cashPile = new CashPile({ parent: this });
 
-        this.paperSound = new Sound({
+        /*this.paperSound = new Sound({
             name: 'paperSound',
             parent: this,
             loop: false,
             volume: 1.0,
-        });
+        });*/
     }
 
     awake() {

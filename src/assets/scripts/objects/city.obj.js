@@ -39,7 +39,7 @@ export class City extends Object {
             "emissive": { value: new THREE.Color(0xABCC45) }, //Fake SSS
             "time": { value: 1.0 },
             "swayBlend": { value: 0.005 },
-            "windForce": { value: new THREE.Vector3(20, -15) },
+            "windForce": { value: new THREE.Vector3(25, -15) },
         });
         // console.log(this.materials['Leafs']);
         this.materials['Concrete'] = new THREE.MeshStandardMaterial({

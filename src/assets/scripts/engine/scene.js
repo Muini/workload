@@ -18,7 +18,7 @@ export default class Scene {
 
         this.assetsToLoad = 0;
         this.assetsLoaded = 0;
-        this.callback = function() {};
+        this.onPreloaded = function() {};
 
         this.instance = new THREE.Scene();
         this.instance.updateMatrixWorld(true);
@@ -32,10 +32,24 @@ export default class Scene {
         this.mainCamera = undefined;
 
         this.objects = [];
+        this.sounds = {};
+
+        this.assets = {
+            'models': {},
+            'sounds': {},
+            'textures': {},
+        }
+    }
+
+    addSound(sound) {
+        if (this.sounds[sound.name])
+            console.warn(`Sound ${sound.name} already exist in scene ${this.scene.name}. Please use another name`);
+        this.sounds[sound.name] = sound;
     }
 
     addObject(object) {
         this.objects.push(object);
+        // this.assets['models']
     }
 
     awakeObjects() {
@@ -75,7 +89,11 @@ export default class Scene {
         // Get all entites, load their assets (sounds, models, textures)
         this.assetsToLoad += this.objects.length;
 
-        this.callback = callback;
+        this.onPreloaded = callback;
+
+        for (const soundName in this.sounds) {
+            this.sounds[soundName].load();
+        }
 
         AssetsManager.loadAssetsFromScene(this.name, _ => {
             if (window.DEBUG)
@@ -83,12 +101,12 @@ export default class Scene {
             this.isLoading = false;
             this.hasLoaded = true;
             this.start();
-            this.callback();
+            this.onPreloaded();
         });
     }
 
     start() {
-        Engine.addToResize(this.resize.bind(this));
+        Engine.addToResize(this.uuid, this.resize.bind(this));
         this.resize();
         this.awakeObjects();
     }
@@ -96,6 +114,10 @@ export default class Scene {
     unload() {
         if (window.DEBUG)
             console.log('%cEngine%c Clear scene %c' + this.name, "color:white;background:gray;padding:2px 4px;", "color:black", "color:DodgerBlue");
+
+        for (key in this.sounds) {
+            this.sounds[key].stop();
+        }
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].destroy();
         }

@@ -26,7 +26,7 @@ uniform float maxblur; // max blur amount
 // #define ITERATIONS 64
 
 #define DISTORTION_ANAMORPHIC	0.0;
-#define DISTORTION_BARREL       0.3;
+#define DISTORTION_BARREL       0.35;
 
 // Helpers-----------------------------------------------------------------------------------
 vec2 rotate(vec2 vector, float angle)
@@ -108,17 +108,15 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount, float pixelDepth)
                 if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold && tapDepth < pixelDepth) {
                         continue;
                 }
-                vec3 col = texture2D(tex, uv + pos).xyz;
+                vec3 col = vec3(0.0);
+                col.x = texture2D(tex, uv + pos - vec2(0.5 * radius, 0.5 * radius)).x;
+                col.y = texture2D(tex, uv + pos).y;
+                col.z = texture2D(tex, uv + pos + vec2(0.5 * radius, 0.5 * radius)).z;
                 // col = mix(vec3(0.0), col, vec3(pixelDepth));
                 vec3 bokeh = pow(col, vec3(9.0)) * amount+.4;
                 acc += col * bokeh;
                 div += bokeh;
         }
-        // In focus
-
-
-        // Foreground
-
 
         return acc / div;
 }

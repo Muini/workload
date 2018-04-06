@@ -9,7 +9,7 @@
     align-items: center;
     flex-direction: column;
     z-index: 10;
-    background: rgba(10, 30, 50, .6);
+    background: rgba(5, 15, 30, .6);
     visibility: visible;
     opacity: 1;
     transition-property: opacity, visibility;
@@ -17,51 +17,102 @@
     transition-timing-function: $easeInSineOutExpo;
     @include fluid-type( $mq-min-width, $mq-xxlarge-min, 12px, 20px);
     .percent {
-        font-size: 1em;
-        margin-top: -2em;
-        transform: translateY(-50%);
+        font-size: .75em;
+        font-weight: bolder;
+        margin-top: -2.6em;
+        letter-spacing: .1em;
+        transform: translateY(-45%);
         color: rgba(255, 255, 255, .8);
+        opacity: 1;
+        transition: opacity 625ms ease-out 325ms;
     }
     .animation {
         position: relative;
-        display: block;
-        width: 3.5em;
-        height: 3.5em;
-        border: 0.25em solid rgba(10, 30, 50, .4);
+        width: 4.0em;
+        height: 4.0em;
+        background-color: rgba(5, 15, 30, 0.4);
         border-radius: 50%;
-        box-sizing: content-box;
-        &:before {
+        overflow: hidden;
+        transform: scale(1);
+        transition: transform 625ms ease-out 0ms;
+        box-shadow: 0 .5em 1em rgba(5, 15, 30, .4);
+        &:after {
             position: absolute;
-            width: 0.5em;
-            height: 0.5em;
+            width: 3.5em;
+            height: 3.5em;
             top: 50%;
             left: 50%;
+            transform: translate(-50.5%, -50%);
             border-radius: 50%;
-            border-top: 0.5em solid rgba(255, 255, 255, .6);
+            background-color: rgba(5, 15, 30, 1.0);
+            box-shadow: 0 0 .5em rgba(255, 255, 255, 0.4);
             content: '';
             display: block;
-            animation: load infinite 2.0s $easeInOutCirc;
             visibility: visible;
+        }
+        &>div {
+            position: absolute;
+            top: 0;
+            overflow: hidden;
+            width: 50%;
+            height: 100%;
+            flex-shrink: 0;
+            &>span {
+                position: relative;
+                top: 0;
+                display: block;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                border-radius: 10em;
+                background-color: rgb(200, 200, 200);
+                // transition: transform ease-out 125ms;
+            }
+            &:nth-child(1) {
+                left: 0;
+                &>span {
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
+                    transform-origin: 0 50% 0;
+                    left: 100%;
+                    transform: rotate(0deg); //from 0% to 180deg - from 0 to 50%
+                }
+            }
+            &:nth-child(2) {
+                left: 50%;
+                &>span {
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                    transform-origin: 100% 50% 0;
+                    left: -100%;
+                    transform: rotate(0deg); //from 0% to 180deg - from 50 to 100%
+                }
+            }
         }
     }
     &.hide {
         opacity: 0;
         visibility: hidden;
-        transition-duration: 600ms;
+        transition-duration: 325ms;
+        transition-delay: 225ms;
         .animation {
-            &:before {
-                animation: none;
-                visibility: hidden;
-            }
+            transform: scale(0);
+            transition-duration: 325ms;
+            transition-delay: 325ms;
+        }
+        .percent {
+            opacity: 0;
+            transition-duration: 325ms;
+            transition-delay: 0ms;
         }
     }
 }
 
 @keyframes load {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg) translateY(-1.75em)
+        transform: translate(-50%, -50%) rotate(0deg) translateY(-1.775em)
     }
     100% {
-        transform: translate(-50%, -50%) rotate(360deg) translateY(-1.75em)
+        transform: translate(-50%, -50%) rotate(360deg) translateY(-1.775em)
     }
 }

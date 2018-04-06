@@ -13,20 +13,42 @@ export class Cubemap extends Object {
         //Init variables
         this.name = 'cubemap';
 
-        this.cubeCamera1 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, opt.resolution || 128);
+        let resolution = opt.resolution || 128;
+        let shouldUpdate = opt.shouldUpdate;
+        let tickRate = opt.tickRate || 2;
+        switch (Engine.quality) {
+            case 1:
+                resolution /= 8;
+                shouldUpdate = false;
+                tickRate *= 8;
+                break;
+            case 2:
+                resolution /= 4;
+                tickRate *= 4;
+                break;
+            case 3:
+                resolution /= 2;
+                tickRate *= 2;
+                break;
+            case 4:
+                break;
+        }
+
+        this.cubeCamera1 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera1.name = 'Cubemap CubeCamera1';
         this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
         this.model.add(this.cubeCamera1);
 
-        this.cubeCamera2 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, opt.resolution || 128);
+        this.cubeCamera2 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera2.name = 'Cubemap CubeCamera1';
         this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
         this.model.add(this.cubeCamera2);
 
+
         this.texture = this.cubeCamera1.renderTarget.texture;
 
-        this.shouldUpdate = opt.shouldUpdate;
-        this.tickRate = opt.tickRate || 2;
+        this.shouldUpdate = shouldUpdate;
+        this.tickRate = tickRate;
         this.tick = 0;
 
         this.hasBeenRendered = false;

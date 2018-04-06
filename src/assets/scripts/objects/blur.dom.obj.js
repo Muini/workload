@@ -18,8 +18,10 @@ export class BlurDom extends DomObject {
         this.width = 0;
         this.height = 0;
 
+        this.shouldUpdate = false;
+
         this.onDataChanged = _ => {
-            this.updatePositions();
+            this.shouldUpdate = true;
         }
 
     }
@@ -27,18 +29,20 @@ export class BlurDom extends DomObject {
     updatePositions() {
         let bounding = this.dom.getBoundingClientRect();
 
-        this.x = bounding.x;
-        this.y = bounding.y;
+        this.x = bounding.x - Engine.containerBoundingBox.x;
+        this.y = bounding.y - Engine.containerBoundingBox.y;
         this.width = bounding.width;
         this.height = bounding.height;
+
+        this.shouldUpdate = false;
     }
 
     awake() {
         super.awake();
 
-        Engine.addToResize(_ => {
+        Engine.addToResize(this.uuid, _ => {
             Engine.waitNextTick(_ => {
-                this.updatePositions();
+                this.shouldUpdate = true;
             });
         });
 
@@ -50,7 +54,22 @@ export class BlurDom extends DomObject {
         // Is fired when the object is added to the scene
     }
 
+    setVisibility(bool) {
+        super.setVisibility(bool);
+        this.shouldUpdate = bool;
+    }
+
+    update(time, delta) {
+        super.update(time, delta);
+
+        if (this.shouldUpdate)
+            this.updatePositions();
+    }
+
     destroy() {
+        if (Engine.postprod)
+            Engine.postprod.removeBlurPosition(this);
+        Engine.removeFromResize(this.uuid);
         super.destroy();
     }
 

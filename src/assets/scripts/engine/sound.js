@@ -1,5 +1,6 @@
 import { Howl, Howler } from 'howler';
 
+import Engine from './engine';
 import SoundEngine from './soundEngine';
 
 export default class Sound {
@@ -9,22 +10,41 @@ export default class Sound {
         url,
         loop,
         volume,
-        onLoaded
     }) {
+        this.uuid = Engine.uuid();
         this.name = opt.name || null;
         this.howl = new Howl({
             src: [opt.url],
             autoplay: false,
-            preload: true,
+            preload: false,
             loop: opt.loop ? opt.loop : false,
             volume: opt.volume ? opt.volume : 1.0,
         })
         this.parent = opt.parent ? opt.parent : null; //Parent mush be THREE object to get 3D position
+        if (!this.parent) throw 'Sound parameter "parent" is mandatory and should be a Object or Scene type';
+        this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.nominalVolume = opt.volume ? opt.volume : 1.0;
-        this.howl.once('load', function() {
-            if (typeof onLoaded == 'function')
-                onLoaded();
+
+        this.init();
+    }
+
+    init() {
+        // Add the sound to the scene, either if the parent is an object or not
+        if (this.parent.isScene) {
+            this.scene.addSound(this);
+        } else {
+            // If its an object, add it to the object for quick ref and to the scene for preloading
+            this.parent.sounds[this.name] = this;
+            this.scene.addSound(this);
+        }
+    }
+
+    load(callback) {
+        this.howl.once('load', _ => {
+            if (typeof callback == 'function')
+                callback();
         });
+        this.howl.load();
     }
 
     play(fadeLength) {

@@ -12,6 +12,7 @@ varying vec2 vUv;
 uniform float time;
 
 uniform float noiseStrength;
+uniform sampler2D noiseTexture;
 
 uniform float rgbSplitStrength;
 
@@ -22,9 +23,6 @@ uniform sampler2D LUTtexture;
 uniform float LUTstrength;
 
 void main() {
-
-    float dx = 1.0 / resolution.x;
-    float dy = 1.0 / resolution.y;
 
     gl_FragColor = texture2D(tDiffuse, vUv);
     
@@ -52,12 +50,28 @@ void main() {
     
     if(noiseStrength > 0.0){
 
-        float dx = rand( vUv + time );
-        vec3 noiseColor = gl_FragColor.rgb + gl_FragColor.rgb * clamp( 0.1 + dx, 0.0, 1.0 );
+        #if STATIC_NOISE
+            vec2 uv = mod(vUv, 0.1) / 0.1;
+            vec4 noise = texture2D(noiseTexture, uv);
+            noise.r *= (.5*(1.+sin(time/50.)));
+            noise.g *= (.5*(1.+sin(time/50.+0.5*PI)));
+            noise.b *= (.5*(1.+sin(time/50.+1.0*PI)));
+            noise.w *= (.5*(1.+sin(time/50.+1.5*PI)));
+            float intensity = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;
+            float dx = (noise.r + noise.g + noise.b + noise.w) * (1.0 - intensity);
+            vec3 noiseColor = gl_FragColor.rgb + gl_FragColor.rgb * clamp( 0.1 + dx, 0.0, 1.0 );
 
-        noiseColor = gl_FragColor.rgb + clamp( noiseStrength, 0.0,1.0 ) * ( noiseColor - gl_FragColor.rgb );
+            noiseColor = gl_FragColor.rgb + clamp( noiseStrength, 0.0,1.0 ) * ( noiseColor - gl_FragColor.rgb );
 
-        gl_FragColor.rgb = noiseColor;
+            gl_FragColor.rgb = noiseColor;
+        #else
+            float dx = rand( vUv + time );
+            vec3 noiseColor = gl_FragColor.rgb + gl_FragColor.rgb * clamp( 0.1 + dx, 0.0, 1.0 );
+
+            noiseColor = gl_FragColor.rgb + clamp( noiseStrength, 0.0,1.0 ) * ( noiseColor - gl_FragColor.rgb );
+
+            gl_FragColor.rgb = noiseColor;
+        #endif
     }
     
     vec3 lut = lut(gl_FragColor, LUTtexture).rgb;

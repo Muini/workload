@@ -23,7 +23,7 @@ export default class DomObject {
         this.parent = opt.parent || null;
         if (!this.parent) {
             if (window.DEBUG)
-                console.warn('Object parameter "parent" is mandatory and should be a Object or Scene type', this)
+                console.warn('DomObject parameter "parent" is mandatory and should be a Object or Scene type', this)
         } else {
             this.scene = this.parent.isScene ? this.parent : this.parent.scene;
             this.scene.addObject(this);

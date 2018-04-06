@@ -28,6 +28,8 @@ THREE.BlurSharpenShader = {
             ]
         },
 
+        "noiseTexture": { value: null },
+
         "blurStrength": { value: 0.5 },
 
         "sharpenStrength": { value: 0.1 },

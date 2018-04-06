@@ -1,6 +1,6 @@
 export default {
     //Scene name
-    'intro.plan1': {
+    'city': {
         models: {
             'city.model': '/static/models/city.glb',
         },

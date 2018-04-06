@@ -9,6 +9,10 @@ import * as THREE from 'three';
 
 THREE.FilmicShader = {
 
+    defines: {
+        STATIC_NOISE: 1,
+    },
+
     uniforms: {
 
         "tDiffuse": { value: null },
@@ -21,6 +25,7 @@ THREE.FilmicShader = {
         "sharpenStrength": { value: 0.1 },
 
         "noiseStrength": { value: 0.05 },
+        "noiseTexture": { value: null },
 
         "rgbSplitStrength": { value: 5.0 },
 

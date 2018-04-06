@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+
+import Engine from './engine';
+
 import '../../shaders/postprocess/EffectComposer';
 // import { ShaderPass } from 'three/examples/js/postprocessing/ShaderPass';
 import '../../shaders/postprocess/ShaderPass';
@@ -34,6 +37,7 @@ export default class PostProd {
             filmic: {
                 enabled: false,
                 noise: 0.05,
+                useStaticNoise: true,
                 rgbSplit: 1.0,
                 vignette: 1.0,
                 vignetteOffset: 1.0,
@@ -52,20 +56,6 @@ export default class PostProd {
             }
         }
 
-        if (!this.renderer.extensions.get('WEBGL_depth_texture')) {
-            throw "WEBGL_depth_texture not supported";
-            return;
-        }
-
-        this.isMobile = (navigator.userAgent.match(/Android/i) ||
-            navigator.userAgent.match(/webOS/i) ||
-            navigator.userAgent.match(/iPhone/i) ||
-            navigator.userAgent.match(/iPad/i) ||
-            navigator.userAgent.match(/iPod/i) ||
-            navigator.userAgent.match(/BlackBerry/i) ||
-            navigator.userAgent.match(/Windows Phone/i)
-        );
-
         this.renderTarget = new THREE.WebGLRenderTarget(this.width, this.height);
         this.renderTarget.texture.format = THREE.RGBAFormat;
         this.renderTarget.texture.minFilter = THREE.LinearFilter;
@@ -73,6 +63,11 @@ export default class PostProd {
 
         this.composer = new THREE.EffectComposer(this.renderer, this.renderTarget);
 
+        if (!this.renderer.extensions.get('WEBGL_depth_texture')) {
+            console.warn("WEBGL_depth_texture not supported");
+            this.passes.bokehdof.enabled = false;
+        }
+        // Bokeh DOF
         if (this.passes.bokehdof.enabled) {
             this.depthRenderTarget = this.renderTarget.clone();
             this.depthRenderTarget.texture.minFilter = THREE.NearestFilter;
@@ -82,11 +77,12 @@ export default class PostProd {
             this.depthRenderTarget.depthTexture = new THREE.DepthTexture();
             this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
             this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
-        }
-        // Bokeh DOF
-        if (this.passes.bokehdof.enabled) {
             // this.depthComposer.reset();
-            THREE.BokehShader.defines.ITERATIONS = this.isMobile ? 12 : 32;
+            if (Engine.quality < 3) {
+                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 2 ? 8 : 12;
+            } else {
+                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 4 ? 24 : 48;
+            }
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";
             this.bokehPass.uniforms['nearClip'].value = this.camera ? this.camera.near : 1.0;
@@ -113,10 +109,18 @@ export default class PostProd {
 
         //filmic
         if (this.passes.filmic.enabled) {
+
+            THREE.FilmicShader.defines.STATIC_NOISE = this.passes.filmic.useStaticNoise ? 1 : 0;
+
             this.filmicPass = new THREE.ShaderPass(THREE.FilmicShader);
             this.filmicPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
 
             this.filmicPass.uniforms['noiseStrength'].value = this.passes.filmic.noise;
+
+            let noiseTexture = new THREE.TextureLoader().load('/static/img/noise.png');
+            noiseTexture.minFilter = THREE.NearestFilter;
+            noiseTexture.magFilter = THREE.NearestFilter;
+            this.filmicPass.uniforms['noiseTexture'].value = noiseTexture;
 
             this.filmicPass.uniforms['rgbSplitStrength'].value = this.passes.filmic.rgbSplit;
 
@@ -133,7 +137,11 @@ export default class PostProd {
 
         // Blur & Sharpen
         if (this.passes.blur.enabled) {
-            THREE.BlurSharpenShader.defines.SAMPLE = this.isMobile ? 8 : 12;
+            if (Engine.quality < 3) {
+                THREE.BlurSharpenShader.defines.SAMPLE = Engine.quality < 2 ? 6 : 8;
+            } else {
+                THREE.BlurSharpenShader.defines.SAMPLE = Engine.quality < 4 ? 10 : 12;
+            }
             this.blurDomElems = [];
             this.blurPos = [
                 new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
@@ -146,6 +154,11 @@ export default class PostProd {
             this.blurPass.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
 
             this.blurPass.uniforms['blurPos'].value = this.blurPos;
+
+            let noiseTexture = new THREE.TextureLoader().load('/static/img/noise.png');
+            noiseTexture.minFilter = THREE.NearestFilter;
+            noiseTexture.magFilter = THREE.NearestFilter;
+            this.blurPass.uniforms['noiseTexture'].value = noiseTexture;
 
             this.blurPass.uniforms['blurStrength'].value = this.passes.blur.strength;
 
@@ -172,14 +185,14 @@ export default class PostProd {
             this.bokehPass.uniforms['tDiffuse'].value = this.renderTarget.texture;
             this.composer.addPass(this.bokehPass);
         }
-        if (this.passes.fxaa.enabled) {
-            this.composer.addPass(this.FXAAPass);
-        }
         if (this.passes.bloom.enabled) {
             this.composer.addPass(this.bloomPass);
         }
         if (this.passes.filmic.enabled) {
             this.composer.addPass(this.filmicPass);
+        }
+        if (this.passes.fxaa.enabled) {
+            this.composer.addPass(this.FXAAPass);
         }
         if (this.passes.blur.enabled) {
             this.composer.addPass(this.blurPass);
@@ -209,7 +222,19 @@ export default class PostProd {
     addBlurPosition(domblur) {
         if (!this.passes.blur.enabled) return;
         this.blurDomElems.push(domblur);
+        if (this.blurDomElems.length > this.blurPos.length) {
+            console.warn(`Blur Doms Elems exceed limits of ${this.blurPos.length}. First item is deleted ${this.blurDomElems[0]}`)
+            this.blurDomElems.splice(0, 1);
+        }
         this.updateBlurPositions();
+    }
+
+    removeBlurPosition(domblur) {
+        for (let i = 0; i < this.blurDomElems.length; i++) {
+            if (this.blurDomElems[i].uuid == domblur.uuid) {
+                this.blurDomElems.splice(i, 1);
+            }
+        }
     }
 
     updateBlurPositions() {
@@ -218,7 +243,7 @@ export default class PostProd {
         for (let i = 0; i < 4; i++) {
             if (this.blurDomElems[i]) {
                 this.blurPos[i].set(
-                    this.blurDomElems[i].x / this.width,
+                    (this.blurDomElems[i].x / this.width),
                     1.0 - (this.blurDomElems[i].y / this.height),
                     (this.blurDomElems[i].x + this.blurDomElems[i].width) / this.width,
                     1.0 - (this.blurDomElems[i].y / this.height) - (this.blurDomElems[i].height / this.height),
@@ -238,7 +263,7 @@ export default class PostProd {
         if (!this.scene || !this.camera) return;
 
         if (this.passes.filmic.enabled) {
-            this.filmicPass.uniforms['time'].value = Math.sin(time);
+            this.filmicPass.uniforms['time'].value = time;
         }
         if (this.passes.blur.enabled) {
             this.updateBlurPositions();

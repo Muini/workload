@@ -5,6 +5,8 @@ varying vec2 vUv;
 
 uniform mediump vec4 blurPos[4];
 
+uniform sampler2D noiseTexture;
+
 uniform float blurStrength;
 
 uniform float sharpenStrength;
@@ -15,8 +17,6 @@ uniform float gain;
 
 #define PI 3.14159265359
 #define TWO_PI 6.28318530718
-
-float random(vec3 scale,float seed){return fract(sin(dot(gl_FragCoord.xyz+seed,scale))*43758.5453+seed);}
 
 vec2 Circle(float Start, float Points, float Point) 
 {
@@ -31,13 +31,13 @@ vec2 Circle(float Start, float Points, float Point)
 
 void main() {
 
-    float dx = 1.0 / resolution.x;
-    float dy = 1.0 / resolution.y;
-
     gl_FragColor = texture2D(tDiffuse, vUv);
 
     // Sharpen
     if(sharpenStrength > 0.0){
+
+        float dx = 1.0 / resolution.x;
+        float dy = 1.0 / resolution.y;
 
         vec4 sum = vec4(0.0);
         sum += -1. * texture2D(tDiffuse, vUv.xy + vec2( -sharpenStrength * dx , 0.0 * dy));
@@ -61,7 +61,8 @@ void main() {
     
     vec3 color = vec3(0,0,0);
 
-    float randomOffset = 1.0 + (random(vec3(12.9898,78.233,151.7182),0.0) * 0.5);
+    vec4 noise = texture2D(noiseTexture, mod(vUv, 0.1) / 0.1);
+    float randomOffset = ((noise.r + noise.g + noise.b) / 3.0) * 0.5;
 
     // Blur where we need
     for(int i=0; i<4; i++){
@@ -75,6 +76,8 @@ void main() {
             color.rgb *= gain;
 
             gl_FragColor.rgb = color.rgb;
+
+            break;
         }
     }
 

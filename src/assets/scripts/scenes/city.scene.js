@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // Engine
 import Engine from '../engine/engine';
 import Scene from '../engine/scene';
+import Sound from '../engine/sound';
 
 // Objects
 import { Camera } from '../objects/camera.obj';
@@ -11,10 +12,12 @@ import { Sky } from '../objects/sky.obj';
 import { City } from '../objects/city.obj';
 
 // Dom Objects
+import { TitleDom } from '../objects/title.dom.obj';
+import { SubtitleDom } from '../objects/subtitle.dom.obj';
 
 // Create scene
 export default new Scene({
-    name: 'intro.plan1',
+    name: 'city',
     data: {},
     setup: function() {
         // Create & Add camera
@@ -23,7 +26,7 @@ export default new Scene({
             position: new THREE.Vector3(0, 22, 62),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 45,
-            aperture: 11.0,
+            aperture: 10.0,
             focus: 55.0, //76.0 //32.0
             far: 500,
         });
@@ -38,12 +41,11 @@ export default new Scene({
             parent: this,
             near: 1,
             far: 500,
-            resolution: Engine.isMobile ? 16 : 64,
+            resolution: 128,
             position: new THREE.Vector3(0, 80, 20),
             shouldUpdate: false,
             tickRate: 2,
         });
-
 
         // Ambient Light
         let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 10.0);
@@ -59,8 +61,8 @@ export default new Scene({
         this.sun.castShadow = Engine.isMobile ? false : true;
         this.instance.add(this.sun);
 
-        this.sun.shadow.mapSize.width = Engine.isMobile ? 512 : 1024; // default
-        this.sun.shadow.mapSize.height = Engine.isMobile ? 512 : 1024; // default
+        this.sun.shadow.mapSize.width = Engine.quality < 4 ? 512 : 1024; // default
+        this.sun.shadow.mapSize.height = Engine.quality < 4 ? 512 : 1024; // default
         this.sun.shadow.camera.near = 1.0; // default
         this.sun.shadow.camera.far = 150; // default
         let size = 50.0;
@@ -80,9 +82,20 @@ export default new Scene({
             mieDirectionalG: 0.9
         })
 
-        this.instance.fog = new THREE.FogExp2(0xd3dee5, 0.006);
+        this.instance.fog = new THREE.FogExp2(0xDAE1E5, 0.0075);
 
         this.city = new City({ parent: this });
+
+        let citySound = new Sound({
+            name: 'city-loop',
+            parent: this,
+            url: '/static/sounds/city-loop.m4a',
+            loop: true,
+            volume: 0.4,
+        });
+
+        this.title = new TitleDom({ parent: this });
+        this.subtitle = new SubtitleDom({ parent: this });
 
     },
     onStart: function() {
@@ -96,19 +109,22 @@ export default new Scene({
         this.instance.add(sunTarget);
         this.sun.target = sunTarget;
 
-        /*
-        let tween = new Engine.Tween({ y: 30, z: 62 })
-            .to({ y: 22, z: 30 }, 6000)
-            .repeat(Infinity)
-            .yoyo(true)
-            .easing(Engine.Easing.Cubic.InOut)
-            .on('update', ({ y, z }) => {
-                this.camera.model.position.y = y;
-                this.camera.model.position.z = z;
-                this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
-                Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
-            })
-            .start();
-            */
+        // this.sounds['city-loop'].play();
+
+
+        // let tween = new Engine.Tween({ y: 30, z: 62 })
+        //     .to({ y: 22, z: 30 }, 6000)
+        //     .repeat(Infinity)
+        //     .yoyo(true)
+        //     .easing(Engine.Easing.Cubic.InOut)
+        //     .on('update', ({ y, z }) => {
+        //         this.camera.model.position.y = y;
+        //         this.camera.model.position.z = z;
+        //         this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
+        //         if (Engine.postprod.bokehPass)
+        //             Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
+        //     })
+        //     .start();
+
     }
 })
