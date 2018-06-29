@@ -226,12 +226,11 @@ export default class PostProd {
             console.warn(`Blur Doms Elems exceed limits of ${this.blurPos.length}. First item is deleted ${this.blurDomElems[0]}`)
             this.blurDomElems.splice(0, 1);
         }
-        this.updateBlurPositions();
     }
 
     removeBlurPosition(domblur) {
         for (let i = 0; i < this.blurDomElems.length; i++) {
-            if (this.blurDomElems[i].uuid == domblur.uuid) {
+            if (this.blurDomElems[i].uuid === domblur.uuid) {
                 this.blurDomElems.splice(i, 1);
             }
         }

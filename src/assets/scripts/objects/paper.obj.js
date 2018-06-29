@@ -28,8 +28,11 @@ export class Paper extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
+            // Is fired when the object is added to the scene
+        })();
     }
 
     update(time, delta) {

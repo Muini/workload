@@ -29,6 +29,8 @@ export default class Scene {
         this.hasLoaded = false;
         this.isLoading = false;
 
+        this.isPlaying = false;
+
         this.mainCamera = undefined;
 
         this.objects = [];
@@ -53,11 +55,14 @@ export default class Scene {
     }
 
     awakeObjects() {
-        for (let i = 0; i < this.objects.length; i++) {
-            this.objects[i].awake();
-        }
-        if (window.DEBUG)
-            console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        return (async() => {
+            for (let i = 0; i < this.objects.length; i++) {
+                await this.objects[i].awake();
+            }
+            if (window.DEBUG)
+                console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+            return;
+        })();
     }
 
     setCamera(camera) {
@@ -100,28 +105,42 @@ export default class Scene {
                 console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
             this.isLoading = false;
             this.hasLoaded = true;
-            this.start();
             this.onPreloaded();
         });
     }
 
     start() {
+        // return (async() => {
         Engine.addToResize(this.uuid, this.resize.bind(this));
         this.resize();
         this.awakeObjects();
+        this.onStart();
+        this.isPlaying = true;
+        // return;
+        // });
+    }
+
+    stop() {
+        //This is the end of the scene
+        for (let i = 0; i < this.objects.length; i++) {
+            this.objects[i].setActive(false);
+        }
+        for (let key in this.sounds) {
+            this.sounds[key].stop();
+        }
+        this.isPlaying = false;
+        Engine.removeFromResize(this.uuid);
     }
 
     unload() {
         if (window.DEBUG)
             console.log('%cEngine%c Clear scene %c' + this.name, "color:white;background:gray;padding:2px 4px;", "color:black", "color:DodgerBlue");
 
-        for (key in this.sounds) {
-            this.sounds[key].stop();
-        }
+
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].destroy();
         }
-        Engine.removeToResize(this.uuid);
+        Engine.removeFromResize(this.uuid);
     }
 
 }

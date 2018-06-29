@@ -5,11 +5,11 @@ import Engine from '../engine/engine';
 import Scene from '../engine/scene';
 
 // Objects
+import { Camera } from '../objects/default/camera.obj';
 import { Worker } from '../objects/worker.obj';
-import { Camera } from '../objects/camera.obj';
 
 // Dom Objects
-import { ExempleDom } from '../objects/exemple.dom.obj';
+import { ExempleDom } from '../objects/default/exemple.dom.obj';
 
 // Create scene
 export default new Scene({

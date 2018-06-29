@@ -99,23 +99,25 @@ export class City extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
 
-        this.eoMotors = [];
-        this.clouds = [];
-        this.model.traverse((child) => {
-            if (child.name.indexOf('Eolienne_motor') > -1) {
-                this.eoMotors.push(child)
-            }
-            if (child.name.indexOf('Cloud') > -1) {
-                this.clouds.push(child)
-            }
-        });
-        for (let i = 0; i < this.eoMotors.length; i++) {
-            this.eoMotors[i].rotation.x += Math.random() * 3.14;
-        }
+            await super.awake();
 
-        // Is fired when the object is added to the scene
+            this.eoMotors = [];
+            this.clouds = [];
+            this.model.traverse(async(child) => {
+                if (child.name.indexOf('Eolienne_motor') > -1) {
+                    this.eoMotors.push(child)
+                }
+                if (child.name.indexOf('Cloud') > -1) {
+                    this.clouds.push(child)
+                }
+            });
+            for (let i = 0; i < this.eoMotors.length; i++) {
+                this.eoMotors[i].rotation.x += Math.random() * 3.14;
+            }
+
+        })();
     }
 
     update(time, delta) {

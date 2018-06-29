@@ -1,6 +1,4 @@
-import * as THREE from 'three';
 import Engine from './engine';
-import AssetsManager from './assetsManager';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
@@ -74,63 +72,72 @@ export default class DomObject {
 
     // Awake happen when the scene is loaded into the engine & started to be used
     awake() {
-        if (!this.dom) return;
-        // Parse Dom to look for data
-        this.parseDom();
-        // Watch data
-        for (let data in this.data) {
-            this.data.watch(data, (id, oldval, newval) => {
-                if (newval !== oldval) {
-                    Engine.waitNextTick(_ => {
-                        this.updateData(id);
-                    });
-                }
-                return newval;
-            });
-        }
+        return (async() => {
+            if (!this.dom) return;
+            // Parse Dom to look for data
+            await this.parseDom();
+            // Watch data
+            for (let data in this.data) {
+                this.data.watch(data, (id, oldval, newval) => {
+                    if (newval !== oldval) {
+                        Engine.waitNextTick(_ => {
+                            this.updateData(id);
+                        });
+                    }
+                    return newval;
+                });
+            }
 
-        this.setActive(this.isActive);
+            this.setActive(this.isActive);
+        })();
     }
 
     parseDom() {
-        // find text vars
-        let texts = this.dom.querySelectorAll('p,div,span');
-        for (let i = 0; i < texts.length; i++) {
-            let data = texts[i].textContent;
-            let vars = data.match(mustachRegEx);
-            if (vars) {
-                vars = vars.map(function(x) { return x.match(/[\w\.]+/)[0]; });
-                for (let v = 0; v < vars.length; v++) {
-                    if (!this._vars[vars[v]]) {
-                        this._vars[vars[v]] = [];
-                    }
-                    this._vars[vars[v]].push({
-                        node: texts[i],
-                        exp: data,
+        return (async() => {
+            // find text vars
+            let texts = await this.dom.querySelectorAll('p,div,span');
+            for (let i = 0; i < texts.length; i++) {
+                let data = texts[i].textContent;
+                let vars = data.match(mustachRegEx);
+                if (vars) {
+                    vars = vars.map(function(x) {
+                        return x.match(/[\w\.]+/)[0];
                     });
-                    this.updateData(vars[v]);
+                    for (let v = 0; v < vars.length; v++) {
+                        if (!this._vars[vars[v]]) {
+                            this._vars[vars[v]] = [];
+                        }
+                        this._vars[vars[v]].push({
+                            node: texts[i],
+                            exp: data,
+                        });
+                        await this.updateData(vars[v]);
+                    }
                 }
+
             }
+            // find class vars
+            let classes = await this.dom.querySelectorAll('*[class]');
 
-        }
-        // find class vars
-        let classes = this.dom.querySelectorAll('*[class]');
 
-        // console.log(texts, this._vars);
+            // console.log(texts, this._vars);
 
-        this._shouldUpdateVars = true;
+            this._shouldUpdateVars = true;
+        })();
     }
 
     updateData(data) {
-        if (!this._vars[data] || !this.isActive) return;
-        for (let i = 0; i < this._vars[data].length; i++) {
-            let phrase = this._vars[data][i].exp.replace(mustachRegEx, (value) => {
-                let single = value.match(/[\w\.]+/)[0];
-                return this.data[single];
-            });
-            this._vars[data][i].node.textContent = phrase;
-        }
-        this.onDataChanged();
+        return (async() => {
+            if (!this._vars[data] || !this.isActive) return;
+            for (let i = 0; i < this._vars[data].length; i++) {
+                let phrase = this._vars[data][i].exp.replace(mustachRegEx, (value) => {
+                    let single = value.match(/[\w\.]+/)[0];
+                    return this.data[single];
+                });
+                this._vars[data][i].node.textContent = phrase;
+            }
+            this.onDataChanged();
+        })();
     }
 
     update(time, delta) {}

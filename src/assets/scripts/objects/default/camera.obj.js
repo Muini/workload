@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
-import Object from '../engine/object';
+import Engine from '../../engine/engine';
+import Object from '../../engine/object';
 
 export class Camera extends Object {
     constructor(opt = {}) {
@@ -32,10 +32,11 @@ export class Camera extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
-        // Is fired when the object is added to the scene
-
+            // Is fired when the object is added to the scene
+        })();
     }
 
     update(time, delta) {

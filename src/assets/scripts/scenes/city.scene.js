@@ -6,9 +6,9 @@ import Scene from '../engine/scene';
 import Sound from '../engine/sound';
 
 // Objects
-import { Camera } from '../objects/camera.obj';
-import { Cubemap } from '../objects/cubemap.obj';
-import { Sky } from '../objects/sky.obj';
+import { Camera } from '../objects/default/camera.obj';
+import { Cubemap } from '../objects/default/cubemap.obj';
+import { Sky } from '../objects/default/sky.obj';
 import { City } from '../objects/city.obj';
 
 // Dom Objects
@@ -23,7 +23,7 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(0, 22, 62),
+            position: new THREE.Vector3(0, 30, 62),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 45,
             aperture: 10.0,
@@ -102,6 +102,7 @@ export default new Scene({
         // this.camera.model.rotation.y = (0 / 180) * 3.14;
         // this.camera.instance.rotation.x = -(10 / 180) * 3.14;
         this.setCamera(this.camera.instance);
+
         let sunTarget = new THREE.Object3D();
         sunTarget.position.x = 12.0;
         sunTarget.position.y = 20;
@@ -112,19 +113,22 @@ export default new Scene({
         // this.sounds['city-loop'].play();
 
 
-        // let tween = new Engine.Tween({ y: 30, z: 62 })
-        //     .to({ y: 22, z: 30 }, 6000)
-        //     .repeat(Infinity)
-        //     .yoyo(true)
-        //     .easing(Engine.Easing.Cubic.InOut)
-        //     .on('update', ({ y, z }) => {
-        //         this.camera.model.position.y = y;
-        //         this.camera.model.position.z = z;
-        //         this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
-        //         if (Engine.postprod.bokehPass)
-        //             Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
-        //     })
-        //     .start();
+        let tween = new Engine.Tween({ y: 30, z: 62 })
+            .to({ y: 22, z: 30 }, 6000)
+            // .repeat(Infinity)
+            // .yoyo(true)
+            .easing(Engine.Easing.Cubic.InOut)
+            .on('update', ({ y, z }) => {
+                this.camera.model.position.y = y;
+                this.camera.model.position.z = z;
+                this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
+                if (Engine.postprod.bokehPass)
+                    Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
+            })
+            .on('complete', _ => {
+                Engine.nextScene();
+            })
+            .start();
 
     }
 })

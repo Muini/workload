@@ -8,18 +8,20 @@ class ModelLoader {
     }
 
     load(modelUrl, onFinished, onUpdate) {
-        this.loader.load(modelUrl,
-            (gltf) => {
-                // console.log(modelUrl, gltf);
-                onFinished(gltf);
-            },
-            (xhr) => {
-                onUpdate(xhr.loaded, xhr.total);
-            },
-            (error) => {
-                console.error('GLTF Loader error :', error);
-            },
-        );
+        return (async() => {
+            return this.loader.load(modelUrl,
+                (gltf) => {
+                    // console.log(modelUrl, gltf);
+                    onFinished(gltf);
+                },
+                (xhr) => {
+                    onUpdate(xhr.loaded, xhr.total);
+                },
+                (error) => {
+                    console.error('GLTF Loader error :', error);
+                },
+            );
+        })();
     }
 }
 

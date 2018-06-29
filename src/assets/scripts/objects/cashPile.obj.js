@@ -25,7 +25,9 @@ export class CashPile extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
+        })();
     }
 
     update(time, delta) {

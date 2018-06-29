@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
+import Engine from '../../engine/engine';
 
-import Object from '../engine/object';
+import Object from '../../engine/object';
 
 export class Exemple extends Object {
     constructor(opt = {}) {
@@ -33,9 +33,11 @@ export class Exemple extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
-        // Is fired when the object is added to the scene
+            // Is fired when the object is added to the scene
+        })();
     }
 
     update(time, delta) {

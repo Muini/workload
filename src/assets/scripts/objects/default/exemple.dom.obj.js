@@ -23,9 +23,11 @@ export class ExempleDom extends BlurDom {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
-        // Is fired when the object is added to the scene
+            // Is fired when the object is added to the scene
+        })();
     }
 
     update(time, delta) {

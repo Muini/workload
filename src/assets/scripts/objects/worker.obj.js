@@ -55,7 +55,7 @@ export class Worker extends Object {
 
         this.lights['Desk_Spot'] = new THREE.SpotLight(0xDFEEFF);
         this.lights['Desk_Spot'].power = 6;
-        this.lights['Desk_Spot'].castShadow = Engine.isMobile ? false : true;
+        this.lights['Desk_Spot'].castShadow = true;
 
         super.init();
 
@@ -78,20 +78,23 @@ export class Worker extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
-        this.lights['Desk_Spot'].target = this.model;
-
-        Engine.wait(_ => {
-            for (let i = 0; i < 5; i++) {
-                this.papersCount++;
-                this.paperBlock.addPaper();
-            }
+            this.lights['Desk_Spot'].target = this.model;
 
             Engine.wait(_ => {
-                this.startWorking();
-            }, 1000);
-        }, 500);
+                for (let i = 0; i < 5; i++) {
+                    this.papersCount++;
+                    this.paperBlock.addPaper();
+                }
+
+                Engine.wait(_ => {
+                    this.startWorking();
+                }, 1000);
+            }, 500);
+
+        })();
     }
 
     die() {

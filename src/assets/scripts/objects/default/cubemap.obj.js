@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
+import Engine from '../../engine/engine';
 
-import Object from '../engine/object';
+import Object from '../../engine/object';
 
 export class Cubemap extends Object {
     constructor(opt = {}) {
@@ -69,9 +69,9 @@ export class Cubemap extends Object {
     }
 
     awake() {
-        super.awake();
-
-        // Is fired when the object is added to the scene
+        return (async() => {
+            await super.awake();
+        })();
     }
 
     update(time, delta) {

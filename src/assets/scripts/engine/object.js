@@ -82,99 +82,125 @@ export default class Object {
         }
     }
 
+    getModel() {
+        return (async() => {
+            //Is there a model ?
+            if (this.modelName) {
+                //Get the model from the assets manager
+                const asset = await AssetsManager.getAsset('model', this.modelName);
+                this.model = asset.model;
+                //Create an animator if there is animations
+                if (asset.animations.length) {
+                    this.animator = new Animator({
+                        model: this.model,
+                        animations: asset.animations
+                    });
+                }
+                //Update local parameters
+                await this.overwriteModelParameters();
+            } else {
+                //There is no model, just name it properly
+                this.model.name = this.name;
+                if (!this.isCamera)
+                    this.rotation.x += Math.PI / 2; //hack inverted axis
+            }
+            return;
+        })();
+    }
+
     // Awake happen when the scene is loaded into the engine & started to be used
     awake() {
-        if (this.modelName) {
-            const asset = AssetsManager.getAsset('model', this.modelName);
-            this.model = asset.model;
-            if (asset.animations.length) {
-                this.animator = new Animator({ model: this.model, animations: asset.animations });
+        return (async() => {
+            await this.getModel();
+
+            this.model.position.x += this.position.x;
+            this.model.position.y += this.position.y;
+            this.model.position.z += this.position.z;
+            this.model.rotation.x += this.rotation.x;
+            this.model.rotation.y += this.rotation.y;
+            this.model.rotation.z += this.rotation.z;
+            if (this.parent.isScene) {
+                this.scene.instance.add(this.model);
+            } else {
+                this.parent.model.add(this.model);
             }
-            this.overwriteModelParameters();
-        } else {
-            this.model.name = this.name;
-            if (!this.isCamera)
-                this.rotation.x += Math.PI / 2; //hack inverted axis
-        }
 
-        this.model.position.x += this.position.x;
-        this.model.position.y += this.position.y;
-        this.model.position.z += this.position.z;
-        this.model.rotation.x += this.rotation.x;
-        this.model.rotation.y += this.rotation.y;
-        this.model.rotation.z += this.rotation.z;
-        if (this.parent.isScene) {
-            this.scene.instance.add(this.model);
-        } else {
-            this.parent.model.add(this.model);
-        }
+            this.updateEnvMap();
 
-        this.updateEnvMap();
-
-        this.setActive(this.isActive);
+            this.setActive(this.isActive);
+        })();
     }
 
     overwriteModelParameters() {
-        function updateLights(child, lights) {
-            if (child.isSpotLight && !child.isPointLight && child.isDirectionalLight) return;
+        return (async() => {
 
-            child.decay = 2;
-            child.penumbra = 0.8;
-            child.angle /= 2.;
+            const updateLights = async function(child, lights) {
+                if (child.isSpotLight && !child.isPointLight && child.isDirectionalLight) return;
 
-            if (child.isPointLight) {
-                child.distance = 5.0;
-            }
-            //Overwrite lights
-            for (let light in lights) {
-                if (child.name == light) {
-                    child.color = lights[light].color;
-                    child.intensity = lights[light].intensity;
-                    child.power = lights[light].power;
-                    child.castShadow = lights[light].castShadow;
-                    child.visible = lights[light].visible;
-                    if (child.isPointLight) {
-                        child.distance = lights[light].distance;
-                    }
-                    lights[light] = child;
-                    child = lights[light];
+                child.decay = 2;
+                child.penumbra = 0.8;
+                child.angle /= 2.;
+
+                if (child.isPointLight) {
+                    child.distance = 5.0;
                 }
-            }
-        }
+                //Overwrite lights
+                for (let light in lights) {
+                    if (child.name == light) {
+                        child.color = lights[light].color;
+                        child.intensity = lights[light].intensity;
+                        child.power = lights[light].power;
+                        child.castShadow = lights[light].castShadow;
+                        child.visible = lights[light].visible;
+                        if (child.isPointLight) {
+                            child.distance = lights[light].distance;
+                        }
+                        lights[light] = child;
+                        child = lights[light];
+                    }
+                }
 
-        function updateMaterials(child, materials) {
-            //Overwrite materials
-            for (let material in materials) {
-                if (child.material.length) {
-                    for (let m = 0; m < child.material.length; m++) {
-                        // console.log(child.material[m].name)
-                        if (material == child.material[m].name) {
+                return child;
+            }
+
+            const updateMaterials = async function(child, materials) {
+                //Overwrite materials
+                for (let material in materials) {
+                    if (child.material.length) {
+                        for (let m = 0; m < child.material.length; m++) {
+                            // console.log(child.material[m].name)
+                            if (material == child.material[m].name) {
+                                if (child.isSkinnedMesh)
+                                    materials[material].skinning = true;
+                                child.material[m] = materials[material];
+                            }
+                        }
+                    } else {
+                        // console.log(child.material.name)
+                        if (material == child.material.name) {
                             if (child.isSkinnedMesh)
                                 materials[material].skinning = true;
-                            child.material[m] = materials[material];
+                            child.material = materials[material];
                         }
                     }
-                } else {
-                    // console.log(child.material.name)
-                    if (material == child.material.name) {
-                        if (child.isSkinnedMesh)
-                            materials[material].skinning = true;
-                        child.material = materials[material];
-                    }
                 }
-            }
-        }
 
-        this.model.traverse((child) => {
-            if (child.isMesh || child.isSkinnedMesh) {
-                child.castShadow = this.hasShadows;
-                child.receiveShadow = true;
-                updateMaterials(child, this.materials);
-            } else {
-                updateLights(child, this.lights);
+                return child;
             }
-        });
-        this.model.name = this.name;
+
+            this.model.traverse(async(child) => {
+                if (child.isMesh || child.isSkinnedMesh) {
+                    child.castShadow = this.hasShadows;
+                    child.receiveShadow = true;
+                    child = await updateMaterials(child, this.materials);
+                } else {
+                    child = await updateLights(child, this.lights);
+                }
+            });
+
+            this.model.name = this.name;
+
+        })();
     }
 
     updateEnvMap() {

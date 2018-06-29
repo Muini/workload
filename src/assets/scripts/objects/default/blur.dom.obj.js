@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
-import DomObject from '../engine/domObject';
+import Engine from '../../engine/engine';
+import DomObject from '../../engine/domObject';
 
 export class BlurDom extends DomObject {
     constructor(opt = {}) {
@@ -38,25 +38,28 @@ export class BlurDom extends DomObject {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
-        Engine.addToResize(this.uuid, _ => {
-            Engine.waitNextTick(_ => {
-                this.shouldUpdate = true;
+            Engine.addToResize(this.uuid, _ => {
+                Engine.waitNextTick(_ => {
+                    this.shouldUpdate = true;
+                });
             });
-        });
 
-        if (Engine.postprod)
-            Engine.postprod.addBlurPosition(this);
-        else
-            console.warn('Blur Dom Objects require postprocessing effects on')
-
-        // Is fired when the object is added to the scene
+            // Is fired when the object is added to the scene
+        })();
     }
 
     setVisibility(bool) {
         super.setVisibility(bool);
         this.shouldUpdate = bool;
+        if (bool === false && Engine.postprod)
+            Engine.postprod.removeBlurPosition(this);
+        else if (Engine.postprod)
+            Engine.postprod.addBlurPosition(this);
+        else
+            console.warn('Blur Dom Objects require postprocessing effects on')
     }
 
     update(time, delta) {

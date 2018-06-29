@@ -7,61 +7,9 @@ import SoundEngine from './soundEngine';
 import * as TWEEN from 'es6-tween';
 import Loader from './loader';
 
+import './watch-polyfill';
+
 window.DEBUG = true;
-
-/*
- * object.watch polyfill
- *
- * 2012-04-03
- *
- * By Eli Grey, http://eligrey.com
- * Public Domain.
- * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
- */
-
-// object.watch
-if (!Object.prototype.watch) {
-    Object.defineProperty(Object.prototype, "watch", {
-        enumerable: false,
-        configurable: true,
-        writable: false,
-        value: function(prop, handler) {
-            var
-                oldval = this[prop],
-                newval = oldval,
-                getter = function() {
-                    return newval;
-                },
-                setter = function(val) {
-                    oldval = newval;
-                    return newval = handler.call(this, prop, oldval, val);
-                };
-
-            if (delete this[prop]) { // can't watch constants
-                Object.defineProperty(this, prop, {
-                    get: getter,
-                    set: setter,
-                    enumerable: true,
-                    configurable: true
-                });
-            }
-        }
-    });
-}
-
-// object.unwatch
-if (!Object.prototype.unwatch) {
-    Object.defineProperty(Object.prototype, "unwatch", {
-        enumerable: false,
-        configurable: true,
-        writable: false,
-        value: function(prop) {
-            var val = this[prop];
-            delete this[prop]; // remove accessors
-            this[prop] = val;
-        }
-    });
-}
 
 class Engine {
     constructor(opt = {}) {
@@ -82,6 +30,8 @@ class Engine {
             this.height = window.innerHeight;
 
         this.scenes = {};
+        this.scenesOrder = [];
+        this.sceneCurrentIndex = 0;
 
         this.isMobile = (navigator.userAgent.match(/Android/i) ||
             navigator.userAgent.match(/webOS/i) ||
@@ -116,9 +66,9 @@ class Engine {
             factorial(20);
         }
         durationTime = (durationTime + (performance.now() - startTime)) / 2;
-        if (window.DEBUG) {
+        /*if (window.DEBUG) {
             console.log('Performance Test: ' + durationTime + ' ms');
-        }
+        }*/
         if (durationTime > 22)
             this.quality--;
 
@@ -159,6 +109,7 @@ class Engine {
 
         this.updateFunctions = {};
         this.resizeFunctions = {};
+        this.waitFunctions = {};
 
         this.Tween = TWEEN.Tween;
         this.Easing = TWEEN.Easing;
@@ -204,10 +155,10 @@ class Engine {
                     },
                     blur: {
                         enabled: true,
-                        strength: 5.0,
+                        strength: 3.0,
                         sharpen: this.quality < 3 ? 0.05 : 0.15,
                         blurRgbSplit: 1.5,
-                        gain: 1.10,
+                        gain: 1.20,
                     }
                 }
             });
@@ -298,6 +249,9 @@ class Engine {
     }
 
     wait(fct, timeToWait) {
+        /*
+        if (typeof fct !== 'function' || uuid === undefined) return;
+        this.waitFunctions[uuid] = fct;*/
         setTimeout(_ => {
             this.waitNextTick(fct);
         }, timeToWait);
@@ -359,7 +313,7 @@ class Engine {
             if (this.currentScene.isLoading) {
                 // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
                 Engine.Loader.show();
-                this.currentScene.callback = callback;
+                this.currentScene.onPreloaded = callback;
             } else {
                 // Else load the scene, then start it
                 this.currentScene.preload(callback);
@@ -367,15 +321,48 @@ class Engine {
         }
     }
 
-    start() {
-        if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScene(...) function';
+    setScenesOrder(order) {
+        this.scenesOrder = order;
+    }
+
+    nextScene() {
         if (window.DEBUG)
-            console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
-        this.currentScene.onStart();
-        if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
-        this.hasStarted = true;
-        requestAnimationFrame(_ => {
+            console.log('%cEngine%c Next Scene', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+
+        // Pause render
+        this.pause();
+        // Clear renderer
+        this.renderer.clear();
+        // Stop the scene and deactivate everything
+        this.currentScene.stop();
+        // Set the next scene
+        this.sceneCurrentIndex++;
+        this.setScene(this.scenesOrder[this.sceneCurrentIndex], _ => {
+            // When loaded, init the new scene
+            this.currentScene.start();
+            // Start the render
             this.play();
+        });
+    }
+
+    start() {
+        this.setScene(this.scenesOrder[this.sceneCurrentIndex], async _ => {
+
+            if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScenesOrder(...) function';
+
+            if (window.DEBUG)
+                console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+
+            await this.currentScene.start();
+
+            if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
+
+            this.hasStarted = true;
+
+            requestAnimationFrame(_ => {
+                this.play();
+            });
+
         });
     }
 

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
+import Engine from '../../engine/engine';
 
-import Object from '../engine/object';
-import '../vendors/Sky';
+import Object from '../../engine/object';
+import '../../vendors/Sky';
 
 export class Sky extends Object {
     constructor(opt = {}) {
@@ -33,9 +33,11 @@ export class Sky extends Object {
     }
 
     awake() {
-        super.awake();
+        return (async() => {
+            await super.awake();
 
-        // Is fired when the object is added to the scene
+            // Is fired when the object is added to the scene
+        })();
     }
 
     update(time, delta) {
