@@ -108,6 +108,14 @@ export default class Object {
         })();
     }
 
+    //TODO: created method called after scene loaded, before awake and before set scene as active that construct
+    // every object and set their basic values before launching it
+    created() {
+        return (async() => {
+
+        })();
+    }
+
     // Awake happen when the scene is loaded into the engine & started to be used
     awake() {
         return (async() => {

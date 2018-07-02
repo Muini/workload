@@ -245,8 +245,10 @@ export default class PostProd {
                     (this.blurDomElems[i].x / this.width),
                     1.0 - (this.blurDomElems[i].y / this.height),
                     (this.blurDomElems[i].x + this.blurDomElems[i].width) / this.width,
-                    1.0 - (this.blurDomElems[i].y / this.height) - (this.blurDomElems[i].height / this.height),
+                    1.0 - (this.blurDomElems[i].y / this.height) - (this.blurDomElems[i].height / this.height)
                 );
+            } else {
+                this.blurPos[i].set(0.0, 0.0, 0.0, 0.0);
             }
         }
         this.blurPass.uniforms['blurPos'].value = this.blurPos;

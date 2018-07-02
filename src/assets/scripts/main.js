@@ -19,7 +19,7 @@ Engine.setFixedRatio(2 / 1);
 // Set Scene will start the loading process of scenes
 Engine.setScenesOrder([
     'city',
-    'workload'
+    'workload',
 ]);
 
 // Start the engine ; It will start the preloading and launch the first scene

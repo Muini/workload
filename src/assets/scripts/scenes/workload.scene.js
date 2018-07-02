@@ -62,5 +62,7 @@ export default new Scene({
         this.camera.model.rotation.y = (45 / 180) * 3.14;
         this.camera.instance.rotation.x = -(30 / 180) * 3.14;
         this.setCamera(this.camera.instance);
+
+        // setTimeout(_ => { Engine.nextScene(); }, 3000);
     }
 });

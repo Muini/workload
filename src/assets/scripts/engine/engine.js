@@ -29,7 +29,7 @@ class Engine {
         else
             this.height = window.innerHeight;
 
-        this.scenes = {};
+        this.scenes = new Map();
         this.scenesOrder = [];
         this.sceneCurrentIndex = 0;
 
@@ -107,10 +107,11 @@ class Engine {
         this.hasStarted = false;
         this.isPlaying = false;
 
-        this.updateFunctions = {};
-        this.resizeFunctions = {};
-        this.waitFunctions = {};
+        this.updateFunctions = new Map();
+        this.resizeFunctions = new Map();
+        this.waitFunctions = new Map();
 
+        TWEEN.autoPlay(false);
         this.Tween = TWEEN.Tween;
         this.Easing = TWEEN.Easing;
 
@@ -224,22 +225,18 @@ class Engine {
 
     addToResize(uuid, fct) {
         if (typeof fct !== 'function' || uuid === undefined) return;
-        this.resizeFunctions[uuid] = fct;
+        this.resizeFunctions.set(uuid, fct);
+    }
+    removeFromResize(uuid) {
+        this.resizeFunctions.delete(uuid)
     }
 
     addToUpdate(uuid, fct) {
         if (typeof fct !== 'function' || uuid === undefined) return;
-        this.updateFunctions[uuid] = fct;
+        this.updateFunctions.set(uuid, fct);
     }
-
-    removeFromUpdate(uid) {
-        if (!this.updateFunctions[uid]) return;
-        delete this.updateFunctions[uid];
-    }
-
-    removeFromResize(uid) {
-        if (!this.resizeFunctions[uid]) return;
-        delete this.resizeFunctions[uid];
+    removeFromUpdate(uuid) {
+        this.updateFunctions.delete(uuid)
     }
 
     waitNextTick(fct) {
@@ -276,9 +273,9 @@ class Engine {
         this.container.style['height'] = this.height + 'px';
         this.containerBoundingBox = this.container.getBoundingClientRect();
 
-        for (let key in this.resizeFunctions) {
-            this.resizeFunctions[key]();
-        }
+        this.resizeFunctions.forEach(fct => {
+            fct();
+        });
 
         if (this.hasPostProd)
             this.postprod.resize(this.width, this.height, this.pixelDensity);
@@ -294,29 +291,54 @@ class Engine {
     }
 
     registerScene(scene) {
-        this.scenes[scene.name] = scene;
-        if (this.scenes[scene.name]) {
-            this.scenes[scene.name].setup();
+        this.scenes.set(scene.name, scene);
+        this.scenes.get(scene.name).initScene();
+    }
+
+    preloadScenesCheck() {
+        if (this.currentScene.isLoading || this.isPreloading) return;
+        let nextIndex = this.sceneCurrentIndex + 1;
+
+        const checkIfSceneShouldPreload = _ => {
+            let nextSceneName = this.scenesOrder[nextIndex];
+            if (!nextSceneName) return false;
+            if (!this.scenes.get(nextSceneName).hasLoaded) {
+                this.isPreloading = true;
+                this.scenes.get(nextSceneName).preload(_ => {
+                    this.isPreloading = false;
+                });
+            } else {
+                nextIndex++;
+                return checkIfSceneShouldPreload();
+            }
         }
+        checkIfSceneShouldPreload();
     }
 
     setScene(sceneName, callback) {
-        if (this.scenes[sceneName] === undefined) throw `Engine : Scene ${sceneName} is not registered`;
-        this.currentScene = this.scenes[sceneName];
+        if (this.scenes.get(sceneName) === undefined) throw `Engine : Scene ${sceneName} is not registered`;
+        this.currentScene = this.scenes.get(sceneName);
         if (window.DEBUG)
             window.scene = this.currentScene.instance;
         if (this.currentScene.hasLoaded) {
             // If the scene is already loaded, start it
+            console.log('Scene is already loaded, continue')
             this.performanceCycleNbr = 0;
             callback();
         } else {
             if (this.currentScene.isLoading) {
                 // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
+                console.log('Scene is already loading, wait for it')
                 Engine.Loader.show();
                 this.currentScene.onPreloaded = callback;
             } else {
                 // Else load the scene, then start it
-                this.currentScene.preload(callback);
+                console.log('Scene is not loaded, load it !')
+                this.isPreloading = true;
+                this.currentScene.preload(_ => {
+                    this.isPreloading = false;
+                    callback();
+                });
             }
         }
     }
@@ -337,6 +359,12 @@ class Engine {
         this.currentScene.stop();
         // Set the next scene
         this.sceneCurrentIndex++;
+        // Check if the next scene exist
+        if (!this.scenesOrder[this.sceneCurrentIndex]) {
+            if (window.DEBUG)
+                console.log('%cEngine%c No more scenes to play.', "color:white;background:Orange;padding:2px 4px;", "color:black");
+            return this.stop();
+        }
         this.setScene(this.scenesOrder[this.sceneCurrentIndex], _ => {
             // When loaded, init the new scene
             this.currentScene.start();
@@ -359,9 +387,7 @@ class Engine {
 
             this.hasStarted = true;
 
-            requestAnimationFrame(_ => {
-                this.play();
-            });
+            this.play();
 
         });
     }
@@ -446,6 +472,9 @@ class Engine {
         //Check if we need to downgrade the renderer
         this.adaptiveRenderer(time, delta);
 
+        //Check if we're loading something in background
+        this.preloadScenesCheck();
+
         //Update & Render Post processing effects
         if (this.hasPostProd)
             this.postprod.update(time, delta);
@@ -453,9 +482,9 @@ class Engine {
         TWEEN.update(time);
 
         //Update all objects
-        for (let key in this.updateFunctions) {
-            this.updateFunctions[key](time, delta);
-        }
+        this.updateFunctions.forEach(fct => {
+            fct(time, delta);
+        });
 
         //Render the scene
         this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);

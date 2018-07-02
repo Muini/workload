@@ -34,7 +34,7 @@ export default class Scene {
         this.mainCamera = undefined;
 
         this.objects = [];
-        this.sounds = {};
+        this.sounds = new Map();
 
         this.assets = {
             'models': {},
@@ -43,10 +43,17 @@ export default class Scene {
         }
     }
 
+    initScene() {
+        return (async() => {
+            await this.setup();
+            return;
+        })();
+    }
+
     addSound(sound) {
-        if (this.sounds[sound.name])
+        if (this.sounds.get(sound.name))
             console.warn(`Sound ${sound.name} already exist in scene ${this.scene.name}. Please use another name`);
-        this.sounds[sound.name] = sound;
+        this.sounds.set(sound.name, sound);
     }
 
     addObject(object) {
@@ -56,9 +63,7 @@ export default class Scene {
 
     awakeObjects() {
         return (async() => {
-            for (let i = 0; i < this.objects.length; i++) {
-                await this.objects[i].awake();
-            }
+            await Promise.all(this.objects.map(async object => { await object.awake() }))
             if (window.DEBUG)
                 console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
             return;
@@ -96,9 +101,7 @@ export default class Scene {
 
         this.onPreloaded = callback;
 
-        for (const soundName in this.sounds) {
-            this.sounds[soundName].load();
-        }
+        this.sounds.forEach(elem => elem.load());
 
         AssetsManager.loadAssetsFromScene(this.name, _ => {
             if (window.DEBUG)
@@ -122,12 +125,13 @@ export default class Scene {
 
     stop() {
         //This is the end of the scene
+        // Desactivate every objects
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].setActive(false);
         }
-        for (let key in this.sounds) {
-            this.sounds[key].stop();
-        }
+        // Stop all sounds
+        this.sounds.forEach(elem => elem.stop());
+
         this.isPlaying = false;
         Engine.removeFromResize(this.uuid);
     }
@@ -136,7 +140,7 @@ export default class Scene {
         if (window.DEBUG)
             console.log('%cEngine%c Clear scene %c' + this.name, "color:white;background:gray;padding:2px 4px;", "color:black", "color:DodgerBlue");
 
-
+        this.sounds.forEach(elem => elem.destroy());
         for (let i = 0; i < this.objects.length; i++) {
             this.objects[i].destroy();
         }
