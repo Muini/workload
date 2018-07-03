@@ -77,11 +77,18 @@ export class Worker extends Object {
         });*/
     }
 
+    created() {
+        return (async() => {
+            await super.created();
+
+            this.lights['Desk_Spot'].target = this.model;
+
+        })();
+    }
+
     awake() {
         return (async() => {
             await super.awake();
-
-            this.lights['Desk_Spot'].target = this.model;
 
             Engine.wait(_ => {
                 for (let i = 0; i < 5; i++) {

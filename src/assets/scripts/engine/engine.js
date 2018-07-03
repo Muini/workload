@@ -42,7 +42,7 @@ class Engine {
             navigator.userAgent.match(/Windows Phone/i)
         );
         this.quality = this.isMobile ? 2 : 4;
-
+        /*
         function factorial(num) {
             if (num < 0) {
                 throw new Error("Number cannot be negative.");
@@ -69,8 +69,8 @@ class Engine {
         /*if (window.DEBUG) {
             console.log('Performance Test: ' + durationTime + ' ms');
         }*/
-        if (durationTime > 22)
-            this.quality--;
+        // if (durationTime > 22)
+        //     this.quality--;
 
         this.container = undefined;
         this.containerBoundingBox = undefined;
@@ -102,6 +102,7 @@ class Engine {
         this.performanceCycleLength = 10; //Every 8 frames
         this.maxPerformanceCycle = 5; //3 Cycles
 
+        // TODO: Remove Looper
         this.loop = new Looper();
         this.loop.add(this.update.bind(this));
         this.hasStarted = false;
@@ -111,6 +112,7 @@ class Engine {
         this.resizeFunctions = new Map();
         this.waitFunctions = new Map();
 
+        // TODO: Create Tween Class that manipulate TWEEN.js
         TWEEN.autoPlay(false);
         this.Tween = TWEEN.Tween;
         this.Easing = TWEEN.Easing;
@@ -165,6 +167,7 @@ class Engine {
             });
         }
 
+        // TODO: Singleton Loader Class
         this.Loader = new Loader();
 
         this.container = container;
@@ -249,6 +252,7 @@ class Engine {
         /*
         if (typeof fct !== 'function' || uuid === undefined) return;
         this.waitFunctions[uuid] = fct;*/
+        // TODO: timeout based on current update
         setTimeout(_ => {
             this.waitNextTick(fct);
         }, timeToWait);
@@ -296,6 +300,7 @@ class Engine {
     }
 
     preloadScenesCheck() {
+        // TODO: wait between loading to not overheat ; buffer ?
         if (this.currentScene.isLoading || this.isPreloading) return;
         let nextIndex = this.sceneCurrentIndex + 1;
 
@@ -416,6 +421,8 @@ class Engine {
     }
 
     adaptiveRenderer(time, delta) {
+        // TODO: upscale renderer when framerate is good if it has been downscaled before
+
         if (this.lastTick == null) return;
         if (this.performanceCycleNbr >= this.maxPerformanceCycle) return;
 
@@ -497,5 +504,4 @@ class Engine {
     }
 }
 
-// const Engine = new FourEngine()
 export default new Engine();

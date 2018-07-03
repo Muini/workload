@@ -44,7 +44,7 @@ export default class DomObject {
         }
         //If the engine has started, it means it's an instanciation
         if (this.parent && Engine.hasStarted) {
-            this.awake();
+            this.created();
         }
     }
 
@@ -70,8 +70,7 @@ export default class DomObject {
         this.setVisibility(bool);
     }
 
-    // Awake happen when the scene is loaded into the engine & started to be used
-    awake() {
+    created() {
         return (async() => {
             if (!this.dom) return;
             // Parse Dom to look for data
@@ -87,7 +86,12 @@ export default class DomObject {
                     return newval;
                 });
             }
+        })();
+    }
 
+    // Awake happen when the scene is loaded into the engine & started to be used
+    awake() {
+        return (async() => {
             this.setActive(this.isActive);
         })();
     }

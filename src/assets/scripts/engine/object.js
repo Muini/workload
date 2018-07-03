@@ -51,7 +51,7 @@ export default class Object {
         }
         //If the engine has started, it means it's an instanciation
         if (Engine.hasStarted) {
-            this.awake();
+            this.created();
         }
     }
 
@@ -108,16 +108,7 @@ export default class Object {
         })();
     }
 
-    //TODO: created method called after scene loaded, before awake and before set scene as active that construct
-    // every object and set their basic values before launching it
     created() {
-        return (async() => {
-
-        })();
-    }
-
-    // Awake happen when the scene is loaded into the engine & started to be used
-    awake() {
         return (async() => {
             await this.getModel();
 
@@ -135,6 +126,15 @@ export default class Object {
 
             this.updateEnvMap();
 
+            if (this.scene.isPlaying) {
+                await this.awake();
+            }
+        })();
+    }
+
+    // Awake happen when the scene is loaded into the engine & started to be used
+    awake() {
+        return (async() => {
             this.setActive(this.isActive);
         })();
     }

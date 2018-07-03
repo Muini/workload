@@ -61,6 +61,15 @@ export default class Scene {
         // this.assets['models']
     }
 
+    createObjects() {
+        return (async() => {
+            await Promise.all(this.objects.map(async object => { await object.created() }))
+            if (window.DEBUG)
+                console.log('%cEngine%c Scene created ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+            return;
+        })();
+    }
+
     awakeObjects() {
         return (async() => {
             await Promise.all(this.objects.map(async object => { await object.awake() }))
@@ -106,6 +115,7 @@ export default class Scene {
         AssetsManager.loadAssetsFromScene(this.name, _ => {
             if (window.DEBUG)
                 console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
+            this.createObjects();
             this.isLoading = false;
             this.hasLoaded = true;
             this.onPreloaded();

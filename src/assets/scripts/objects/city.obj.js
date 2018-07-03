@@ -98,10 +98,10 @@ export class City extends Object {
         // Define & init here custom variables
     }
 
-    awake() {
+    created() {
         return (async() => {
 
-            await super.awake();
+            await super.created();
 
             this.eoMotors = [];
             this.clouds = [];
@@ -117,6 +117,12 @@ export class City extends Object {
                 this.eoMotors[i].rotation.x += Math.random() * 3.14;
             }
 
+        })();
+    }
+
+    awake() {
+        return (async() => {
+            await super.awake();
         })();
     }
 
