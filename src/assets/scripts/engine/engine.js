@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import Stats from 'stats.js';
 import Looper from '../vendors/looper';
 import PostProd from './postprod';
-import SoundEngine from './soundEngine';
+import SoundEngine from './soundEngine'; 
+import * as TWEEN from 'tween';
 // import * as TWEEN from 'es6-tween';
 import Loader from './loader';
 
@@ -114,9 +115,8 @@ class Engine {
 
         // TODO: Create Tween Class that manipulate TWEEN.js
         // TWEEN.autoPlay(false);
-        // this.Tween = TWEEN.Tween;
-        this.Tween = {};
-        // this.Easing = TWEEN.Easing;
+        this.Tween = TWEEN.Tween;
+        this.Easing = TWEEN.Easing;
 
         this.Loader = undefined;
 

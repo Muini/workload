@@ -131,10 +131,10 @@ export class City extends Obj {
 
         this.materials['Leafs'].uniforms['time'].value = time;
         for (let i = 0; i < this.eoMotors.length; i++) {
-            this.eoMotors[i].rotation.x += 0.005 * 3.14;
+            this.eoMotors[i].rotation.x += 0.00025 * 3.14 * delta;
         }
         for (let i = 0; i < this.clouds.length; i++) {
-            this.clouds[i].position.x += Math.cos(time * .000001) / 20.;
+            this.clouds[i].position.x += Math.cos(time * .000001) / 400. * delta;
         }
     }
 

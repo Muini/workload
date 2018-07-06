@@ -46,7 +46,7 @@ export class Paper extends Obj {
     appear() {
         let initialPosX = this.model.position.x;
         let tween = new Engine.Tween({ opacity: 0 }).to({ opacity: 1 }, 300)
-        tween.on('update', ({ opacity }) => {
+        tween.onUpdate(({ opacity }) => {
             this.materials['Paper'].opacity = opacity;
             this.model.position.x = initialPosX + ((1 - opacity) * .25);
         })
@@ -56,11 +56,11 @@ export class Paper extends Obj {
     disappear(onComplete) {
         let initialPosZ = this.model.position.z;
         let tween = new Engine.Tween({ opacity: 1 }).to({ opacity: 0 }, 400)
-        tween.on('update', ({ opacity }) => {
+        tween.onUpdate(({ opacity }) => {
             this.materials['Paper'].opacity = opacity;
             this.model.position.z = initialPosZ + ((1 - opacity) * 1.);
         });
-        tween.on('complete', _ => {
+        tween.onComplete(_ => {
             if (typeof onComplete === 'function') onComplete();
             this.destroy();
         });
@@ -70,7 +70,7 @@ export class Paper extends Obj {
     moveDown(value) {
         let initialPosY = this.model.position.y;
         let tween = new Engine.Tween({ y: 0 }).to({ y: value }, 300)
-        tween.on('update', ({ y }) => {
+        tween.onUpdate(({ y }) => {
             this.model.position.y = initialPosY - y;
         });
         tween.start();

@@ -3,7 +3,7 @@
 
 #define LUT_FLIP_Y
 
-#pragma glslify: lut = require('glsl-lut')
+#pragma glslify: lookup = require('glsl-lut')
 
 uniform sampler2D tDiffuse;
 uniform vec2 resolution;
@@ -74,7 +74,7 @@ void main() {
         #endif
     }
     
-    vec3 lut = lut(gl_FragColor, LUTtexture).rgb;
+    vec3 lut = lookup(gl_FragColor, LUTtexture).rgb;
     gl_FragColor.rgb = mix(gl_FragColor.rgb, lut, LUTstrength);
     
 }

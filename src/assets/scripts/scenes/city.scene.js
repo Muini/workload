@@ -118,14 +118,15 @@ export default new Scene({
             // .repeat(Infinity)
             // .yoyo(true)
             .easing(Engine.Easing.Cubic.InOut)
-            .on('update', ({ y, z }) => {
+            .onUpdate(({ y, z }) => {
+                console.log('update')
                 this.camera.model.position.y = y;
                 this.camera.model.position.z = z;
                 this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
                 if (Engine.postprod.bokehPass)
                     Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
             })
-            .on('complete', _ => {
+            .onComplete( _ => {
                 Engine.nextScene();
             })
             .start();
