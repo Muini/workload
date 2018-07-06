@@ -4,7 +4,7 @@ import Stats from 'stats.js';
 import Looper from '../vendors/looper';
 import PostProd from './postprod';
 import SoundEngine from './soundEngine';
-import * as TWEEN from 'es6-tween';
+// import * as TWEEN from 'es6-tween';
 import Loader from './loader';
 
 import './watch-polyfill';
@@ -113,9 +113,10 @@ class Engine {
         this.waitFunctions = new Map();
 
         // TODO: Create Tween Class that manipulate TWEEN.js
-        TWEEN.autoPlay(false);
-        this.Tween = TWEEN.Tween;
-        this.Easing = TWEEN.Easing;
+        // TWEEN.autoPlay(false);
+        // this.Tween = TWEEN.Tween;
+        this.Tween = {};
+        // this.Easing = TWEEN.Easing;
 
         this.Loader = undefined;
 
@@ -320,32 +321,35 @@ class Engine {
         checkIfSceneShouldPreload();
     }
 
-    setScene(sceneName, callback) {
-        if (this.scenes.get(sceneName) === undefined) throw `Engine : Scene ${sceneName} is not registered`;
-        this.currentScene = this.scenes.get(sceneName);
-        if (window.DEBUG)
-            window.scene = this.currentScene.instance;
-        if (this.currentScene.hasLoaded) {
-            // If the scene is already loaded, start it
-            console.log('Scene is already loaded, continue')
-            this.performanceCycleNbr = 0;
-            callback();
-        } else {
-            if (this.currentScene.isLoading) {
-                // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
-                console.log('Scene is already loading, wait for it')
-                Engine.Loader.show();
-                this.currentScene.onPreloaded = callback;
+    setScene(sceneName) {
+        return new Promise((resolve, reject) => {
+            //TODO: reject setScene
+            if (this.scenes.get(sceneName) === undefined) throw `Engine : Scene ${sceneName} is not registered`;
+            this.currentScene = this.scenes.get(sceneName);
+            if (window.DEBUG)
+                window.scene = this.currentScene.instance;
+            if (this.currentScene.hasLoaded) {
+                // If the scene is already loaded, start it
+                console.log('Scene is already loaded, continue')
+                this.performanceCycleNbr = 0;
+                resolve();
             } else {
-                // Else load the scene, then start it
-                console.log('Scene is not loaded, load it !')
-                this.isPreloading = true;
-                this.currentScene.preload(_ => {
-                    this.isPreloading = false;
-                    callback();
-                });
+                if (this.currentScene.isLoading) {
+                    // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
+                    console.log('Scene is already loading, wait for it')
+                    Engine.Loader.show();
+                    this.currentScene.onPreloaded = resolve;
+                } else {
+                    // Else load the scene, then start it
+                    console.log('Scene is not loaded, load it !')
+                    this.isPreloading = true;
+                    this.currentScene.preload(_ => {
+                        this.isPreloading = false;
+                        resolve();
+                    });
+                }
             }
-        }
+        });
     }
 
     setScenesOrder(order) {
@@ -370,31 +374,32 @@ class Engine {
                 console.log('%cEngine%c No more scenes to play.', "color:white;background:Orange;padding:2px 4px;", "color:black");
             return this.stop();
         }
-        this.setScene(this.scenesOrder[this.sceneCurrentIndex], _ => {
-            // When loaded, init the new scene
-            this.currentScene.start();
-            // Start the render
-            this.play();
-        });
+        this.setScene(this.scenesOrder[this.sceneCurrentIndex]).then(_ => {
+          // When loaded, init the new scene
+          this.currentScene.start();
+          // Start the render
+          this.play();
+        })
     }
 
     start() {
-        this.setScene(this.scenesOrder[this.sceneCurrentIndex], async _ => {
+        return (async() => {
+            // Set the scene when the engine is starting
+            await this.setScene(this.scenesOrder[this.sceneCurrentIndex]).then(async _ => {
+                if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScenesOrder(...) function';
 
-            if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScenesOrder(...) function';
-
-            if (window.DEBUG)
+                if (window.DEBUG)
                 console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
 
-            await this.currentScene.start();
+                await this.currentScene.start();
 
-            if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
+                if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
 
-            this.hasStarted = true;
+                this.hasStarted = true;
 
-            this.play();
-
-        });
+                this.play();
+            });
+        })();
     }
 
     play() {

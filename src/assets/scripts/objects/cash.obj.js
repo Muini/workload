@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import Object from '../engine/object';
 
-import { Tween } from 'es6-tween';
+// import { Tween } from 'es6-tween';
 
 export class Cash extends Object {
     constructor(opt = {}) {

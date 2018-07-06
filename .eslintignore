@@ -1,4 +1,5 @@
-build/*.js
-config/*.js
-src/**/*.js
-src/**/*.vue
+/build/
+/config/
+/dist/
+/*.js
+/test/unit/coverage/
