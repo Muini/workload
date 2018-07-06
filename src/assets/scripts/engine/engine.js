@@ -7,7 +7,7 @@ import SoundEngine from './soundEngine';
 import * as TWEEN from 'es6-tween';
 import Loader from './loader';
 
-import './watch-polyfill';
+import './utils/watch-polyfill';
 
 window.DEBUG = true;
 
@@ -113,7 +113,7 @@ class Engine {
         this.waitFunctions = new Map();
 
         // TODO: Create Tween Class that manipulate TWEEN.js
-        TWEEN.autoPlay(false);
+        // TWEEN.autoPlay(false);
         this.Tween = TWEEN.Tween;
         this.Easing = TWEEN.Easing;
 

@@ -50,9 +50,9 @@ export default new Scene({
         // Test Worker
         this.worker = new Worker({ parent: this });
 
-        let work3 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0.0, -8.0) });
+        // let work3 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0.0, -8.0) });
 
-        let work5 = new Worker({ parent: this, position: new THREE.Vector3(-16.0, 0.0, -16.0) });
+        // let work5 = new Worker({ parent: this, position: new THREE.Vector3(-16.0, 0.0, -16.0) });
 
         this.testdom = new ExempleDom({ parent: this });
 

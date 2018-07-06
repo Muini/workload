@@ -86,6 +86,10 @@ export default class DomObject {
                     return newval;
                 });
             }
+
+            if (this.scene && this.scene.isPlaying) {
+                await this.awake();
+            }
         })();
     }
 

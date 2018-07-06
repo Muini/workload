@@ -21,13 +21,23 @@ export default class Loader extends DomObject {
             chunkPercentage: 0,
         }
 
-        this.awake();
+        this.created();
+    }
+
+    created() {
+        return (async() => {
+            super.created();
+
+            this.parts = await this.dom.querySelectorAll('.part');
+
+            this.awake();
+        })();
     }
 
     awake() {
-        super.awake();
-
-        this.parts = this.dom.querySelectorAll('.part');
+        return (async() => {
+            super.awake();
+        })();
     }
 
     show() {

@@ -32,11 +32,17 @@ export class Exemple extends Object {
         // Define & init here custom variables
     }
 
+    created() {
+        return (async() => {
+            await super.created();
+            // Is fired when the object is created after assets are loaded
+        })();
+    }
+
     awake() {
         return (async() => {
             await super.awake();
-
-            // Is fired when the object is added to the scene
+            // Is fired when the scene is starting
         })();
     }
 

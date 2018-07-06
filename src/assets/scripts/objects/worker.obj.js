@@ -83,6 +83,15 @@ export class Worker extends Object {
 
             this.lights['Desk_Spot'].target = this.model;
 
+            this.bonhomme = [];
+            // TODO: Make utils for getting children easily
+            this.model.traverse(async(child) => {
+                if (child.name == 'Bonhomme') {
+                    this.bonhomme = child
+                }
+            });
+            this.bonhomme.visible = false;
+
         })();
     }
 
@@ -119,11 +128,14 @@ export class Worker extends Object {
     }
 
     startWorking() {
+        if (this.isWorking) return;
+        this.bonhomme.visible = true;
         this.isWorking = true;
         this.animator.play('Work');
     }
 
     stopWorking() {
+        if (!this.isWorking) return;
         this.isWorking = false;
     }
 

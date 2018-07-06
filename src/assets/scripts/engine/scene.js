@@ -104,33 +104,34 @@ export default class Scene {
     }
 
     preload(callback) {
-        this.isLoading = true;
-        // Get all entites, load their assets (sounds, models, textures)
-        this.assetsToLoad += this.objects.length;
+        return (async() => {
+            this.isLoading = true;
+            // Get all entites, load their assets (sounds, models, textures)
+            this.assetsToLoad += this.objects.length;
 
-        this.onPreloaded = callback;
+            this.onPreloaded = callback;
 
-        this.sounds.forEach(elem => elem.load());
+            this.sounds.forEach(elem => elem.load());
 
-        AssetsManager.loadAssetsFromScene(this.name, _ => {
-            if (window.DEBUG)
-                console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
-            this.createObjects();
-            this.isLoading = false;
-            this.hasLoaded = true;
-            this.onPreloaded();
-        });
+            await AssetsManager.loadAssetsFromScene(this.name, _ => {
+                if (window.DEBUG)
+                    console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
+                this.createObjects();
+                this.isLoading = false;
+                this.hasLoaded = true;
+                return this.onPreloaded();
+            });
+        })();
     }
 
     start() {
-        // return (async() => {
-        Engine.addToResize(this.uuid, this.resize.bind(this));
-        this.resize();
-        this.awakeObjects();
-        this.onStart();
-        this.isPlaying = true;
-        // return;
-        // });
+        return (async() => {
+            Engine.addToResize(this.uuid, this.resize.bind(this));
+            this.resize();
+            await this.awakeObjects();
+            this.onStart();
+            this.isPlaying = true;
+        })();
     }
 
     stop() {

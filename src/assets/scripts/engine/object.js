@@ -31,7 +31,6 @@ export default class Object {
         this.parent = opt.parent || undefined;
         if (!this.parent) throw 'Object parameter "parent" is mandatory and should be a Object or Scene type';
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
-        this.scene.addObject(this);
 
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
         this.rotation = opt.rotation || new THREE.Vector3(0, 0, 0);
@@ -49,6 +48,9 @@ export default class Object {
         for (let light in this.lights) {
             this.lights[light].name = light;
         }
+
+        this.scene.addObject(this);
+
         //If the engine has started, it means it's an instanciation
         if (Engine.hasStarted) {
             this.created();
