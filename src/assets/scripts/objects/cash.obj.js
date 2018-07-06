@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 
-import Object from '../engine/object';
+import Obj from '../engine/obj';
 
 // import { Tween } from 'es6-tween';
 
-export class Cash extends Object {
+export class Cash extends Obj {
     constructor(opt = {}) {
         super(opt);
     }

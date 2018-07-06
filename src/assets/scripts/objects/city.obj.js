@@ -2,11 +2,11 @@ import * as THREE from 'three';
 
 import Engine from '../engine/engine';
 
-import Object from '../engine/object';
+import Obj from '../engine/obj';
 
 import SwayShader from '../../shaders/sway/SwayShader';
 
-export class City extends Object {
+export class City extends Obj {
     constructor(opt = {}) {
         super(opt);
     }

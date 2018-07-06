@@ -2,10 +2,10 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
 
-import Object from '../../engine/object';
+import Obj from '../../engine/obj';
 import '../../vendors/Sky';
 
-export class Sky extends Object {
+export class Sky extends Obj {
     constructor(opt = {}) {
         super(opt);
     }

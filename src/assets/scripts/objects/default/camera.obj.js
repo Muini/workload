@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
-import Object from '../../engine/object';
+import Obj from '../../engine/obj';
 
-export class Camera extends Object {
+export class Camera extends Obj {
     constructor(opt = {}) {
         super(opt);
     }

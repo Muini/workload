@@ -3,12 +3,12 @@ import * as THREE from 'three';
 import Engine from '../engine/engine';
 
 import Sound from '../engine/sound';
-import Object from '../engine/object';
+import Obj from '../engine/obj';
 
 import { PaperBlock } from './paperBlock.obj';
 import { CashPile } from './cashPile.obj';
 
-export class Worker extends Object {
+export class Worker extends Obj {
     constructor(opt) {
         super(opt);
     }

@@ -3,7 +3,7 @@ import Engine from './engine';
 import AssetsManager from './assetsManager';
 import Animator from './animator';
 
-export default class Object {
+export default class Obj {
     constructor(opt = {
         parent,
         position,
@@ -128,7 +128,7 @@ export default class Object {
 
             this.updateEnvMap();
 
-            if (this.scene.isPlaying) {
+            if (this.scene && this.scene.isPlaying) {
                 await this.awake();
             }
         })();

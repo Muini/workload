@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Engine from './engine.js';
+import Engine from './engine';
 
 import AssetsManager from '../engine/assetsManager';
 

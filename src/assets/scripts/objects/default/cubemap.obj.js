@@ -2,9 +2,9 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
 
-import Object from '../../engine/object';
+import Obj from '../../engine/obj';
 
-export class Cubemap extends Object {
+export class Cubemap extends Obj {
     constructor(opt = {}) {
         super(opt);
     }

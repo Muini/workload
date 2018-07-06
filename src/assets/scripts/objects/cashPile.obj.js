@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 
-import Object from '../engine/object';
+import Obj from '../engine/obj';
 
 import { Cash } from './cash.obj';
 
-export class CashPile extends Object {
+export class CashPile extends Obj {
     constructor(opt = {}) {
         super(opt);
     }

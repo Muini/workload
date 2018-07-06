@@ -1,48 +1,48 @@
 {
-  "name": "workload",
-  "version": "1.0.0",
-  "description": "A 3D Interactive story",
-  "private": true,
-  "main": "index.js",
-  "scripts": {
-    "start": "rm -rf .cache && parcel -p 5000 --no-hmr ./index.html",
-    "build": "parcel build ./index.html --public-url ./ "
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/neuvieme-page/neuvieme-page-website.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/neuvieme-page/neuvieme-page-website/issues"
-  },
-  "homepage": "https://github.com/neuvieme-page/neuvieme-page-website#readme",
-  "devDependencies": {
-    "babel-eslint": "^8.2.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "eslint": "^4.17.0",
-    "eslint-config-standard": "^11.0.0-beta.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^6.0.0",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "glslify-bundle": "^5.0.0",
-    "glslify-deps": "^1.3.1",
-    "gsap": "^2.0.1",
-    "node-sass": "^4.7.2",
-    "parcel-bundler": "^1.7.0",
-    "posthtml-include": "^1.2.0",
-    "stylelint": "^8.4.0",
-    "stylelint-config-standard": "^18.0.0"
-  },
-  "dependencies": {
-    "babel-runtime": "^6.26.0",
-    "es6-tween": "^5.3.0",
-    "glsl-lut": "^1.1.0",
-    "howler": "^2.0.13",
-    "stats.js": "^0.17.0",
-    "three": "^0.94.0",
-    "webfontloader": "^1.6.28"
-  }
+    "name": "workload",
+    "version": "1.0.0",
+    "description": "A 3D Interactive story",
+    "private": true,
+    "main": "index.js",
+    "scripts": {
+        "start": "parcel -p 5000 --no-hmr ./index.html",
+        "build": "parcel build ./index.html --public-url ./ "
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/neuvieme-page/neuvieme-page-website.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/neuvieme-page/neuvieme-page-website/issues"
+    },
+    "homepage": "https://github.com/neuvieme-page/neuvieme-page-website#readme",
+    "devDependencies": {
+        "babel-eslint": "^8.2.1",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "eslint": "^4.17.0",
+        "eslint-config-standard": "^11.0.0-beta.0",
+        "eslint-plugin-import": "^2.8.0",
+        "eslint-plugin-node": "^6.0.0",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-standard": "^3.0.1",
+        "glslify-bundle": "^5.0.0",
+        "glslify-deps": "^1.3.1",
+        "gsap": "^2.0.1",
+        "node-sass": "^4.7.2",
+        "parcel-bundler": "^1.7.0",
+        "posthtml-include": "^1.2.0",
+        "stylelint": "^8.4.0",
+        "stylelint-config-standard": "^18.0.0"
+    },
+    "dependencies": {
+        "babel-runtime": "^6.26.0",
+        "es6-tween": "^5.3.0",
+        "glsl-lut": "^1.1.0",
+        "howler": "^2.0.13",
+        "stats.js": "^0.17.0",
+        "three": "^0.94.0",
+        "webfontloader": "^1.6.28"
+    }
 }
