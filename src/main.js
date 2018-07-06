@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 /* Loading Global Scss */
-require('./assets/styles/main.scss')
+import './assets/styles/main.scss'
 
 /* Loading Polyfills */
 /*import 'promise-polyfill'
@@ -15,24 +15,24 @@ if (!window.fetch) {
 
 /* Loading Vendors */
 import * as WebFont from 'webfontloader';
-import UAParser from 'ua-parser-js'
+// import UAParser from 'ua-parser-js'
 
 /* User Agent Info */
-window.ua = new UAParser().getResult()
+// window.ua = new UAParser().getResult()
 
-function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(' ', '-');
-}
-const device = htmlEntities(window.ua.device.type == undefined ? 'desktop' : window.ua.device.type);
-const browser = htmlEntities(window.ua.browser.name);
-const os = htmlEntities(window.ua.os.name);
+// function htmlEntities(str) {
+//     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(' ', '-');
+// }
+// const device = htmlEntities(window.ua.device.type == undefined ? 'desktop' : window.ua.device.type);
+// const browser = htmlEntities(window.ua.browser.name);
+// const os = htmlEntities(window.ua.os.name);
 
-requestAnimationFrame(_ => {
-    document.body.classList.add(device);
-    document.body.classList.add(browser);
-    document.body.classList.add(os);
+// requestAnimationFrame(_ => {
+//     document.body.classList.add(device);
+//     document.body.classList.add(browser);
+//     document.body.classList.add(os);
 
-});
+// });
 
 // Import main scene file
 import './assets/scripts/main';

@@ -1,4 +1,6 @@
-.DS_Store
-node_modules/
-dist/
-npm-debug.log
+node_modules
+dist
+.cache
+.psd
+src/video
+src/.DS_Store

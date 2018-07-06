@@ -118,7 +118,7 @@ class AssetsManager {
         })();
     }
 
-    cloneGltf = (gltf) => {
+    cloneGltf(gltf) {
         return (async() => {
             const clone = {
                 animations: gltf.animations,
