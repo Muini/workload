@@ -153,7 +153,7 @@ export default new Scene({
             });
         
         Engine.wait(_ => {
-            // tween.start();
+            tween.start();
         }, 1000);
 
     }

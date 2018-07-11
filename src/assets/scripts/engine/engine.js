@@ -99,6 +99,8 @@ class Engine {
         this.fpsMedian = 0;
         this.tickNbr = 0;
         this.hasAdapativeRenderer = true;
+        this.adaptiveRendererDelay = 400;
+        this.lastAdaptiveRendererTime = 0;
         this.performanceCycleNbr = 0;
         this.maxPerformanceCycle = 5; //3 Cycles
         this.performanceCycleLength = 10; //Every 8 frames
@@ -266,12 +268,12 @@ class Engine {
         if (this.hasPostProd)
             this.postprod.resize(this.width, this.height, this.pixelDensity);
 
-        if (!this.isPlaying && this.hasStarted) {
+        /*if (!this.isPlaying && this.hasStarted) {
             this.pause();
             this.waitNextTick(_ => {
                 this.play();
             });
-        }
+        }*/
     }
 
     registerScene(scene) {
@@ -386,7 +388,7 @@ class Engine {
         if (!this.hasStarted || this.isPlaying) return;
         this.update = this.update.bind(this);
         this.lastTick = 0;
-        this.requestId = requestAnimationFrame(time => this.update(time));
+        this.requestId = window.requestAnimationFrame(time => this.update(time));
         this.isPlaying = true;
         if (window.DEBUG)
             console.log('%cEngine%c ▶️ Play', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
@@ -412,15 +414,17 @@ class Engine {
     adaptiveRenderer(time, delta) {
         if (!this.hasAdapativeRenderer) return;
 
-        if (this.lastTick == null) return;
-        if (this.performanceCycleNbr >= this.maxPerformanceCycle) return;
+        if (this.lastTick == null || 
+            this.performanceCycleNbr >= this.maxPerformanceCycle || 
+            (time - this.lastAdaptiveRendererTime < this.adaptiveRendererDelay)
+        ) return;
 
         this.tickNbr++;
 
         //Check current FPS
         let fps = 1000 / (time - this.lastTick);
         this.fpsMedian += fps;
-
+        
         //Check median FPS by cycle
         if (this.tickNbr % this.performanceCycleLength === 0) {
             //Get the mediam FPS of the cycle
@@ -453,6 +457,7 @@ class Engine {
                     //Trigger the resize
                     this.resize();
                     hasBeenResized = true;
+                    this.lastAdaptiveRendererTime = time;
                     // console.log(this.fpsMedian, this.pixelDensity);
                     if (window.DEBUG)
                         console.log('%cEngine%c Adapting renderer to ' + newPixelDensity + ' pixelRatio', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
@@ -470,18 +475,14 @@ class Engine {
     update(time) {
         if (!this.currentScene || !this.currentScene.mainCamera || !this.isPlaying) return;
 
+        this.requestId = window.requestAnimationFrame(time => this.update(time))
+        
         if (window.DEBUG)
             this.stats.begin();
 
         // Calculate delta
         const now = time,
             delta = now - (this.lastTick || now);
-
-        //Store lastTick
-        this.lastTick = time;
-
-        //Store elapsed time
-        this.elapsedTime += delta;
 
         //Check if we need to downgrade the renderer
         if (this.hasAdapativeRenderer)
@@ -500,10 +501,15 @@ class Engine {
         //Render the scene
         this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
 
+        //Store elapsed time
+        this.elapsedTime += delta;
+        
+        //Store lastTick
+        this.lastTick = time;
+
         if (window.DEBUG)
             this.stats.end();
         
-        this.requestId = requestAnimationFrame(time => this.update(time))
     }
 }
 
