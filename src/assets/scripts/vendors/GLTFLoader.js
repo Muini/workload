@@ -150,7 +150,7 @@ THREE.GLTFLoader = (function() {
 
             }
 
-            console.time('GLTFLoader');
+            // console.time('GLTFLoader');
 
             var parser = new GLTFParser(json, extensions, {
 

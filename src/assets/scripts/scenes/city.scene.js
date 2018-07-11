@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import Engine from '../engine/engine';
 import Scene from '../engine/scene';
 import Sound from '../engine/sound';
+import { Ease, Tween } from '../engine/tween';
 
 // Objects
 import { Camera } from '../objects/default/camera.obj';
@@ -14,6 +15,7 @@ import { City } from '../objects/city.obj';
 // Dom Objects
 import { TitleDom } from '../objects/title.dom.obj';
 import { SubtitleDom } from '../objects/subtitle.dom.obj';
+import DomObject from '../engine/domObject';
 
 // Create scene
 export default new Scene({
@@ -55,9 +57,9 @@ export default new Scene({
         // Sun
         this.sun = new THREE.DirectionalLight(0xFFF4E6, 10.0);
         this.sun.name = "Sun";
-        this.sun.position.x = 0;
+        this.sun.position.x = -30;
         this.sun.position.y = 100;
-        this.sun.position.z = 0;
+        this.sun.position.z = 30;
         this.sun.castShadow = Engine.isMobile ? false : true;
         this.instance.add(this.sun);
 
@@ -65,7 +67,7 @@ export default new Scene({
         this.sun.shadow.mapSize.height = Engine.quality < 4 ? 512 : 1024; // default
         this.sun.shadow.camera.near = 1.0; // default
         this.sun.shadow.camera.far = 150; // default
-        let size = 50.0;
+        let size = 100.0;
         this.sun.shadow.camera.left = -size; // default
         this.sun.shadow.camera.right = size; // default
         this.sun.shadow.camera.top = size; // default
@@ -76,13 +78,13 @@ export default new Scene({
             parent: this,
             size: 1000,
             sunPosition: this.sun.position,
-            turbidity: 2.5,
-            rayleight: 2.5,
+            turbidity: 1.0,
+            rayleight: 10.0,
             mieCoefficient: 0.01,
-            mieDirectionalG: 0.9
+            mieDirectionalG: 0.75
         })
 
-        this.instance.fog = new THREE.FogExp2(0xDAE1E5, 0.0075);
+        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.0075);
 
         this.city = new City({ parent: this });
 
@@ -112,24 +114,47 @@ export default new Scene({
 
         // this.sounds['city-loop'].play();
 
+        this.title.setVisibility(false)
+        this.subtitle.setVisibility(false)
 
-        let tween = new Engine.Tween({ y: 30, z: 62 })
+        /*let tween = new Engine.Tween.to(
+            this.camera.model.position, 
+            6, 
+            { 
+                y: 22, 
+                z: 30,
+                ease: Engine.Easing.Cubic.InOut,
+                onUpdate: _ => {
+                    this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
+                    if (Engine.postprod && Engine.postprod.bokehPass)
+                        Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
+                },
+                onComplete: _ => {
+                    // Engine.nextScene();
+                }
+            }
+        );*/
+        let tween = new Tween({ y:30, z:62 })
             .to({ y: 22, z: 30 }, 6000)
             // .repeat(Infinity)
             // .yoyo(true)
-            .easing(Engine.Easing.Cubic.InOut)
-            .onUpdate(({ y, z }) => {
-                console.log('update')
-                this.camera.model.position.y = y;
-                this.camera.model.position.z = z;
+            .ease(Ease.Cubic.InOut)
+            .onUpdate((value, progress) => {
+                // console.log('update', value.y, value.z, progress)
+                this.camera.model.position.y = value.y;
+                this.camera.model.position.z = value.z;
                 this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
-                if (Engine.postprod.bokehPass)
+                if (Engine.postprod && Engine.postprod.bokehPass)
                     Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
             })
             .onComplete( _ => {
+                // console.log('complete')
                 Engine.nextScene();
-            })
-            .start();
+            });
+        
+        Engine.wait(_ => {
+            // tween.start();
+        }, 1000);
 
     }
 })

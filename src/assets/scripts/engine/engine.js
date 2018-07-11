@@ -1,14 +1,12 @@
 import * as THREE from 'three';
 // import '../vendors/WebGLDeferredRenderer';
 import Stats from 'stats.js';
-import Looper from '../vendors/looper';
 import PostProd from './postprod';
 import SoundEngine from './soundEngine'; 
-import * as TWEEN from 'tween';
-// import * as TWEEN from 'es6-tween';
 import Loader from './loader';
 
 import './utils/watch-polyfill';
+import UUID from './utils/uuid';
 
 window.DEBUG = true;
 
@@ -67,12 +65,12 @@ class Engine {
             factorial(20);
         }
         durationTime = (durationTime + (performance.now() - startTime)) / 2;
-        /*if (window.DEBUG) {
+        if (window.DEBUG) {
             console.log('Performance Test: ' + durationTime + ' ms');
-        }*/
-        // if (durationTime > 22)
-        //     this.quality--;
-
+        }
+        if (durationTime > 22)
+            this.quality--;
+        */
         this.container = undefined;
         this.containerBoundingBox = undefined;
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
@@ -95,30 +93,22 @@ class Engine {
         this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
-        this.startTick = undefined;
-        this.lastTick = undefined;
+
+        this.lastTick = 0;
+        this.elapsedTime = 0;
         this.fpsMedian = 0;
         this.tickNbr = 0;
+        this.hasAdapativeRenderer = true;
         this.performanceCycleNbr = 0;
-        this.performanceCycleLength = 10; //Every 8 frames
         this.maxPerformanceCycle = 5; //3 Cycles
+        this.performanceCycleLength = 10; //Every 8 frames
 
-        // TODO: Remove Looper
-        this.loop = new Looper();
-        this.loop.add(this.update.bind(this));
+        this.requestId = undefined;
         this.hasStarted = false;
         this.isPlaying = false;
 
         this.updateFunctions = new Map();
         this.resizeFunctions = new Map();
-        this.waitFunctions = new Map();
-
-        // TODO: Create Tween Class that manipulate TWEEN.js
-        // TWEEN.autoPlay(false);
-        this.Tween = TWEEN.Tween;
-        this.Easing = TWEEN.Easing;
-
-        this.Loader = undefined;
 
         this.bindEvents();
 
@@ -149,8 +139,8 @@ class Engine {
                         noise: 0.1,
                         useStaticNoise: true,
                         rgbSplit: this.quality < 3 ? 0.0 : 5.0,
-                        vignette: this.quality < 2 ? 0.0 : 10.0,
-                        vignetteOffset: 0.2,
+                        vignette: this.quality < 2 ? 0.0 : 20.0,
+                        vignetteOffset: 0.15,
                         lut: 0.75,
                         lutURL: '/static/img/lut-gamma.png',
                     },
@@ -161,30 +151,21 @@ class Engine {
                         enabled: true,
                         strength: 3.0,
                         sharpen: this.quality < 3 ? 0.05 : 0.15,
-                        blurRgbSplit: 1.5,
+                        blurRgbSplit: 1.25,
                         gain: 1.20,
                     }
                 }
             });
         }
 
-        // TODO: Singleton Loader Class
-        this.Loader = new Loader();
-
         this.container = container;
         this.container.appendChild(this.renderer.domElement);
         if (window.DEBUG)
             this.container.appendChild(this.stats.dom);
 
-        requestAnimationFrame(_ => {
+        this.waitNextTick(_ => {
             this.containerBoundingBox = this.container.getBoundingClientRect();
         });
-    }
-
-    uuid() {
-        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-        )
     }
 
     setFixedRatio(ratio) {
@@ -244,19 +225,19 @@ class Engine {
     }
 
     waitNextTick(fct) {
-        requestAnimationFrame(_ => {
-            fct();
-        });
+        this.wait(fct, 0);
     }
 
     wait(fct, timeToWait) {
-        /*
-        if (typeof fct !== 'function' || uuid === undefined) return;
-        this.waitFunctions[uuid] = fct;*/
-        // TODO: timeout based on current update
-        setTimeout(_ => {
-            this.waitNextTick(fct);
-        }, timeToWait);
+        const uuid = UUID();
+        const startTime = this.lastTick;
+        this.addToUpdate(uuid, _ => {
+            const elapsed = this.lastTick - startTime;
+            if(elapsed >= timeToWait){
+                this.removeFromUpdate(uuid);
+                fct();
+            }
+        });
     }
 
     resize() {
@@ -286,11 +267,9 @@ class Engine {
             this.postprod.resize(this.width, this.height, this.pixelDensity);
 
         if (!this.isPlaying && this.hasStarted) {
+            this.pause();
             this.waitNextTick(_ => {
                 this.play();
-                this.waitNextTick(_ => {
-                    this.pause();
-                });
             });
         }
     }
@@ -330,18 +309,18 @@ class Engine {
                 window.scene = this.currentScene.instance;
             if (this.currentScene.hasLoaded) {
                 // If the scene is already loaded, start it
-                console.log('Scene is already loaded, continue')
+                // console.log('Scene is already loaded, continue')
                 this.performanceCycleNbr = 0;
                 resolve();
             } else {
                 if (this.currentScene.isLoading) {
                     // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
-                    console.log('Scene is already loading, wait for it')
-                    Engine.Loader.show();
+                    // console.log('Scene is already loading, wait for it')
+                    Loader.show();
                     this.currentScene.onPreloaded = resolve;
                 } else {
                     // Else load the scene, then start it
-                    console.log('Scene is not loaded, load it !')
+                    // console.log('Scene is not loaded, load it !')
                     this.isPreloading = true;
                     this.currentScene.preload(_ => {
                         this.isPreloading = false;
@@ -376,9 +355,10 @@ class Engine {
         }
         this.setScene(this.scenesOrder[this.sceneCurrentIndex]).then(_ => {
             // When loaded, init the new scene
-            this.currentScene.start();
-            // Start the render
-            this.play();
+            this.currentScene.start().then(_ => {
+                // Start the render
+                this.play();
+            });
         })
     }
 
@@ -404,7 +384,9 @@ class Engine {
 
     play() {
         if (!this.hasStarted || this.isPlaying) return;
-        this.loop.start();
+        this.update = this.update.bind(this);
+        this.lastTick = 0;
+        this.requestId = requestAnimationFrame(time => this.update(time));
         this.isPlaying = true;
         if (window.DEBUG)
             console.log('%cEngine%c ▶️ Play', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
@@ -412,7 +394,8 @@ class Engine {
 
     pause() {
         if (!this.hasStarted || !this.isPlaying) return;
-        this.loop.stop();
+        window.cancelAnimationFrame(this.requestId);
+        this.requestId = undefined;
         this.isPlaying = false;
         if (window.DEBUG)
             console.log('%cEngine%c ⏸️ Pause', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
@@ -422,11 +405,12 @@ class Engine {
         if (window.DEBUG)
             console.log('%cEngine%c ⏹️ Stop', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         this.pause();
+        this.elapsedTime = 0;
         this.hasStarted = false;
     }
 
     adaptiveRenderer(time, delta) {
-        // TODO: upscale renderer when framerate is good if it has been downscaled before
+        if (!this.hasAdapativeRenderer) return;
 
         if (this.lastTick == null) return;
         if (this.performanceCycleNbr >= this.maxPerformanceCycle) return;
@@ -446,16 +430,23 @@ class Engine {
 
             //Adjust pixelDensity based on the fps but not on the first cycle
             if (this.performanceCycleNbr !== 0) {
+
                 let newPixelDensity = this.pixelDensity;
-                if (this.fpsMedian < 10) {
+                if(this.fpsMedian > 58){
+                    newPixelDensity *= 1.1;
+                } else if (this.fpsMedian < 10) {
                     newPixelDensity /= 1.5;
                 } else if (this.fpsMedian < 25) {
-                    newPixelDensity /= 1.25;
+                    newPixelDensity /= 1.2;
                 } else if (this.fpsMedian < 50) {
                     newPixelDensity /= 1.1;
                 }
-                if (newPixelDensity <= .75)
-                    newPixelDensity = .75;
+                
+                if(newPixelDensity > this.pixelDensity){
+                    newPixelDensity = this.pixelDensity;
+                }else if (newPixelDensity <= .6){
+                    newPixelDensity = .6;
+                }
 
                 if (newPixelDensity != this.pixelDensity) {
                     this.pixelDensity = newPixelDensity;
@@ -466,6 +457,7 @@ class Engine {
                     if (window.DEBUG)
                         console.log('%cEngine%c Adapting renderer to ' + newPixelDensity + ' pixelRatio', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
                 }
+
             }
 
             //Reset vars to start a new cycle
@@ -475,14 +467,25 @@ class Engine {
         }
     }
 
-    update(time, delta) {
+    update(time) {
+        if (!this.currentScene || !this.currentScene.mainCamera || !this.isPlaying) return;
+
         if (window.DEBUG)
             this.stats.begin();
 
-        if (!this.currentScene || !this.currentScene.mainCamera) return;
+        // Calculate delta
+        const now = time,
+            delta = now - (this.lastTick || now);
+
+        //Store lastTick
+        this.lastTick = time;
+
+        //Store elapsed time
+        this.elapsedTime += delta;
 
         //Check if we need to downgrade the renderer
-        this.adaptiveRenderer(time, delta);
+        if (this.hasAdapativeRenderer)
+            this.adaptiveRenderer(time, delta);
 
         //Check if we're loading something in background
         this.preloadScenesCheck();
@@ -491,21 +494,16 @@ class Engine {
         if (this.hasPostProd)
             this.postprod.update(time, delta);
 
-        TWEEN.update(time);
-
         //Update all objects
-        this.updateFunctions.forEach(fct => {
-            fct(time, delta);
-        });
+        this.updateFunctions.forEach(fct => fct(time, delta));
 
         //Render the scene
         this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
 
-        //Store lastTick
-        this.lastTick = time;
-
         if (window.DEBUG)
             this.stats.end();
+        
+        this.requestId = requestAnimationFrame(time => this.update(time))
     }
 }
 

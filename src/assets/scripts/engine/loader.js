@@ -1,8 +1,7 @@
 import Engine from './engine';
-import AssetsManager from './assetsManager';
 import DomObject from './domObject';
 
-export default class Loader extends DomObject {
+class Loader extends DomObject {
     constructor(opt = {}) {
         super(opt);
     }
@@ -26,9 +25,9 @@ export default class Loader extends DomObject {
 
     created() {
         return (async() => {
-            super.created();
+            await super.created();
 
-            this.parts = await this.dom.querySelectorAll('.part');
+            this.domProgress = await this.dom.querySelector('.progress');
 
             this.awake();
         })();
@@ -41,40 +40,26 @@ export default class Loader extends DomObject {
     }
 
     show() {
-        // this.setVisibility(true);
-        requestAnimationFrame(_ => {
+        Engine.waitNextTick(_ => {
+            this.setActive(true);
+            this.dom.style['visibility'] = 'visible';
             this.dom.classList.remove('hide');
         });
     }
 
     hide() {
-        // this.setVisibility(false);
-        requestAnimationFrame(_ => {
+        Engine.waitNextTick(_ => {
+            this.setActive(false);
+            this.dom.style['visibility'] = 'visible';
             this.dom.classList.add('hide');
-        });
+        });    
     }
 
     updateGraphLoader() {
-        requestAnimationFrame(_ => {
-            for (let i = 0; i < this.parts.length; i++) {
-                if (this.data.percentage < 50) {
-                    if (i === 0) {
-                        this.parts[i].style['transform'] = `rotate(${ this.data.percentage / 50 * 180 }deg)`;
-                        this.parts[i].style['webkitTransform'] = `rotate(${ this.data.percentage / 50 * 180 }deg)`;
-                    } else {
-                        this.parts[i].style['transform'] = `rotate(0deg)`;
-                        this.parts[i].style['webkitTransform'] = `rotate(0deg)`;
-                    }
-                } else {
-                    if (i === 0) {
-                        this.parts[i].style['transform'] = `rotate(180deg)`;
-                        this.parts[i].style['webkitTransform'] = `rotate(180deg)`;
-                    } else {
-                        this.parts[i].style['transform'] = `rotate(${ (this.data.percentage - 50) / 50 * 180 }deg)`;
-                        this.parts[i].style['webkitTransform'] = `rotate(${ (this.data.percentage - 50) / 50 * 180 }deg)`;
-                    }
-                }
-            }
+        if(!this.isActive) return;
+        Engine.waitNextTick(_ => {
+            this.domProgress.style['transform'] = `translateZ(0) scaleX(${ (this.data.percentage / 100) })`;
+            this.domProgress.style['webkitTransform'] = `translateZ(0) scaleX(${ (this.data.percentage / 100) })`;
         });
     }
 
@@ -91,7 +76,8 @@ export default class Loader extends DomObject {
         }
 
         this.updateGraphLoader();
-        // console.log('update loader', this.data.percentage, (assetPercent / assetsToLoad));
     }
 
 }
+
+export default new Loader();

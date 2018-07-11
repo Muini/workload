@@ -1,4 +1,5 @@
 import Engine from './engine';
+import Loader from './loader';
 
 import Assets from '../assets';
 import ModelLoader from './modelLoader';
@@ -65,8 +66,7 @@ class AssetsManager {
                     },
                     (loaded, total) => {
                         this.assetPercent = loaded / total * 100;
-                        if (Engine.Loader)
-                            Engine.Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
+                        Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
                     }
                 );
             }
@@ -85,8 +85,7 @@ class AssetsManager {
 
     updateLoader() {
         this.assetsLoaded++;
-        if (Engine.Loader)
-            Engine.Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
+        Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
         if (window.DEBUG)
             console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' assets loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
         if (this.assetsLoaded >= this.assetsToLoad) {

@@ -1,4 +1,5 @@
 import Engine from './engine';
+import UUID from './utils/uuid';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
@@ -7,7 +8,7 @@ export default class DomObject {
         parent,
         active,
     }) {
-        this.uuid = Engine.uuid();
+        this.uuid = UUID();
         this.name = 'unnamed dom object';
 
         this.selector = undefined;

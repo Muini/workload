@@ -1,6 +1,7 @@
 import { Howl, Howler } from 'howler';
 
 import Engine from './engine';
+import UUID from './utils/uuid';
 import SoundEngine from './soundEngine';
 
 export default class Sound {
@@ -11,7 +12,7 @@ export default class Sound {
         loop,
         volume,
     }) {
-        this.uuid = Engine.uuid();
+        this.uuid = UUID();
         this.name = opt.name || null;
         this.howl = new Howl({
             src: [opt.url],

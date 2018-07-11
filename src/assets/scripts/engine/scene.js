@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Engine from './engine';
+import UUID from './utils/uuid';
 
 import AssetsManager from '../engine/assetsManager';
 
@@ -10,7 +11,7 @@ export default class Scene {
         setup,
         onStart,
     }) {
-        this.uuid = Engine.uuid();
+        this.uuid = UUID();
         this.name = opt.name || 'unamed scene';
         this.data = opt.data || {};
         this.setup = opt.setup || function() {};
@@ -111,7 +112,7 @@ export default class Scene {
 
             this.onPreloaded = callback;
 
-            this.sounds.forEach(elem => elem.load());
+            this.sounds.forEach(sound => sound.load());
 
             await AssetsManager.loadAssetsFromScene(this.name, _ => {
                 if (window.DEBUG)

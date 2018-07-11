@@ -84,10 +84,6 @@
   dependencies:
     commander "^2.15.1"
 
-"@tweenjs/tween.js@^17.2.0":
-  version "17.2.0"
-  resolved "https://registry.yarnpkg.com/@tweenjs/tween.js/-/tween.js-17.2.0.tgz#21f89b709bafc4b303adae7a83b4f35a0d9e4796"
-
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -2601,10 +2597,6 @@ grapheme-breaker@^0.3.2:
   dependencies:
     brfs "^1.2.0"
     unicode-trie "^0.3.1"
-
-gsap@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/gsap/-/gsap-2.0.1.tgz#c784500e80dc7591131478f0787b67bacc9a8c52"
 
 har-schema@^1.0.5:
   version "1.0.5"
@@ -5706,9 +5698,9 @@ text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
-three@^0.94.0:
-  version "0.94.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.94.0.tgz#4ce6db7f2bfbf79c2d73444aa6e3cfc08a32d762"
+three@0.92.0:
+  version "0.92.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.92.0.tgz#8d3d1f5af890e62da7f4cb45d20c09fa51057dcd"
 
 through2@^0.6.3:
   version "0.6.5"
@@ -5831,10 +5823,6 @@ tunnel-agent@^0.6.0:
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"
   dependencies:
     safe-buffer "^5.0.1"
-
-tween@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/tween/-/tween-0.9.0.tgz#f856c7a9c9ab85ca9a2bc02282591aa2513a20ed"
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"

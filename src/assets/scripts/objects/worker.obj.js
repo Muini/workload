@@ -165,7 +165,7 @@ export class Worker extends Obj {
                 this.timeElapsed2 = 0;
                 if (this.papersCount > 0) {
                     this.papersCount--;
-                    this.paperBlock.removePaper(_ => {
+                    this.paperBlock.removePaper().then(_ => {
                         this.cashPile.addCash();
                         if (this.cashPile.cashs.length >= this.cashPile.cashsMax) {
                             this.stopWorking();

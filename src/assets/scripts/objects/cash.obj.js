@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../engine/engine';
 import Obj from '../engine/obj';
+import { Ease, Tween } from '../engine/tween';
 
 export class Cash extends Obj {
     constructor(opt = {}) {
@@ -47,37 +48,39 @@ export class Cash extends Obj {
 
     appear() {
         let initialPosY = this.model.position.y;
-        let tween = new Engine.Tween({ opacity: 0 }).to({ opacity: 1 }, 300)
-        tween.onUpdate(({ opacity }) => {
-            console.log('update')
-            this.materials['Paper'].opacity = opacity;
-            this.materials['Money'].opacity = opacity;
-            this.model.position.y = initialPosY + ((1 - opacity) * .25);
-        })
-        tween.start();
+        let tween = new Tween({ opacity: 0 })
+            .to({ opacity: 1 }, 300)
+            .onUpdate((value, progress) => {
+                this.materials['Paper'].opacity = value.opacity;
+                this.materials['Money'].opacity = value.opacity;
+                this.model.position.y = initialPosY + ((1 - value.opacity) * .25);
+            })
+            .start();
     }
 
     disappear() {
         let initialPosZ = this.model.position.z;
-        let tween = new Engine.Tween({ opacity: 1 }).to({ opacity: 0 }, 400)
-        tween.onUpdate(({ opacity }) => {
-            this.materials['Paper'].opacity = opacity;
-            this.materials['Money'].opacity = opacity;
-            this.model.position.z = initialPosZ + ((1 - opacity) * 1.);
-        });
-        tween.onComplete(_ => {
-            this.destroy();
-        });
-        tween.start();
+        let tween = new Tween({ opacity: 1 })
+            .to({ opacity: 0 }, 400)
+            .onUpdate((value, progress) => {
+                this.materials['Paper'].opacity = value.opacity;
+                this.materials['Money'].opacity = value.opacity;
+                this.model.position.z = initialPosZ + ((1 - value.opacity) * 1.);
+            })
+            .onComplete(_ => {
+                this.destroy();
+            })
+            .start();
     }
 
     moveDown(value) {
         let initialPosY = this.model.position.y;
-        let tween = new Engine.Tween({ y: 0 }).to({ y: value }, 300)
-        tween.onUpdate(({ y }) => {
-            this.model.position.y = initialPosY - y;
-        });
-        tween.start();
+        let tween = new Tween({ y: 0 })
+            .to({ y: value }, 300)
+            .onUpdate((value, progress) => {
+                this.model.position.y = initialPosY - value.y;
+            })
+            .start();
     }
 
 }

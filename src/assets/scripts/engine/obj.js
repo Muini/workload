@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Engine from './engine';
+import UUID from './utils/uuid';
 import AssetsManager from './assetsManager';
 import Animator from './animator';
 
@@ -10,7 +11,7 @@ export default class Obj {
         rotation,
         active,
     }) {
-        this.uuid = Engine.uuid();
+        this.uuid = UUID();
         this.name = 'unnamed object';
 
         this.model = new THREE.Group();
@@ -18,7 +19,7 @@ export default class Obj {
         this.modelUrl = undefined;
         this.animator = undefined;
 
-        this.sounds = {};
+        this.sounds = new Map();
         this.materials = {};
         this.lights = {};
         this.hasShadows = false;
@@ -79,9 +80,9 @@ export default class Obj {
     }
 
     stopAllSounds() {
-        for (key in this.sounds) {
-            this.sounds[key].stop();
-        }
+        this.sounds.forEach((sound, index) => {
+            sound.stop();
+        });
     }
 
     getModel() {
@@ -237,9 +238,9 @@ export default class Obj {
 
     destroy() {
         this.setActive(false);
-        for (key in this.sounds) {
-            this.sounds[key].destroy();
-        }
+        this.sounds.forEach((sound, index) => {
+            sound.destroy();
+        });
         if (this.animator)
             this.animator.destroy();
         this.animator = null;

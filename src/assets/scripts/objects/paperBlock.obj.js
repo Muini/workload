@@ -44,11 +44,14 @@ export class PaperBlock extends Obj {
         newPaper.appear();
     }
 
-    removePaper(onComplete) {
-        if (this.papers.length <= 0) return;
-        this.papers[0].disappear(onComplete);
-        this.papers.splice(0, 1);
-        this.movePapersDown();
+    removePaper() {
+        return (async () => {
+            if (this.papers.length <= 0) return;
+            this.papers[0].disappear();
+            this.papers.splice(0, 1);
+            await this.movePapersDown();
+            return;
+        })();
     }
 
     movePapersDown() {
