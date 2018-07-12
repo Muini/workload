@@ -35,7 +35,8 @@ export default class Scene {
         this.mainCamera = undefined;
 
         this.objects = [];
-        this.sounds = new Map();
+        this.children = [];
+        this.sounds = [];
 
         this.assets = {
             'models': {},
@@ -52,30 +53,31 @@ export default class Scene {
     }
 
     addSound(sound) {
-        if (this.sounds.get(sound.name))
-            console.warn(`Sound ${sound.name} already exist in scene ${this.scene.name}. Please use another name`);
-        this.sounds.set(sound.name, sound);
+        this.sounds.push(sound);
     }
 
     addObject(object) {
         this.objects.push(object);
-        // this.assets['models']
+    }
+
+    addChildren(child){
+        this.children.push(child);
     }
 
     createObjects() {
         return (async() => {
-            await Promise.all(this.objects.map(async object => { await object.created() }))
+            await Promise.all(this.children.map(async object => { await object.created() }))
             if (window.DEBUG)
-                console.log('%cEngine%c Scene created ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+                console.log('%cEngine%c Scene created ' + this.children.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
             return;
         })();
     }
 
     awakeObjects() {
         return (async() => {
-            await Promise.all(this.objects.map(async object => { await object.awake() }))
+            await Promise.all(this.children.map(async object => { await object.awake() }))
             if (window.DEBUG)
-                console.log('%cEngine%c Scene awaked ' + this.objects.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+                console.log('%cEngine%c Scene awaked ' + this.children.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
             return;
         })();
     }
@@ -114,10 +116,10 @@ export default class Scene {
 
             this.sounds.forEach(sound => sound.load());
 
-            await AssetsManager.loadAssetsFromScene(this.name, _ => {
+            await AssetsManager.loadAssetsFromScene(this.name, async _ => {
                 if (window.DEBUG)
                     console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
-                this.createObjects();
+                await this.createObjects();
                 this.isLoading = false;
                 this.hasLoaded = true;
                 return this.onPreloaded();
@@ -130,8 +132,8 @@ export default class Scene {
             Engine.addToResize(this.uuid, this.resize.bind(this));
             this.resize();
             await this.awakeObjects();
-            this.onStart();
             this.isPlaying = true;
+            this.onStart();
         })();
     }
 

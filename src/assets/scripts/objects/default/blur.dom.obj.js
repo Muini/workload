@@ -41,10 +41,9 @@ export class BlurDom extends DomObject {
         return (async() => {
             await super.awake();
 
-            Engine.addToResize(this.uuid, _ => {
-                Engine.waitNextTick(_ => {
-                    this.shouldUpdate = true;
-                });
+            Engine.addToResize(this.uuid, async _ => {
+                await Engine.waitNextTick();
+                this.shouldUpdate = true;
             });
 
             // Is fired when the object is added to the scene

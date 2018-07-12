@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import Engine from './engine';
 import Loader from './loader';
 

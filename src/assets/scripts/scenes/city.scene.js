@@ -88,7 +88,7 @@ export default new Scene({
 
         this.city = new City({ parent: this });
 
-        let citySound = new Sound({
+        this.citySound = new Sound({
             name: 'city-loop',
             parent: this,
             url: '/static/sounds/city-loop.m4a',
@@ -100,7 +100,7 @@ export default new Scene({
         this.subtitle = new SubtitleDom({ parent: this });
 
     },
-    onStart: function() {
+    onStart: async function() {
         // this.camera.model.rotation.y = (0 / 180) * 3.14;
         // this.camera.instance.rotation.x = -(10 / 180) * 3.14;
         this.setCamera(this.camera.instance);
@@ -112,37 +112,20 @@ export default new Scene({
         this.instance.add(sunTarget);
         this.sun.target = sunTarget;
 
-        // this.sounds['city-loop'].play();
+        this.citySound.play(1000);
 
         this.title.setVisibility(false)
         this.subtitle.setVisibility(false)
 
-        /*let tween = new Engine.Tween.to(
-            this.camera.model.position, 
-            6, 
-            { 
-                y: 22, 
-                z: 30,
-                ease: Engine.Easing.Cubic.InOut,
-                onUpdate: _ => {
-                    this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
-                    if (Engine.postprod && Engine.postprod.bokehPass)
-                        Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
-                },
-                onComplete: _ => {
-                    // Engine.nextScene();
-                }
-            }
-        );*/
         let tween = new Tween({ y:30, z:62 })
-            .to({ y: 22, z: 30 }, 6000)
+            .to({ y: 22, z: 10 }, 6000)
             // .repeat(Infinity)
             // .yoyo(true)
-            .ease(Ease.Cubic.InOut)
-            .onUpdate((value, progress) => {
-                // console.log('update', value.y, value.z, progress)
-                this.camera.model.position.y = value.y;
-                this.camera.model.position.z = value.z;
+            .ease(Ease.Expo.In)
+            .onUpdate((props, progress) => {
+                // console.log('update', props.y, props.z, progress)
+                this.camera.model.position.y = props.y;
+                this.camera.model.position.z = props.z;
                 this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
                 if (Engine.postprod && Engine.postprod.bokehPass)
                     Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
@@ -152,9 +135,15 @@ export default new Scene({
                 Engine.nextScene();
             });
         
-        Engine.wait(_ => {
-            tween.start();
-        }, 1000);
+        await Engine.wait(2000);
+        tween.start();
+        await Engine.wait(1000);
+        this.title.setVisibility(true);
+        await Engine.wait(1000);
+        this.subtitle.setVisibility(true);
+        await Engine.wait(3000);
+        this.title.setVisibility(false);
+        this.subtitle.setVisibility(false);
 
     }
 })

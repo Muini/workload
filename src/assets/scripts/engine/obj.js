@@ -32,6 +32,7 @@ export default class Obj {
         this.parent = opt.parent || undefined;
         if (!this.parent) throw 'Object parameter "parent" is mandatory and should be a Object or Scene type';
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
+        this.children = [];
 
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
         this.rotation = opt.rotation || new THREE.Vector3(0, 0, 0);
@@ -50,12 +51,18 @@ export default class Obj {
             this.lights[light].name = light;
         }
 
+        //Add object to the parent as children, and to the scene to register it
         this.scene.addObject(this);
+        this.parent.addChildren(this);
 
         //If the engine has started, it means it's an instanciation
         if (Engine.hasStarted) {
             this.created();
         }
+    }
+
+    addChildren(child){
+        this.children.push(child);
     }
 
     setVisibility(bool) {
@@ -115,20 +122,28 @@ export default class Obj {
         return (async() => {
             await this.getModel();
 
+            // Set original coord
             this.model.position.x += this.position.x;
             this.model.position.y += this.position.y;
             this.model.position.z += this.position.z;
             this.model.rotation.x += this.rotation.x;
             this.model.rotation.y += this.rotation.y;
             this.model.rotation.z += this.rotation.z;
+            // Add mesh instance to scene or parent
             if (this.parent.isScene) {
                 this.scene.instance.add(this.model);
             } else {
                 this.parent.model.add(this.model);
             }
 
+            //Update Env Map
             this.updateEnvMap();
 
+            // Create children now
+            if(this.children.length > 0)
+                await Promise.all(this.children.map(async child => { await child.created() }))
+
+            // Awake
             if (this.scene && this.scene.isPlaying) {
                 await this.awake();
             }
@@ -139,13 +154,16 @@ export default class Obj {
     awake() {
         return (async() => {
             this.setActive(this.isActive);
+            // Awake children now
+            if(this.children.length > 0)
+                await Promise.all(this.children.map(async child => { await child.awake() }))
         })();
     }
 
     overwriteModelParameters() {
         return (async() => {
 
-            const updateLights = async function(child, lights) {
+            const updateLights = function(child, lights) {
                 if (child.isSpotLight && !child.isPointLight && child.isDirectionalLight) return;
 
                 child.decay = 2;
@@ -174,7 +192,7 @@ export default class Obj {
                 return child;
             }
 
-            const updateMaterials = async function(child, materials) {
+            const updateMaterials = function(child, materials) {
                 //Overwrite materials
                 for (let material in materials) {
                     if (child.material.length) {
@@ -238,11 +256,13 @@ export default class Obj {
 
     destroy() {
         this.setActive(false);
+        this.children.forEach(child => child.destroy());
         this.sounds.forEach((sound, index) => {
             sound.destroy();
         });
         if (this.animator)
             this.animator.destroy();
+        this.children = [];
         this.animator = null;
         this.name = null;
         this.model = null;

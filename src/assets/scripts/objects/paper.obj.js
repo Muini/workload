@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import Engine from '../engine/engine';
 import Obj from '../engine/obj';
 import { Ease, Tween } from '../engine/tween';
-import { resolve } from 'uri-js';
 
 export class Paper extends Obj {
     constructor(opt = {}) {
@@ -50,9 +49,9 @@ export class Paper extends Obj {
             let initialPosX = this.model.position.x;
             let tween = new Tween({ opacity: 0 })
                 .to({ opacity: 1 }, 300)
-                .onUpdate((value, progress) => {
-                    this.materials['Paper'].opacity = value.opacity;
-                    this.model.position.x = initialPosX + ((1 - value.opacity) * .25);
+                .onUpdate((props, progress) => {
+                    this.materials['Paper'].opacity = props.opacity;
+                    this.model.position.x = initialPosX + ((1 - props.opacity) * .25);
                 })
                 .onComplete(_ => {
                     resolve();
@@ -66,9 +65,9 @@ export class Paper extends Obj {
             let initialPosZ = this.model.position.z;
             let tween = new Tween({ opacity: 1 })
                 .to({ opacity: 0 }, 400)
-                .onUpdate((value, progress) => {
-                    this.materials['Paper'].opacity = value.opacity;
-                    this.model.position.z = initialPosZ + ((1 - value.opacity) * 1.);
+                .onUpdate((props, progress) => {
+                    this.materials['Paper'].opacity = props.opacity;
+                    this.model.position.z = initialPosZ + ((1 - props.opacity) * 1.);
                 })
                 .onComplete(_ => {
                     this.destroy();
@@ -83,8 +82,8 @@ export class Paper extends Obj {
             let initialPosY = this.model.position.y;
             let tween = new Tween({ y: 0 })
                 .to({ y: value }, 300)
-                .onUpdate((value, progress) => {
-                    this.model.position.y = initialPosY - value.y;
+                .onUpdate((props, progress) => {
+                    this.model.position.y = initialPosY - props.y;
                 })
                 .onComplete(_ => {
                     resolve();

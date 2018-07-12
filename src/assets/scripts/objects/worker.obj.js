@@ -60,21 +60,32 @@ export class Worker extends Obj {
         super.init();
 
         this.timeElapsed = 0;
-        this.timeElapsed2 = 0;
 
         this.isWorking = false;
         this.isDead = false;
+
+        this.workingSpeed = 1.0;
+        this.happiness = 0.5;
 
         this.paperBlock = new PaperBlock({ parent: this });
         this.papersCount = 0;
         this.cashPile = new CashPile({ parent: this });
 
-        /*this.paperSound = new Sound({
+        new Sound({
             name: 'paperSound',
+            url: '/static/sounds/worker-papermove.m4a',
             parent: this,
             loop: false,
-            volume: 1.0,
-        });*/
+            volume: 0.4,
+        });
+
+        new Sound({
+            name: 'working',
+            url: '/static/sounds/worker-working.m4a',
+            parent: this,
+            loop: true,
+            volume: 0.5,
+        });
     }
 
     created() {
@@ -96,20 +107,8 @@ export class Worker extends Obj {
     }
 
     awake() {
-        return (async() => {
+        return (async () => {
             await super.awake();
-
-            Engine.wait(_ => {
-                for (let i = 0; i < 5; i++) {
-                    this.papersCount++;
-                    this.paperBlock.addPaper();
-                }
-
-                Engine.wait(_ => {
-                    this.startWorking();
-                }, 1000);
-            }, 500);
-
         })();
     }
 
@@ -131,12 +130,24 @@ export class Worker extends Obj {
         if (this.isWorking) return;
         this.bonhomme.visible = true;
         this.isWorking = true;
+        this.sounds.get('working').setRate(1.0 + (this.happiness / 10.));
+        this.sounds.get('working').play();
         this.animator.play('Work');
     }
 
     stopWorking() {
         if (!this.isWorking) return;
+        this.animator.stop('Work');
+        this.sounds.get('working').stop();
         this.isWorking = false;
+    }
+
+    addWork(number){
+        let i = number;
+        while(i--) {
+            this.papersCount++;
+            this.paperBlock.addPaper();
+        }
     }
 
     update(time, delta) {
@@ -147,45 +158,34 @@ export class Worker extends Obj {
             this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
             return;
         }
+        /*
+        this.timeElapsed += delta;
 
-        if (this.isWorking) {
+        if (this.timeElapsed > 3000) {
+            this.timeElapsed = 0;
+            this.addWork(4);
+        }*/
 
+        if (this.papersCount > 0) {
+            this.startWorking();
             this.timeElapsed += delta;
-            this.timeElapsed2 += delta;
-
-            if (this.timeElapsed > 3000) {
+            if (this.timeElapsed > (1000 / (this.workingSpeed * this.happiness))) {
                 this.timeElapsed = 0;
-                for (let i = 0; i < 5; i++) {
-                    this.papersCount++;
-                    this.paperBlock.addPaper();
-                }
+                this.papersCount--;
+                this.sounds.get('paperSound').play();
+                this.paperBlock.removePaper().then(_ => {
+                    this.cashPile.addCash();
+                });
             }
-
-            if (this.timeElapsed2 > 1000) {
-                this.timeElapsed2 = 0;
-                if (this.papersCount > 0) {
-                    this.papersCount--;
-                    this.paperBlock.removePaper().then(_ => {
-                        this.cashPile.addCash();
-                        if (this.cashPile.cashs.length >= this.cashPile.cashsMax) {
-                            this.stopWorking();
-                            Engine.wait(_ => {
-                                this.die();
-                            }, 500);
-                        }
-                    });
-                }
-            }
-
-            this.materials['Screen'].emissiveIntensity = THREE.Math.randFloat(9, 11);
-            this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
-
         } else {
-
-            this.materials['Screen'].emissiveIntensity = 0;
-            this.lights['Desk_Screen_Light'].power = 0;
-
+            this.stopWorking();
         }
+
+        this.materials['Screen'].emissiveIntensity = THREE.Math.randFloat(9, 11);
+        this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
+
+        // this.materials['Screen'].emissiveIntensity = 0;
+        // this.lights['Desk_Screen_Light'].power = 0;
     }
 
 }

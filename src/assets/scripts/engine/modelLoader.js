@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import GLTFLoader from '../vendors/GLTFLoader';
+import '../vendors/GLTFLoader';
 
 class ModelLoader {
     constructor(opt = {}) {

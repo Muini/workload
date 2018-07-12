@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import Engine from '../engine/engine'
 import Obj from '../engine/obj';
 
 import { Paper } from './paper.obj';
@@ -13,20 +14,23 @@ export class PaperBlock extends Obj {
         //Init variables
         this.name = 'paper_block';
 
-        super.init();
-
         this.papers = [];
         this.papersMax = 30;
-
+        
         this.paperHeight = .12;
+        
+        super.init();
+    }
 
+    created() {
+        return (async () => {
+            await super.created();
+        })();
     }
 
     awake() {
         return (async() => {
             await super.awake();
-
-            // Is fired when the object is added to the scene
         })();
     }
 
@@ -41,7 +45,9 @@ export class PaperBlock extends Obj {
             position: new THREE.Vector3(THREE.Math.randFloat(-0.05, 0.05), this.paperHeight * (this.papers.length), THREE.Math.randFloat(-0.05, 0.05))
         })
         this.papers.push(newPaper)
-        newPaper.appear();
+        Engine.waitNextTick().then(_ => {
+            newPaper.appear();
+        })
     }
 
     removePaper() {
@@ -55,7 +61,8 @@ export class PaperBlock extends Obj {
     }
 
     movePapersDown() {
-        for (let i = 0; i < this.papers.length; i++) {
+        let i = this.papers.length;
+        while (i--) {
             this.papers[i].moveDown(this.paperHeight);
         }
     }

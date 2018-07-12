@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // Engine
 import Engine from '../engine/engine';
 import Scene from '../engine/scene';
+import { Ease, Tween } from '../engine/tween';
 
 // Objects
 import { Camera } from '../objects/default/camera.obj';
@@ -19,11 +20,11 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(10, 11, 10),
+            position: new THREE.Vector3(30, 30, 30),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 50,
             focus: 16.0,
-            aperture: 3.5,
+            aperture: 1.0,
         });
 
         // Floor
@@ -50,18 +51,42 @@ export default new Scene({
         // Test Worker
         this.worker = new Worker({ parent: this });
 
-        // let work3 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0.0, -8.0) });
+        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0.0, -8.0) });
+        this.worker2.happiness = 0.4;
 
-        // let work5 = new Worker({ parent: this, position: new THREE.Vector3(-16.0, 0.0, -16.0) });
+        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(-16.0, 0.0, -16.0) });
+        this.worker3.happiness = 0.6;
 
         this.testdom = new ExempleDom({ parent: this });
 
 
     },
-    onStart: function() {
+    onStart: async function() {
         this.camera.model.rotation.y = (45 / 180) * 3.14;
         this.camera.instance.rotation.x = -(30 / 180) * 3.14;
         this.setCamera(this.camera.instance);
+
+        let tween = new Tween({ x:30, y:30, z:30, aperture: 1.0 })
+            .to({ x:10, y:11, z:10, aperture: 3.5 }, 2000)
+            // .repeat(Infinity)
+            // .yoyo(true)
+            .ease(Ease.Expo.Out)
+            .onUpdate((props, progress) => {
+                this.camera.model.position.x = props.x;
+                this.camera.model.position.y = props.y;
+                this.camera.model.position.z = props.z;
+                this.camera.aperture = props.aperture;
+                if (Engine.postprod && Engine.postprod.bokehPass)
+                    Engine.postprod.bokehPass.uniforms['aperture'].value = this.camera.aperture;
+            })
+            .onComplete(async _ => {
+                this.worker.addWork(10);
+                await Engine.wait(200);
+                this.worker2.addWork(10);
+                await Engine.wait(200);
+                this.worker3.addWork(10);
+            })
+            .start();
 
         // setTimeout(_ => { Engine.nextScene(); }, 3000);
     }

@@ -26,6 +26,7 @@ export default class DomObject {
         } else {
             this.scene = this.parent.isScene ? this.parent : this.parent.scene;
             this.scene.addObject(this);
+            this.parent.addChildren(this);
         }
 
         this._vars = {};
@@ -80,7 +81,7 @@ export default class DomObject {
             for (let data in this.data) {
                 this.data.watch(data, (id, oldval, newval) => {
                     if (newval !== oldval) {
-                        Engine.waitNextTick(_ => {
+                        Engine.waitNextTick().then(_ => {
                             this.updateData(id);
                         });
                     }

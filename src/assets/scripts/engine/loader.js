@@ -40,7 +40,7 @@ class Loader extends DomObject {
     }
 
     show() {
-        Engine.waitNextTick(_ => {
+        Engine.waitNextTick().then(_ => {
             this.setActive(true);
             this.dom.style['visibility'] = 'visible';
             this.dom.classList.remove('hide');
@@ -48,7 +48,7 @@ class Loader extends DomObject {
     }
 
     hide() {
-        Engine.waitNextTick(_ => {
+        Engine.waitNextTick().then(_ => {
             this.setActive(false);
             this.dom.style['visibility'] = 'visible';
             this.dom.classList.add('hide');
@@ -57,7 +57,7 @@ class Loader extends DomObject {
 
     updateGraphLoader() {
         if(!this.isActive) return;
-        Engine.waitNextTick(_ => {
+        Engine.waitNextTick().then(_ => {
             this.domProgress.style['transform'] = `translateZ(0) scaleX(${ (this.data.percentage / 100) })`;
             this.domProgress.style['webkitTransform'] = `translateZ(0) scaleX(${ (this.data.percentage / 100) })`;
         });

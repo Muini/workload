@@ -26,6 +26,8 @@ export default class Sound {
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.nominalVolume = opt.volume ? opt.volume : 1.0;
 
+        this.wasPlaying = false;
+
         this.init();
     }
 
@@ -35,9 +37,10 @@ export default class Sound {
             this.scene.addSound(this);
         } else {
             // If its an object, add it to the object for quick ref and to the scene for preloading
-            this.parent.sounds[this.name] = this;
+            this.parent.sounds.set(this.name, this);
             this.scene.addSound(this);
         }
+        SoundEngine.register(this);
     }
 
     load(callback) {
@@ -45,24 +48,46 @@ export default class Sound {
             if (typeof callback == 'function')
                 callback();
         });
+        this.howl.on('end', _ => {
+            this.isPlaying = false;
+            this.wasPlaying = false;
+        })
         this.howl.load();
     }
 
     play(fadeLength) {
-        if (fadeLength == undefined)
-            fadeLength = 0;
         this.howl.volume(.0);
         this.howl.play();
-        this.howl.fade(0, this.nominalVolume, fadeLength);
+        this.howl.fade(0, this.nominalVolume, fadeLength ? fadeLength : 0);
+    }
+
+    pause(){
+        this.wasPlaying = true;
+        this.howl.pause();
+    }
+
+    setRate(rate){
+        this.howl.rate(rate);
+    }
+
+    resume(){
+        if(!this.wasPlaying) return;
+        this.wasPlaying = false;
+        this.howl.play();
     }
 
     stop(fadeLength) {
-        if (fadeLength == undefined)
-            fadeLength = 60;
-        this.howl.fade(this.nominalVolume, 0, fadeLength);
+        this.wasPlaying = false;
+        this.howl.once('fade', _ => {
+            this.howl.stop();
+        });
+        this.howl.fade(this.nominalVolume, 0, fadeLength ? fadeLength : 60);
     }
 
     destroy() {
+        this.stop();
+        SoundEngine.unregister(this);
+        this.uuid = null;
         this.name = null;
         this.howl.unload();
         this.howl = null;

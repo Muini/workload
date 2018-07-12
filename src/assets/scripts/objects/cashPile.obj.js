@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import Engine from '../engine/engine'
 import Obj from '../engine/obj';
 
 import { Cash } from './cash.obj';
@@ -11,21 +12,26 @@ export class CashPile extends Obj {
 
     init() {
         //Init variables
-        this.name = 'Cash_block';
-
-        super.init();
-
+        this.name = 'cash_pile';
+        
         this.cashs = [];
-        this.cashsMax = 20;
-
+        this.cashsMax = 100;
+        
         this.cashHeight = .1;
-
+        
         this.pileColumn = 2;
+        
+        super.init();
+    }
 
+    created() {
+        return (async () => {
+            await super.created();
+        })();
     }
 
     awake() {
-        return (async() => {
+        return (async () => {
             await super.awake();
         })();
     }
@@ -37,16 +43,18 @@ export class CashPile extends Obj {
     addCash() {
         if (this.cashs.length >= this.cashsMax) return;
         let position = new THREE.Vector3(
-            (0.275 * (this.cashs.length % this.pileColumn)) + THREE.Math.randFloat(-0.01, 0.01),
-            this.cashHeight * (this.cashs.length / this.pileColumn),
-            THREE.Math.randFloat(-0.01, 0.01) + (.05 * (this.cashs.length % this.pileColumn)),
+            (0.225 * (this.cashs.length % this.pileColumn)) + THREE.Math.randFloat(-0.015, 0.015),
+            this.cashHeight * ((this.cashs.length - (this.cashs.length % this.pileColumn)) / this.pileColumn),
+            THREE.Math.randFloat(-0.01, 0.01),
         );
         let newCash = new Cash({
             parent: this,
             position: position
         })
         this.cashs.push(newCash)
-        newCash.appear();
+        Engine.waitNextTick().then(_ => {
+            newCash.appear();
+        })
     }
 
     removeCash() {

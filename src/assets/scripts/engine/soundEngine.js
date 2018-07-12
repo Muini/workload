@@ -4,18 +4,36 @@ class SoundEngine {
     constructor(opt = {
         // datas
     }) {
-        this.sounds = {};
-
-        // this.registerSounds();
+        this.sounds = new Map();
+        this.playingSounds = [];
 
         this.bindEvents();
     }
 
-    /*registerSounds() {
-        for (let i = 0; i < this.datas.length; i++) {
-            this.new(this.datas[i].name, this.datas[i].url, this.datas[i].loop, this.datas[i].volume);
-        }
-    }*/
+    register(sound){
+        this.sounds.set(sound.uuid, sound);
+    }
+
+    unregister(sound){
+        this.sounds.get(sound.uuid).delete();
+    }
+
+    pause() {
+        this.playingSounds = [];
+        Howler.mute(true);
+        this.sounds.forEach(sound => {
+            if(sound.isPlaying){
+                this.playingSounds.push(sound);
+            }
+        });
+    }
+
+    resume() {
+        Howler.mute(false);
+        this.playingSounds.forEach(sound => {
+            sound.resume();
+        });
+    }
 
     bindEvents() {
         let isActive = true
@@ -23,25 +41,25 @@ class SoundEngine {
             if (document.visibilityState == 'visible') {
                 if (!isActive) {
                     isActive = true
-                    Howler.mute(false);
+                    this.resume();
                 }
             } else {
                 if (isActive) {
                     isActive = false
-                    Howler.mute(true);
+                    this.pause();
                 }
             }
         })
         window.addEventListener('focus', _ => {
             if (!isActive) {
                 isActive = true
-                Howler.mute(false);
+                this.resume();
             }
         }, false)
         window.addEventListener('blur', _ => {
             if (isActive) {
                 isActive = false
-                Howler.mute(true);
+                this.pause();
             }
         }, false)
     }
