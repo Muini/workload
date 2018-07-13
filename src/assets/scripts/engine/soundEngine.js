@@ -6,8 +6,6 @@ class SoundEngine {
     }) {
         this.sounds = new Map();
         this.playingSounds = [];
-
-        this.bindEvents();
     }
 
     register(sound){
@@ -15,7 +13,7 @@ class SoundEngine {
     }
 
     unregister(sound){
-        this.sounds.get(sound.uuid).delete();
+        this.sounds.delete(sound.uuid);
     }
 
     pause() {
@@ -33,35 +31,6 @@ class SoundEngine {
         this.playingSounds.forEach(sound => {
             sound.resume();
         });
-    }
-
-    bindEvents() {
-        let isActive = true
-        document.addEventListener('visibilitychange', _ => {
-            if (document.visibilityState == 'visible') {
-                if (!isActive) {
-                    isActive = true
-                    this.resume();
-                }
-            } else {
-                if (isActive) {
-                    isActive = false
-                    this.pause();
-                }
-            }
-        })
-        window.addEventListener('focus', _ => {
-            if (!isActive) {
-                isActive = true
-                this.resume();
-            }
-        }, false)
-        window.addEventListener('blur', _ => {
-            if (isActive) {
-                isActive = false
-                this.pause();
-            }
-        }, false)
     }
 }
 

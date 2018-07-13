@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import Engine from './engine';
+import Log from './utils/log';
 
 import '../../shaders/postprocess/EffectComposer';
 // import { ShaderPass } from 'three/examples/js/postprocessing/ShaderPass';
@@ -64,7 +65,7 @@ export default class PostProd {
         this.composer = new THREE.EffectComposer(this.renderer, this.renderTarget);
 
         if (!this.renderer.extensions.get('WEBGL_depth_texture')) {
-            console.warn("WEBGL_depth_texture not supported");
+            Log.push('warn', this.constructor.name, `WEBGL_depth_texture not supported`);
             this.passes.bokehdof.enabled = false;
         }
         // Bokeh DOF
@@ -223,7 +224,7 @@ export default class PostProd {
         if (!this.passes.blur.enabled) return;
         this.blurDomElems.push(domblur);
         if (this.blurDomElems.length > this.blurPos.length) {
-            console.warn(`Blur Doms Elems exceed limits of ${this.blurPos.length}. First item is deleted ${this.blurDomElems[0]}`)
+            Log.push('warn', this.constructor.name, `Blur Doms Elems exceed limits of ${this.blurPos.length}. First item is deleted ${this.blurDomElems[0]}`);
             this.blurDomElems.splice(0, 1);
         }
     }

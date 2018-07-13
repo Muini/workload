@@ -1,5 +1,6 @@
 import Engine from './engine';
 import UUID from './utils/uuid';
+import Log from './utils/log';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
@@ -21,8 +22,7 @@ export default class DomObject {
 
         this.parent = opt.parent || null;
         if (!this.parent) {
-            if (window.DEBUG)
-                console.warn('DomObject parameter "parent" is mandatory and should be a Object or Scene type', this)
+            Log.push('warn', this.constructor.name, `DomObject parameter "parent" is mandatory and should be a Object or Scene type`);
         } else {
             this.scene = this.parent.isScene ? this.parent : this.parent.scene;
             this.scene.addObject(this);

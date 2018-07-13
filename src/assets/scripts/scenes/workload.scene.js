@@ -7,6 +7,7 @@ import { Ease, Tween } from '../engine/tween';
 
 // Objects
 import { Camera } from '../objects/default/camera.obj';
+import { Cubemap } from '../objects/default/cubemap.obj';
 import { Worker } from '../objects/worker.obj';
 
 // Dom Objects
@@ -25,6 +26,16 @@ export default new Scene({
             focalLength: 50,
             focus: 16.0,
             aperture: 1.0,
+        });
+
+        let cubemap = new Cubemap({
+            parent: this,
+            near: 1,
+            far: 500,
+            resolution: 128,
+            position: new THREE.Vector3(0, 20, 0),
+            shouldUpdate: false,
+            tickRate: 2,
         });
 
         // Floor
@@ -87,7 +98,5 @@ export default new Scene({
                 this.worker3.addWork(10);
             })
             .start();
-
-        // setTimeout(_ => { Engine.nextScene(); }, 3000);
     }
 });

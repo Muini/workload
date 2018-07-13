@@ -1,4 +1,5 @@
 import Engine from './engine/engine';
+import SceneManager from './engine/sceneManager';
 
 //================
 // Scenes
@@ -6,9 +7,9 @@ import Engine from './engine/engine';
 // Register scene here
 //================
 import CityScene from './scenes/city.scene';
-Engine.registerScene(CityScene);
+SceneManager.register(CityScene);
 import WorkloadScene from './scenes/workload.scene';
-Engine.registerScene(WorkloadScene);
+SceneManager.register(WorkloadScene);
 
 //================
 // Load scene & Start Engine
@@ -17,7 +18,7 @@ Engine.init(document.getElementById('film'));
 Engine.setFixedRatio(2 / 1);
 
 // Set Scene will start the loading process of scenes
-Engine.setScenesOrder([
+SceneManager.setOrder([
     'city',
     'workload',
 ]);

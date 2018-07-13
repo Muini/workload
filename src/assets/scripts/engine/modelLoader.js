@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import '../vendors/GLTFLoader';
+import Log from './utils/log';
 
 class ModelLoader {
     constructor(opt = {}) {
@@ -18,7 +19,7 @@ class ModelLoader {
                     onUpdate(xhr.loaded, xhr.total);
                 },
                 (error) => {
-                    console.error('GLTF Loader error :', error);
+                    Log.push('error', this.constructor.name, `GLTF Loader error : ${error}`);
                 },
             );
         })();

@@ -1,26 +1,23 @@
 import * as THREE from 'three';
 // import '../vendors/WebGLDeferredRenderer';
+import Log from './utils/log';
 import Stats from 'stats.js';
 import PostProd from './postprod';
+import SceneManager from './sceneManager';
 import SoundEngine from './soundEngine'; 
-import Loader from './loader';
 
 import { Thread } from '@thmsdmcrt_/concurrence';
 
 import './utils/watch-polyfill';
 import UUID from './utils/uuid';
 
-window.DEBUG = false;
-
 class Engine {
     constructor(opt = {}) {
 
-        if (window.DEBUG) {
+        if (Log.debug) {
             this.stats = new Stats();
             this.stats.showPanel(0);
         }
-
-        this.currentScene = undefined;
 
         this.fixedRatio = (16 / 9);
         this.hasFixedRatio = false;
@@ -29,10 +26,6 @@ class Engine {
             this.height = this.width / this.fixedRatio;
         else
             this.height = window.innerHeight;
-
-        this.scenes = new Map();
-        this.scenesOrder = [];
-        this.sceneCurrentIndex = 0;
 
         this.isMobile = (function(){
             let check = false;
@@ -68,7 +61,7 @@ class Engine {
             let startTime = performance.now();
             await thread.run();
             let durationTime = performance.now() - startTime;
-            if (window.DEBUG) {
+            if (Log.debug) {
                 console.log('Performance Test: ' + durationTime + ' ms');
             }
             if (durationTime > 22)
@@ -121,10 +114,15 @@ class Engine {
         this.hasPostProd = true;
         this.postprod = undefined;
 
-        if (window.DEBUG) {
+        Log.push(
+            'success', 
+            this.constructor.name, 
+            'Init - width: ' + this.width + 'px - height: ' + this.height + 'px - Quality: ' + this.quality + ' - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION
+        );
+
+        if (Log.debug) {
             window.THREE = THREE;
             window.renderer = this.renderer;
-            console.log('%cEngine%c Init - width: ' + this.width + 'px - height: ' + this.height + 'px - Quality: ' + this.quality + ' - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION, "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
         }
     }
 
@@ -166,7 +164,7 @@ class Engine {
 
         this.container = container;
         this.container.appendChild(this.renderer.domElement);
-        if (window.DEBUG)
+        if (Log.debug)
             this.container.appendChild(this.stats.dom);
 
         this.waitNextTick().then(_ => {
@@ -186,18 +184,20 @@ class Engine {
             this.performanceCycleNbr = 0;
             this.resize();
         }, false);
-        // if (window.DEBUG) return;
+        // if (Log.debug) return;
         let isActive = true
         document.addEventListener('visibilitychange', _ => {
             if (document.visibilityState == 'visible') {
                 if (!isActive) {
                     isActive = true
                     this.play();
+                    SoundEngine.resume();
                 }
             } else {
                 if (isActive) {
                     isActive = false
                     this.pause();
+                    SoundEngine.pause();
                 }
             }
         })
@@ -205,12 +205,14 @@ class Engine {
             if (!isActive) {
                 isActive = true
                 this.play();
+                SoundEngine.resume();
             }
         }, false)
         window.addEventListener('blur', _ => {
             if (isActive) {
                 isActive = false
                 this.pause();
+                SoundEngine.pause();
             }
         }, false)
     }
@@ -286,106 +288,21 @@ class Engine {
         }*/
     }
 
-    registerScene(scene) {
-        this.scenes.set(scene.name, scene);
-        this.scenes.get(scene.name).initScene();
-    }
-
-    preloadScenesCheck() {
-        // TODO: wait between loading to not overheat ; buffer ?
-        if (this.currentScene.isLoading || this.isPreloading) return;
-        let nextIndex = this.sceneCurrentIndex + 1;
-
-        const checkIfSceneShouldPreload = _ => {
-            let nextSceneName = this.scenesOrder[nextIndex];
-            if (!nextSceneName) return false;
-            if (!this.scenes.get(nextSceneName).hasLoaded) {
-                this.isPreloading = true;
-                this.scenes.get(nextSceneName).preload(_ => {
-                    this.isPreloading = false;
-                });
-            } else {
-                nextIndex++;
-                return checkIfSceneShouldPreload();
-            }
-        }
-        checkIfSceneShouldPreload();
-    }
-
-    setScene(sceneName) {
-        return new Promise((resolve, reject) => {
-            //TODO: reject setScene
-            if (this.scenes.get(sceneName) === undefined) throw `Engine : Scene ${sceneName} is not registered`;
-            this.currentScene = this.scenes.get(sceneName);
-            if (window.DEBUG)
-                window.scene = this.currentScene.instance;
-            if (this.currentScene.hasLoaded) {
-                // If the scene is already loaded, start it
-                // console.log('Scene is already loaded, continue')
-                this.performanceCycleNbr = 0;
-                resolve();
-            } else {
-                if (this.currentScene.isLoading) {
-                    // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
-                    // console.log('Scene is already loading, wait for it')
-                    Loader.show();
-                    this.currentScene.onPreloaded = resolve;
-                } else {
-                    // Else load the scene, then start it
-                    // console.log('Scene is not loaded, load it !')
-                    this.isPreloading = true;
-                    this.currentScene.preload(_ => {
-                        this.isPreloading = false;
-                        resolve();
-                    });
-                }
-            }
-        });
-    }
-
-    setScenesOrder(order) {
-        this.scenesOrder = order;
-    }
-
-    nextScene() {
-        if (window.DEBUG)
-            console.log('%cEngine%c Next Scene', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
-
-        // Pause render
-        this.pause();
-        // Clear renderer
-        this.renderer.clear();
-        // Stop the scene and deactivate everything
-        this.currentScene.stop();
-        // Set the next scene
-        this.sceneCurrentIndex++;
-        // Check if the next scene exist
-        if (!this.scenesOrder[this.sceneCurrentIndex]) {
-            if (window.DEBUG)
-                console.log('%cEngine%c No more scenes to play.', "color:white;background:Orange;padding:2px 4px;", "color:black");
-            return this.stop();
-        }
-        this.setScene(this.scenesOrder[this.sceneCurrentIndex]).then(_ => {
-            // When loaded, init the new scene
-            this.currentScene.start().then(_ => {
-                // Start the render
-                this.play();
-            });
-        })
-    }
-
     start() {
         return (async() => {
             // Set the scene when the engine is starting
-            await this.setScene(this.scenesOrder[this.sceneCurrentIndex]).then(async _ => {
-                if (this.currentScene == undefined) throw 'No scene has been loaded or specified, please use Engine.setScenesOrder(...) function';
+            await SceneManager.set(SceneManager.scenesOrder[SceneManager.sceneCurrentIndex]).then(async _ => {
+                if (SceneManager.currentScene == undefined) return Log.push(
+                    'error',
+                    this.constructor.name,
+                    'No scene has been loaded or specified, please use SceneManager.setOrder(...) function'
+                );
 
-                if (window.DEBUG)
-                    console.log('%cEngine%c ⏺️ Start', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+                Log.push('info', this.constructor.name, '⏺️ Start');
 
-                await this.currentScene.start();
+                await SceneManager.currentScene.start();
 
-                if (this.currentScene.mainCamera == undefined) throw 'No camera has been added or specified, please use scene.setCamera(...) function';
+                if (SceneManager.currentScene.mainCamera == undefined) return Log.push('error', this.constructor.name, 'No camera has been added or specified, please use scene.setCamera(...) function');
 
                 this.hasStarted = true;
 
@@ -400,8 +317,7 @@ class Engine {
         this.lastTick = 0;
         this.requestId = window.requestAnimationFrame(time => this.update(time));
         this.isPlaying = true;
-        if (window.DEBUG)
-            console.log('%cEngine%c ▶️ Play', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        // Log.push('info', this.constructor.name, '▶️ Play');
     }
 
     pause() {
@@ -409,13 +325,11 @@ class Engine {
         window.cancelAnimationFrame(this.requestId);
         this.requestId = undefined;
         this.isPlaying = false;
-        if (window.DEBUG)
-            console.log('%cEngine%c ⏸️ Pause', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        // Log.push('info', this.constructor.name, '⏸️ Pause');
     }
 
     stop() {
-        if (window.DEBUG)
-            console.log('%cEngine%c ⏹️ Stop', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+        Log.push('info', this.constructor.name, '⏹️ Stop');
         this.pause();
         this.elapsedTime = 0;
         this.hasStarted = false;
@@ -469,9 +383,7 @@ class Engine {
                     hasBeenResized = true;
                     this.adaptiveRendererDelay = 500;
                     this.lastAdaptiveRendererTime = time;
-                    // console.log(this.fpsMedian, this.pixelDensity);
-                    if (window.DEBUG)
-                        console.log('%cEngine%c Adapting renderer to ' + newPixelDensity + ' pixelRatio', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+                    Log.push('info', this.constructor.name, `Adapting renderer to ${newPixelDensity} pixelRatio`);
                 }
 
             }
@@ -484,11 +396,11 @@ class Engine {
     }
 
     update(time) {
-        if (!this.currentScene || !this.currentScene.mainCamera || !this.isPlaying) return;
+        if (!SceneManager.currentScene || !SceneManager.currentScene.mainCamera || !this.isPlaying) return;
 
         this.requestId = window.requestAnimationFrame(time => this.update(time))
         
-        if (window.DEBUG)
+        if (Log.debug)
             this.stats.begin();
 
         // Calculate delta
@@ -500,7 +412,7 @@ class Engine {
             this.adaptiveRenderer(time, delta);
 
         //Check if we're loading something in background
-        this.preloadScenesCheck();
+        SceneManager.preloadScenesCheck();
 
         //Update & Render Post processing effects
         if (this.hasPostProd)
@@ -510,7 +422,7 @@ class Engine {
         this.updateFunctions.forEach(fct => fct(time, delta));
 
         //Render the scene
-        this.renderer.render(this.currentScene.instance, this.currentScene.mainCamera);
+        this.renderer.render(SceneManager.currentScene.instance, SceneManager.currentScene.mainCamera);
 
         //Store elapsed time
         this.elapsedTime += delta;
@@ -518,7 +430,7 @@ class Engine {
         //Store lastTick
         this.lastTick = time;
 
-        if (window.DEBUG)
+        if (Log.debug)
             this.stats.end();
         
     }

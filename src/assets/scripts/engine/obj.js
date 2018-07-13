@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Engine from './engine';
+import Log from './utils/log';
 import UUID from './utils/uuid';
 import AssetsManager from './assetsManager';
 import Animator from './animator';
@@ -30,7 +31,7 @@ export default class Obj {
         this.isObject = true;
 
         this.parent = opt.parent || undefined;
-        if (!this.parent) throw 'Object parameter "parent" is mandatory and should be a Object or Scene type';
+        if (!this.parent) return Log.push('error', this.constructor.name, `Object parameter "parent" is mandatory and should be a Object or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.children = [];
 

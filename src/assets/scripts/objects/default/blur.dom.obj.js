@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
+import Log from '../../engine/utils/log';
 import DomObject from '../../engine/domObject';
 
 export class BlurDom extends DomObject {
@@ -58,7 +59,7 @@ export class BlurDom extends DomObject {
         else if (Engine.postprod)
             Engine.postprod.addBlurPosition(this);
         else
-            console.warn('Blur Dom Objects require postprocessing effects on')
+            Log.push('warn', this.constructor.name, `Blur Dom Objects require postprocessing effects on`);
     }
 
     update(time, delta) {

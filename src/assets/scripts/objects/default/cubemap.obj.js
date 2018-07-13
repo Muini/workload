@@ -37,11 +37,13 @@ export class Cubemap extends Obj {
         this.cubeCamera1 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera1.name = 'Cubemap CubeCamera1';
         this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+        this.cubeCamera1.rotation.x = -3.14 / 2;
         this.model.add(this.cubeCamera1);
 
         this.cubeCamera2 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera2.name = 'Cubemap CubeCamera1';
         this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+        this.cubeCamera2.rotation.x = -3.14 / 2;
         this.model.add(this.cubeCamera2);
 
 

@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+import Log from './utils/log';
+
 export default class Animator {
     constructor(opt = {
         model,
@@ -7,7 +9,7 @@ export default class Animator {
     }) {
 
         this.model = opt.model;
-        if (!this.model) throw 'Animator parameter "model" is mandatory and should be a Object or Scene type';
+        if (!this.model) return Log.push('error', this.constructor.name, `Animator parameter "model" is mandatory and should be a Object or Scene type`);
 
         this.animations = opt.animations || undefined;
 
@@ -29,6 +31,10 @@ export default class Animator {
         this.currentAction.play();
 
         this.isPlaying = true;
+    }
+
+    setSpeed(speed){
+        this.currentAction.timeScale = speed || 1.0;
     }
 
     pause() {

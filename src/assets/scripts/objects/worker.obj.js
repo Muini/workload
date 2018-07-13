@@ -169,6 +169,7 @@ export class Worker extends Obj {
         if (this.papersCount > 0) {
             this.startWorking();
             this.timeElapsed += delta;
+            this.animator.setSpeed(this.workingSpeed * this.happiness * 2.0)
             if (this.timeElapsed > (1000 / (this.workingSpeed * this.happiness))) {
                 this.timeElapsed = 0;
                 this.papersCount--;

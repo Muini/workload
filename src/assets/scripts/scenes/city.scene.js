@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // Engine
 import Engine from '../engine/engine';
 import Scene from '../engine/scene';
+import SceneManager from '../engine/sceneManager';
 import Sound from '../engine/sound';
 import { Ease, Tween } from '../engine/tween';
 
@@ -15,7 +16,6 @@ import { City } from '../objects/city.obj';
 // Dom Objects
 import { TitleDom } from '../objects/title.dom.obj';
 import { SubtitleDom } from '../objects/subtitle.dom.obj';
-import DomObject from '../engine/domObject';
 
 // Create scene
 export default new Scene({
@@ -132,7 +132,7 @@ export default new Scene({
             })
             .onComplete( _ => {
                 // console.log('complete')
-                Engine.nextScene();
+                SceneManager.next();
             });
         
         await Engine.wait(2000);

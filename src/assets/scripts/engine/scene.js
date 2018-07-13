@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import Engine from './engine';
 import UUID from './utils/uuid';
+import Log from './utils/log';
 
 import AssetsManager from '../engine/assetsManager';
 
@@ -67,8 +68,7 @@ export default class Scene {
     createObjects() {
         return (async() => {
             await Promise.all(this.children.map(async object => { await object.created() }))
-            if (window.DEBUG)
-                console.log('%cEngine%c Scene created ' + this.children.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+            Log.push('info', this.constructor.name, `Scene created ${this.children.length} object(s)`);
             return;
         })();
     }
@@ -76,8 +76,7 @@ export default class Scene {
     awakeObjects() {
         return (async() => {
             await Promise.all(this.children.map(async object => { await object.awake() }))
-            if (window.DEBUG)
-                console.log('%cEngine%c Scene awaked ' + this.children.length + ' object(s)', "color:white;background:DodgerBlue;padding:2px 4px;", "color:black");
+            Log.push('info', this.constructor.name, `Scene awaked ${this.children.length} object(s)`);
             return;
         })();
     }
@@ -117,8 +116,7 @@ export default class Scene {
             this.sounds.forEach(sound => sound.load());
 
             await AssetsManager.loadAssetsFromScene(this.name, async _ => {
-                if (window.DEBUG)
-                    console.log('%cLoader%c Scene %c' + this.name + '%c loaded', "color:white;background:limegreen;padding:2px 4px;", "color:black", "color:DodgerBlue", "color:black");
+                Log.push('success', this.constructor.name, `Scene ${this.name} loaded`);
                 await this.createObjects();
                 this.isLoading = false;
                 this.hasLoaded = true;
@@ -151,8 +149,7 @@ export default class Scene {
     }
 
     unload() {
-        if (window.DEBUG)
-            console.log('%cEngine%c Clear scene %c' + this.name, "color:white;background:gray;padding:2px 4px;", "color:black", "color:DodgerBlue");
+        Log.push('info', this.constructor.name, `Clear scene ${this.name}`);
 
         this.sounds.forEach(elem => elem.destroy());
         for (let i = 0; i < this.objects.length; i++) {

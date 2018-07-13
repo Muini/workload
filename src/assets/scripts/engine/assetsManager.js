@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from './engine';
 import Loader from './loader';
+import Log from './utils/log';
 
 import Assets from '../assets';
 import ModelLoader from './modelLoader';
@@ -88,8 +89,7 @@ class AssetsManager {
     updateLoader() {
         this.assetsLoaded++;
         Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
-        if (window.DEBUG)
-            console.log('%cLoader%c ' + this.assetsLoaded + '/' + this.assetsToLoad + ' assets loaded', "color:white;background:orange;padding:2px 4px;", "color:black");
+        Log.push('info', this.constructor.name, `${this.assetsLoaded}/${this.assetsToLoad} assets loaded`);
         if (this.assetsLoaded >= this.assetsToLoad) {
             this.onSceneLoaded();
         }
@@ -97,7 +97,7 @@ class AssetsManager {
 
     getAsset(assetType, assetName) {
         return (async() => {
-            if (!this.assets[assetName] || !this.assets[assetName].isLoaded) return console.log(`%cEngine%c Asset ${assetName} has not been loaded ! Make sure it is in assets.js with the correct name. %c` + assetType, "color:white;background:red;padding:2px 4px;", "color:red", "color:DodgerBlue");
+            if (!this.assets[assetName] || !this.assets[assetName].isLoaded) return Log.push('error', this.constructor.name, `Asset ${assetName} has not been loaded ! Make sure it is in assets.js with the correct name.`);
 
             switch (assetType) {
                 case 'model':

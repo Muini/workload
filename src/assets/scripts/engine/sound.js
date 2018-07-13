@@ -1,7 +1,7 @@
 import { Howl, Howler } from 'howler';
 
-import Engine from './engine';
 import UUID from './utils/uuid';
+import Log from './utils/log';
 import SoundEngine from './soundEngine';
 
 export default class Sound {
@@ -22,7 +22,7 @@ export default class Sound {
             volume: opt.volume ? opt.volume : 1.0,
         })
         this.parent = opt.parent ? opt.parent : null; //Parent mush be THREE object to get 3D position
-        if (!this.parent) throw 'Sound parameter "parent" is mandatory and should be a Object or Scene type';
+        if (!this.parent) return Log.push('error', this.constructor.name, `Sound parameter "parent" is mandatory and should be a Object or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.nominalVolume = opt.volume ? opt.volume : 1.0;
 
