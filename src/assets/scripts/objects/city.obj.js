@@ -18,78 +18,17 @@ export class City extends Obj {
         this.hasShadows = true;
 
         // Init materials to be overwrite by name
-        /*
+
         this.addMaterial('Grass', true);
-        
-        this.materials['Floor'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x1F241F),
-            roughness: .75,
-            metalness: .0,
-            dithering: true,
-        });
-        this.materials['Leafs'] = new SwayShader({
-            dithering: true,
-        }, {
-            "diffuse": { value: new THREE.Color(0x557436) },
-            "roughness": { value: .9 },
-            "metalness": { value: .0 },
-            "emissive": { value: new THREE.Color(0xABCC45) }, //Fake SSS
-            "time": { value: 1.0 },
-            "swayBlend": { value: 0.005 },
-            "windForce": { value: new THREE.Vector3(25, -15) },
-        });
-        // console.log(this.materials['Leafs']);
-        this.materials['Concrete'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x9E9691),
-            roughness: .95,
-            metalness: .0,
-            dithering: true,
-        });
-        this.materials['Roof'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x818F8F),
-            roughness: .8,
-            metalness: .5,
-            dithering: true,
-            envMapIntensity: 2.,
-        });
-        this.materials['Metal'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x888888),
-            roughness: .7,
-            metalness: 1.0,
-            dithering: true,
-            envMapIntensity: 5.,
-        });
-        this.materials['White Metal'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xD1D1D1),
-            roughness: .6,
-            metalness: 1.0,
-            dithering: true,
-            envMapIntensity: 6.,
-        });
-        this.materials['Glass'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xC4D8D8),
-            roughness: .2,
-            metalness: 0.9,
-            dithering: true,
-            envMapIntensity: 6.,
-        });
-        this.materials['Glass2'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xBCCCD4),
-            roughness: .25,
-            metalness: 0.9,
-            dithering: true,
-            envMapIntensity: 6.,
-        });
-        this.materials['Clouds'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xE7E7E7),
-            emissive: new THREE.Color(0xC1D1DA),
-            transparent: true,
-            opacity: 0.4,
-            fog: false,
-            // lights: false,
-            emissiveIntensity: 5
-        })
-        */
+        this.addMaterial('Floor', true);
+        this.addMaterial('Concrete', true);
+        this.addMaterial('Roof', true);
+        this.addMaterial('Metal', true);
+        this.addMaterial('White Metal', true);
+        this.addMaterial('Glass', true);
+        this.addMaterial('Glass2', true);
+        this.addMaterial('Clouds', true);
+        this.addMaterial('Leafs', true);
 
         super.init();
     }
@@ -125,7 +64,7 @@ export class City extends Obj {
     update(time, delta) {
         super.update(time, delta);
 
-        this.materials['Leafs'].uniforms['time'].value = time;
+        // this.materials.get('Leafs').instance.uniforms['time'].value = time;
         for (let i = 0; i < this.eoMotors.length; i++) {
             this.eoMotors[i].rotation.x += 0.00025 * 3.14 * delta;
         }

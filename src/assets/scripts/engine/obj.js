@@ -63,16 +63,18 @@ export default class Obj {
         }
     }
 
-    addMaterial(material, isIntancedMaterial){
-        if(!isIntancedMaterial){
+    addMaterial(materialName, isIntancedMaterial = true) {
+        const material = MaterialManager.get(materialName);
+        if (!material) return;
+        if (!isIntancedMaterial) {
             const cloneMaterial = material.clone();
             this.materials.set(cloneMaterial.name, cloneMaterial);
-        }else{
+        } else {
             this.materials.set(material.name, material);
         }
     }
 
-    addChildren(child){
+    addChildren(child) {
         this.children.push(child);
     }
 
@@ -147,12 +149,11 @@ export default class Obj {
                 this.parent.model.add(this.model);
             }
 
-            //Update Env Map
-            this.updateEnvMap();
-
             // Create children now
-            if(this.children.length > 0)
-                await Promise.all(this.children.map(async child => { await child.created() }))
+            if (this.children.length > 0)
+                await Promise.all(this.children.map(async child => {
+                    await child.created()
+                }))
 
             // Awake
             if (this.scene && this.scene.isPlaying) {
@@ -166,8 +167,10 @@ export default class Obj {
         return (async() => {
             this.setActive(this.isActive);
             // Awake children now
-            if(this.children.length > 0)
-                await Promise.all(this.children.map(async child => { await child.awake() }))
+            if (this.children.length > 0)
+                await Promise.all(this.children.map(async child => {
+                    await child.awake()
+                }))
         })();
     }
 
@@ -243,19 +246,19 @@ export default class Obj {
         })();
     }
 
-    updateEnvMap() {
-        // Update envMap
-        if (!this.scene.envMap) return;
-        this.materials.forEach(material => {
-            material.instance.envMap = this.scene.envMap;
-        })
-    }
-
     update(time, delta) {
         if (this.animator)
             this.animator.update(time, delta);
 
-        this.updateEnvMap();
+        // update Env Map & Sway uniform
+        this.materials.forEach(material => {
+            if (this.scene.envMap) {
+                material.instance.envMap = this.scene.envMap;
+            }
+            if (material.isSwayShader) {
+                material.instance.uniforms['time'].value = time;
+            }
+        })
     }
 
     onClicked() {

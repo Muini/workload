@@ -8,11 +8,18 @@ import * as THREE from 'three';
 export default class SwayShader {
     constructor(parameters, uniforms) {
 
+
         var standardShader = THREE.ShaderLib['standard'];
         var swayUniforms = {
-            "time": { value: 1.0 },
-            "swayBlend": { value: 0.005 },
-            "windForce": { value: new THREE.Vector2(0, 0) },
+            "time": {
+                value: 1.0
+            },
+            "swayBlend": {
+                value: 0.005
+            },
+            "windForce": {
+                value: new THREE.Vector2(0, 0)
+            },
         }
 
         var material = new THREE.ShaderMaterial({

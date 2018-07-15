@@ -16,14 +16,7 @@ export class Paper extends Obj {
         this.hasShadows = true;
 
         // Init materials
-        this.materials['Paper'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xe5e5e5),
-            roughness: .85,
-            metalness: .0,
-            dithering: true,
-            opacity: 0,
-            transparent: true,
-        })
+        this.addMaterial('Paper', false);
 
         super.init();
     }
@@ -31,6 +24,7 @@ export class Paper extends Obj {
     created() {
         return (async() => {
             await super.created();
+            this.materials.get('Paper').params.opacity = 0;
         })();
     }
 
@@ -50,7 +44,7 @@ export class Paper extends Obj {
             let tween = new Tween({ opacity: 0 })
                 .to({ opacity: 1 }, 300)
                 .onUpdate((props, progress) => {
-                    this.materials['Paper'].opacity = props.opacity;
+                    this.materials.get('Paper').params.opacity = props.opacity;
                     this.model.position.x = initialPosX + ((1 - props.opacity) * .25);
                 })
                 .onComplete(_ => {
@@ -66,7 +60,7 @@ export class Paper extends Obj {
             let tween = new Tween({ opacity: 1 })
                 .to({ opacity: 0 }, 400)
                 .onUpdate((props, progress) => {
-                    this.materials['Paper'].opacity = props.opacity;
+                    this.materials.get('Paper').params.opacity = props.opacity;
                     this.model.position.z = initialPosZ + ((1 - props.opacity) * 1.);
                 })
                 .onComplete(_ => {

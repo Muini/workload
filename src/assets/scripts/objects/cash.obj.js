@@ -2,7 +2,10 @@ import * as THREE from 'three';
 
 import Engine from '../engine/engine';
 import Obj from '../engine/obj';
-import { Ease, Tween } from '../engine/tween';
+import {
+    Ease,
+    Tween
+} from '../engine/tween';
 
 export class Cash extends Obj {
     constructor(opt = {}) {
@@ -16,29 +19,17 @@ export class Cash extends Obj {
         this.hasShadows = true;
 
         // Init materials
-        this.materials['Paper'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xe5e5e5),
-            roughness: .85,
-            metalness: .0,
-            dithering: true,
-            opacity: 0,
-            transparent: true,
-        })
-        this.materials['Money'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x6A964D),
-            roughness: .8,
-            metalness: .0,
-            dithering: true,
-            opacity: 0,
-            transparent: true,
-        })
+        this.addMaterial('Paper', false);
+        this.addMaterial('Money', false);
 
         super.init();
     }
 
     created() {
-        return (async () => {
+        return (async() => {
             await super.created();
+            this.materials.get('Paper').params.opacity = 0;
+            this.materials.get('Money').params.opacity = 0;
         })();
     }
 
@@ -54,11 +45,15 @@ export class Cash extends Obj {
 
     appear() {
         let initialPosY = this.model.position.y;
-        let tween = new Tween({ opacity: 0 })
-            .to({ opacity: 1 }, 300)
+        let tween = new Tween({
+                opacity: 0
+            })
+            .to({
+                opacity: 1
+            }, 300)
             .onUpdate((props, progress) => {
-                this.materials['Paper'].opacity = props.opacity;
-                this.materials['Money'].opacity = props.opacity;
+                this.materials.get('Paper').params.opacity = props.opacity;
+                this.materials.get('Money').params.opacity = props.opacity;
                 this.model.position.y = initialPosY + ((1 - props.opacity) * .25);
             })
             .start();
@@ -66,11 +61,15 @@ export class Cash extends Obj {
 
     disappear() {
         let initialPosZ = this.model.position.z;
-        let tween = new Tween({ opacity: 1 })
-            .to({ opacity: 0 }, 400)
+        let tween = new Tween({
+                opacity: 1
+            })
+            .to({
+                opacity: 0
+            }, 400)
             .onUpdate((props, progress) => {
-                this.materials['Paper'].opacity = props.opacity;
-                this.materials['Money'].opacity = props.opacity;
+                this.materials.get('Paper').params.opacity = props.opacity;
+                this.materials.get('Money').params.opacity = props.opacity;
                 this.model.position.z = initialPosZ + ((1 - props.opacity) * 1.);
             })
             .onComplete(_ => {
@@ -81,8 +80,12 @@ export class Cash extends Obj {
 
     moveDown(value) {
         let initialPosY = this.model.position.y;
-        let tween = new Tween({ y: 0 })
-            .to({ y: value }, 300)
+        let tween = new Tween({
+                y: 0
+            })
+            .to({
+                y: value
+            }, 300)
             .onUpdate((props, progress) => {
                 this.model.position.y = initialPosY - props.y;
             })

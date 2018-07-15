@@ -5,17 +5,32 @@ import Engine from '../engine/engine';
 import Scene from '../engine/scene';
 import SceneManager from '../engine/sceneManager';
 import Sound from '../engine/sound';
-import { Ease, Tween } from '../engine/tween';
+import {
+    Ease,
+    Tween
+} from '../engine/tween';
 
 // Objects
-import { Camera } from '../objects/default/camera.obj';
-import { Cubemap } from '../objects/default/cubemap.obj';
-import { Sky } from '../objects/default/sky.obj';
-import { City } from '../objects/city.obj';
+import {
+    Camera
+} from '../objects/default/camera.obj';
+import {
+    Cubemap
+} from '../objects/default/cubemap.obj';
+import {
+    Sky
+} from '../objects/default/sky.obj';
+import {
+    City
+} from '../objects/city.obj';
 
 // Dom Objects
-import { TitleDom } from '../objects/title.dom.obj';
-import { SubtitleDom } from '../objects/subtitle.dom.obj';
+import {
+    TitleDom
+} from '../objects/title.dom.obj';
+import {
+    SubtitleDom
+} from '../objects/subtitle.dom.obj';
 
 // Create scene
 export default new Scene({
@@ -50,12 +65,12 @@ export default new Scene({
         });
 
         // Ambient Light
-        let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 10.0);
+        let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 30.0);
         ambiantLight.name = "Ambient Light";
         this.instance.add(ambiantLight);
 
         // Sun
-        this.sun = new THREE.DirectionalLight(0xFFF4E6, 10.0);
+        this.sun = new THREE.DirectionalLight(0xFFF4E6, 30.0);
         this.sun.name = "Sun";
         this.sun.position.x = -30;
         this.sun.position.y = 100;
@@ -86,7 +101,9 @@ export default new Scene({
 
         this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.0075);
 
-        this.city = new City({ parent: this });
+        this.city = new City({
+            parent: this
+        });
 
         this.citySound = new Sound({
             name: 'city-loop',
@@ -96,8 +113,12 @@ export default new Scene({
             volume: 0.4,
         });
 
-        this.title = new TitleDom({ parent: this });
-        this.subtitle = new SubtitleDom({ parent: this });
+        this.title = new TitleDom({
+            parent: this
+        });
+        this.subtitle = new SubtitleDom({
+            parent: this
+        });
 
     },
     onStart: async function() {
@@ -117,8 +138,14 @@ export default new Scene({
         this.title.setVisibility(false)
         this.subtitle.setVisibility(false)
 
-        let tween = new Tween({ y:30, z:62 })
-            .to({ y: 22, z: 10 }, 6000)
+        let tween = new Tween({
+                y: 30,
+                z: 62
+            })
+            .to({
+                y: 22,
+                z: 10
+            }, 6000)
             // .repeat(Infinity)
             // .yoyo(true)
             .ease(Ease.Expo.In)
@@ -130,11 +157,11 @@ export default new Scene({
                 if (Engine.postprod && Engine.postprod.bokehPass)
                     Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
             })
-            .onComplete( _ => {
+            .onComplete(_ => {
                 // console.log('complete')
                 SceneManager.next();
             });
-        
+
         await Engine.wait(2000);
         tween.start();
         await Engine.wait(1000);

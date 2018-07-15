@@ -55,7 +55,7 @@ export default new Scene({
         this.instance.add(plane);
 
         // Ambient Light
-        let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 5);
+        let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 15);
         ambiantLight.name = "Ambient Light";
         this.instance.add(ambiantLight);
 
