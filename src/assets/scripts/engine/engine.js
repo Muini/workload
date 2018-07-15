@@ -35,7 +35,7 @@ class Engine {
             return check;
         })();
         
-        this.quality = this.isMobile ? 2 : 4;
+        this.quality = this.isMobile ? 2 : 3;
         /*
         const thread = Thread(_ => {
             function factorial(num) {
@@ -138,6 +138,7 @@ class Engine {
                 passes: {
                     fxaa: { enabled: this.quality < 2 ? true : true },
                     bloom: { enabled: this.quality < 3 ? false : true, options: [0.5, 1.0, 0.9] },
+                    // bloom: { enabled: false, options: [0.5, 1.0, 0.9] },
                     filmic: {
                         enabled: true,
                         noise: 0.1,
@@ -148,9 +149,8 @@ class Engine {
                         lut: 0.75,
                         lutURL: '/static/img/lut-gamma.png',
                     },
-                    bokehdof: {
-                        enabled: this.quality < 3 ? false : true,
-                    },
+                    // bokehdof: { enabled: this.quality < 3 ? false : true, },
+                    bokehdof: { enabled: false, },
                     blur: {
                         enabled: true,
                         strength: 3.0,
@@ -419,7 +419,14 @@ class Engine {
             this.postprod.update(time, delta);
 
         //Update all objects
-        this.updateFunctions.forEach(fct => fct(time, delta));
+        this.updateFunctions.forEach(fct => {
+            try{
+                fct(time, delta);
+            }catch(error){
+                Log.push('error', this.constructor.name, `${error}`)
+                this.pause();
+            }
+        });
 
         //Render the scene
         this.renderer.render(SceneManager.currentScene.instance, SceneManager.currentScene.mainCamera);

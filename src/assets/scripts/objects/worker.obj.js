@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../engine/engine';
 
+import Material from '../engine/material';
 import Sound from '../engine/sound';
 import Obj from '../engine/obj';
 
@@ -25,12 +26,14 @@ export class Worker extends Obj {
             roughness: .8,
             metalness: .0,
             dithering: true,
+            envMapIntensity: 6.,
         })
         this.materials['Metal'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0x616161),
             roughness: .7,
             metalness: .6,
             dithering: true,
+            envMapIntensity: 6.,
         })
         this.materials['Screen'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0x555555),
@@ -140,6 +143,8 @@ export class Worker extends Obj {
         this.animator.stop('Work');
         this.sounds.get('working').stop();
         this.isWorking = false;
+        this.materials['Screen'].emissiveIntensity = 0;
+        this.lights['Desk_Screen_Light'].power = 0;
     }
 
     addWork(number){
@@ -158,18 +163,11 @@ export class Worker extends Obj {
             this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
             return;
         }
-        /*
-        this.timeElapsed += delta;
-
-        if (this.timeElapsed > 3000) {
-            this.timeElapsed = 0;
-            this.addWork(4);
-        }*/
 
         if (this.papersCount > 0) {
             this.startWorking();
             this.timeElapsed += delta;
-            this.animator.setSpeed(this.workingSpeed * this.happiness * 2.0)
+            this.animator.setSpeed(this.workingSpeed * this.happiness * 3.0)
             if (this.timeElapsed > (1000 / (this.workingSpeed * this.happiness))) {
                 this.timeElapsed = 0;
                 this.papersCount--;
@@ -182,11 +180,10 @@ export class Worker extends Obj {
             this.stopWorking();
         }
 
-        this.materials['Screen'].emissiveIntensity = THREE.Math.randFloat(9, 11);
-        this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
-
-        // this.materials['Screen'].emissiveIntensity = 0;
-        // this.lights['Desk_Screen_Light'].power = 0;
+        if(this.isWorking){
+            this.materials['Screen'].emissiveIntensity = THREE.Math.randFloat(9, 11);
+            this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
+        }
     }
 
 }

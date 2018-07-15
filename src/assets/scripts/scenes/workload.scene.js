@@ -33,7 +33,7 @@ export default new Scene({
             near: 1,
             far: 500,
             resolution: 128,
-            position: new THREE.Vector3(0, 20, 0),
+            position: new THREE.Vector3(0, 4, 0),
             shouldUpdate: false,
             tickRate: 2,
         });

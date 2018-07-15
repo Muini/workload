@@ -34,6 +34,8 @@ export class Cubemap extends Obj {
                 break;
         }
 
+        this.debug = opt.debug || false;
+
         this.cubeCamera1 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera1.name = 'Cubemap CubeCamera1';
         this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
@@ -55,18 +57,19 @@ export class Cubemap extends Obj {
 
         this.hasBeenRendered = false;
 
-        /*
-        var geometry = new THREE.SphereBufferGeometry(2, 32, 32);
-        this.debugMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xffffff),
-            roughness: 0.2,
-            metalness: 1.0,
-            envMap: this.texture,
-            envMapIntensity: 10.0,
-        });
-        var debugSphere = new THREE.Mesh(geometry, this.debugMaterial);
-        this.model.add(debugSphere);
-        */
+        if(this.debug){
+            let geometry = new THREE.SphereBufferGeometry(1, 16, 16);
+            this.debugMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(0xffffff),
+                roughness: 0.2,
+                metalness: 1.0,
+                envMap: this.texture,
+                envMapIntensity: 10.0,
+            });
+            let debugSphere = new THREE.Mesh(geometry, this.debugMaterial);
+            this.model.add(debugSphere);
+        }
+        
         super.init(opt);
     }
 
@@ -95,7 +98,8 @@ export class Cubemap extends Obj {
             this.cubeCamera1.update(Engine.renderer, this.scene.instance);
             this.texture = this.cubeCamera1.renderTarget.texture;
         }
-        // this.debugMaterial.envMap = this.texture;
+        if(this.debug)
+            this.debugMaterial.envMap = this.texture;
         this.scene.setEnvMap(this.texture);
 
         this.tick++;

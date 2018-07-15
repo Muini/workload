@@ -18,12 +18,9 @@ export class City extends Obj {
         this.hasShadows = true;
 
         // Init materials to be overwrite by name
-        this.materials['Grass'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x505D2A),
-            roughness: .6,
-            metalness: .0,
-            dithering: true,
-        });
+        /*
+        this.addMaterial('Grass', true);
+        
         this.materials['Floor'] = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0x1F241F),
             roughness: .75,
@@ -92,10 +89,9 @@ export class City extends Obj {
             // lights: false,
             emissiveIntensity: 5
         })
+        */
 
         super.init();
-
-        // Define & init here custom variables
     }
 
     created() {

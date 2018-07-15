@@ -1,5 +1,6 @@
 import Engine from './engine/engine';
 import SceneManager from './engine/sceneManager';
+import './materials/index';
 
 //================
 // Scenes

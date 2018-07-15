@@ -3,6 +3,7 @@ import Engine from './engine';
 import Log from './utils/log';
 import UUID from './utils/uuid';
 import AssetsManager from './assetsManager';
+import MaterialManager from './materialManager';
 import Animator from './animator';
 
 export default class Obj {
@@ -21,7 +22,7 @@ export default class Obj {
         this.animator = undefined;
 
         this.sounds = new Map();
-        this.materials = {};
+        this.materials = new Map();
         this.lights = {};
         this.hasShadows = false;
 
@@ -45,9 +46,9 @@ export default class Obj {
 
     // Init happen when the entire project is loaded
     init(opt) {
-        for (let material in this.materials) {
-            this.materials[material].name = material;
-        }
+        /*this.materials.forEach(material => {
+            material.instance.name = material.name;
+        });*/
         for (let light in this.lights) {
             this.lights[light].name = light;
         }
@@ -59,6 +60,15 @@ export default class Obj {
         //If the engine has started, it means it's an instanciation
         if (Engine.hasStarted) {
             this.created();
+        }
+    }
+
+    addMaterial(material, isIntancedMaterial){
+        if(!isIntancedMaterial){
+            const cloneMaterial = material.clone();
+            this.materials.set(cloneMaterial.name, cloneMaterial);
+        }else{
+            this.materials.set(material.name, material);
         }
     }
 
@@ -194,31 +204,31 @@ export default class Obj {
             }
 
             const updateMaterials = function(child, materials) {
-                //Overwrite materials
-                for (let material in materials) {
+                // Overwrite materials
+                // Add skinning if this is on a skinned mesh
+                materials.forEach(material => {
                     if (child.material.length) {
-                        for (let m = 0; m < child.material.length; m++) {
-                            // console.log(child.material[m].name)
-                            if (material == child.material[m].name) {
+                        let m = child.material.length;
+                        while (m--) {
+                            if (material.name == child.material[m].name) {
                                 if (child.isSkinnedMesh)
-                                    materials[material].skinning = true;
-                                child.material[m] = materials[material];
+                                    material.instance.skinning = true;
+                                child.material[m] = material.instance;
                             }
                         }
                     } else {
-                        // console.log(child.material.name)
-                        if (material == child.material.name) {
+                        if (material.name == child.material.name) {
                             if (child.isSkinnedMesh)
-                                materials[material].skinning = true;
-                            child.material = materials[material];
+                                material.instance.skinning = true;
+                            child.material = material.instance;
                         }
                     }
-                }
+                });
 
                 return child;
             }
 
-            this.model.traverse(async(child) => {
+            await this.model.traverse(async(child) => {
                 if (child.isMesh || child.isSkinnedMesh) {
                     child.castShadow = this.hasShadows;
                     child.receiveShadow = true;
@@ -236,12 +246,9 @@ export default class Obj {
     updateEnvMap() {
         // Update envMap
         if (!this.scene.envMap) return;
-        for (let material in this.materials) {
-            if (this.materials[material].isMeshStandardMaterial) {
-                this.materials[material].envMap = this.scene.envMap;
-            }
-
-        }
+        this.materials.forEach(material => {
+            material.instance.envMap = this.scene.envMap;
+        })
     }
 
     update(time, delta) {

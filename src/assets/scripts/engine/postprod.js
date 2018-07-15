@@ -80,9 +80,9 @@ export default class PostProd {
             this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
             // this.depthComposer.reset();
             if (Engine.quality < 3) {
-                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 2 ? 12 : 24;
+                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 2 ? 8 : 12;
             } else {
-                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 4 ? 48 : 64;
+                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 4 ? 16 : 24;
             }
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";

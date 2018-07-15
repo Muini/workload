@@ -44,7 +44,7 @@ export default new Scene({
             near: 1,
             far: 500,
             resolution: 128,
-            position: new THREE.Vector3(0, 80, 20),
+            position: new THREE.Vector3(0, 30, 10),
             shouldUpdate: false,
             tickRate: 2,
         });
@@ -67,7 +67,7 @@ export default new Scene({
         this.sun.shadow.mapSize.height = Engine.quality < 4 ? 512 : 1024; // default
         this.sun.shadow.camera.near = 1.0; // default
         this.sun.shadow.camera.far = 150; // default
-        let size = 100.0;
+        let size = 50.0;
         this.sun.shadow.camera.left = -size; // default
         this.sun.shadow.camera.right = size; // default
         this.sun.shadow.camera.top = size; // default
