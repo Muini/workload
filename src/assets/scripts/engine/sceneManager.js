@@ -17,16 +17,16 @@ class SceneManager {
     }
 
     preloadScenesCheck() {
-        // TODO: wait between loading to not overheat ; buffer ?
         if (this.currentScene.isLoading || this.isPreloading) return;
         let nextIndex = this.sceneCurrentIndex + 1;
 
-        const checkIfSceneShouldPreload = _ => {
+        const checkIfSceneShouldPreload = async _ => {
             let nextSceneName = this.scenesOrder[nextIndex];
             if (!nextSceneName) return false;
             if (!this.scenes.get(nextSceneName).hasLoaded) {
                 this.isPreloading = true;
-                this.scenes.get(nextSceneName).preload(_ => {
+                await Engine.wait(1000);
+                await this.scenes.get(nextSceneName).preload(_ => {
                     this.isPreloading = false;
                 });
             } else {
@@ -46,14 +46,11 @@ class SceneManager {
                 window.scene = this.currentScene.instance;
             if (this.currentScene.hasLoaded) {
                 // If the scene is already loaded, start it
-                // console.log('Scene is already loaded, continue')
-                this.performanceCycleNbr = 0;
                 resolve();
             } else {
+                Loader.show();
                 if (this.currentScene.isLoading) {
-                    // If the scene is actually loading, set the callback to start it when it's finished. Also, show the loader !
-                    // console.log('Scene is already loading, wait for it')
-                    Loader.show();
+                    // If the scene is actually loading, set the callback to start it when it's finished.
                     this.currentScene.onPreloaded = resolve;
                 } else {
                     // Else load the scene, then start it
@@ -75,7 +72,7 @@ class SceneManager {
     next() {
         Log.push('info', this.constructor.name, `Next Scene`);
         // Pause render
-        Engine.pause();
+        // Engine.pause();
         // Clear renderer
         Engine.renderer.clear();
         // Stop the scene and deactivate everything
@@ -91,7 +88,7 @@ class SceneManager {
             // When loaded, init the new scene
             this.currentScene.start().then(_ => {
                 // Start the render
-                Engine.play();
+                // Engine.play();
             });
         })
     }

@@ -4,6 +4,7 @@ import DomObject from './domObject';
 class Loader extends DomObject {
     constructor(opt = {}) {
         super(opt);
+        this.isLoader = true;
     }
 
     init() {
@@ -40,15 +41,13 @@ class Loader extends DomObject {
     }
 
     show() {
-        Engine.waitNextTick().then(_ => {
-            this.setActive(true);
-            this.dom.style['visibility'] = 'visible';
-            this.dom.classList.remove('hide');
-        });
+        this.setActive(true);
+        this.dom.style['visibility'] = 'visible';
+        this.dom.classList.remove('hide');
     }
 
     hide() {
-        Engine.waitNextTick().then(_ => {
+        requestAnimationFrame(_ => {
             this.setActive(false);
             this.dom.style['visibility'] = 'visible';
             this.dom.classList.add('hide');
@@ -57,7 +56,7 @@ class Loader extends DomObject {
 
     updateGraphLoader() {
         if(!this.isActive) return;
-        Engine.waitNextTick().then(_ => {
+        requestAnimationFrame(_ => {
             this.domProgress.style['transform'] = `translateZ(0) scaleX(${ (this.data.percentage / 100) })`;
             this.domProgress.style['webkitTransform'] = `translateZ(0) scaleX(${ (this.data.percentage / 100) })`;
         });

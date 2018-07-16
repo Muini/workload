@@ -81,13 +81,7 @@ export class Worker extends Obj {
             this.materials.get('Screen').params.emissiveIntensity = 0.0;
             this.lights['Desk_Screen_Light'].power = 0;
 
-            this.bonhomme = [];
-            // TODO: Make utils for getting children easily
-            this.model.traverse(async(child) => {
-                if (child.name == 'Bonhomme') {
-                    this.bonhomme = child
-                }
-            });
+            this.bonhomme = await this.getChildModel('Bonhomme');
             this.bonhomme.visible = false;
 
         })();

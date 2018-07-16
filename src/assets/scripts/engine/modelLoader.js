@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import '../vendors/GLTFLoader';
+import './utils/GLTFLoader';
 import Log from './utils/log';
 
 class ModelLoader {
@@ -20,6 +20,7 @@ class ModelLoader {
                 },
                 (error) => {
                     Log.push('error', this.constructor.name, `GLTF Loader error : ${error}`);
+                    console.log(error)
                 },
             );
         })();

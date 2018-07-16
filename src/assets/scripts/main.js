@@ -1,6 +1,7 @@
 import Engine from './engine/engine';
 import SceneManager from './engine/sceneManager';
 import './materials/index';
+import Loader from './engine/loader';
 
 //================
 // Scenes
@@ -15,14 +16,21 @@ SceneManager.register(WorkloadScene);
 //================
 // Load scene & Start Engine
 //================
-Engine.init(document.getElementById('film'));
-Engine.setFixedRatio(2 / 1);
+(async() => {
+    await requestAnimationFrame(async _ => {
 
-// Set Scene will start the loading process of scenes
-SceneManager.setOrder([
-    'workload',
-    'city',
-]);
+        await Engine.init(document.getElementById('film'));
+        Engine.setFixedRatio(2 / 1);
 
-// Start the engine ; It will start the preloading and launch the first scene
-Engine.start();
+        // Set Scene will start the loading process of scenes
+        SceneManager.setOrder([
+            'city',
+            'workload',
+        ]);
+
+        await Loader.show();
+
+        // Start the engine ; It will start the preloading and launch the first scene
+        await Engine.start();
+    });
+})();

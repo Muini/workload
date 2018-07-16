@@ -59,6 +59,14 @@
 <body>
     <main id="main" role="main">
         <section id="film">
+            <section class="hud loader">
+                <div class="animation">
+                    <!-- <div><span class="part part1"></span></div>
+                    <div><span class="part part2"></span></div> -->
+                    <div class="bar"><span class="progress"></span></div>
+                </div>
+                <div class="percent">{{ percentage }}%</div>
+            </section>
             <div class="hud hud-test">
                 <p>Score : {{ score }}</p>
             </div>
@@ -68,14 +76,6 @@
             <div class="hud subtitle">
                 <p>An interactive short film by <span>Corentin FLACH</span></p>
             </div>
-        </section>
-        <section class="loader">
-            <div class="animation">
-                <!-- <div><span class="part part1"></span></div>
-                <div><span class="part part2"></span></div> -->
-                <div class="bar"><span class="progress"></span></div>
-            </div>
-            <div class="percent">{{ percentage }}%</div>
         </section>
     </main>
     <!-- built files will be auto injected -->

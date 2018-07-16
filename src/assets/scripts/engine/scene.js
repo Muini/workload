@@ -130,8 +130,12 @@ export default class Scene {
             Engine.addToResize(this.uuid, this.resize.bind(this));
             this.resize();
             await this.awakeObjects();
+            if (!this.camera || !this.camera.instance) return Log.push('error', this.constructor.name, `No camera has been specified in the scene ${this.name}`);
+            this.setCamera(this.camera.instance);
             this.isPlaying = true;
-            this.onStart();
+            Engine.waitNextTick().then(_ => {
+                this.onStart();
+            });
         })();
     }
 

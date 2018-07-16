@@ -12,8 +12,6 @@ export class BlurDom extends DomObject {
     init() {
         super.init();
 
-        // Define & init here custom variables
-
         this.x = 0;
         this.y = 0;
         this.width = 0;
@@ -46,8 +44,6 @@ export class BlurDom extends DomObject {
                 await Engine.waitNextTick();
                 this.shouldUpdate = true;
             });
-
-            // Is fired when the object is added to the scene
         })();
     }
 

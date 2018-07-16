@@ -27,6 +27,8 @@ export default new Scene({
             focus: 16.0,
             aperture: 1.0,
         });
+        this.camera.model.rotation.y = (45 / 180) * 3.14;
+        this.camera.instance.rotation.x = -(30 / 180) * 3.14;
 
         let cubemap = new Cubemap({
             parent: this,
@@ -73,9 +75,8 @@ export default new Scene({
 
     },
     onStart: async function() {
-        this.camera.model.rotation.y = (45 / 180) * 3.14;
-        this.camera.instance.rotation.x = -(30 / 180) * 3.14;
-        this.setCamera(this.camera.instance);
+
+        // this.testdom.setVisibility(false);
 
         let tween = new Tween({ x:30, y:30, z:30, aperture: 1.0 })
             .to({ x:10, y:11, z:10, aperture: 3.5 }, 2000)
@@ -91,6 +92,7 @@ export default new Scene({
                     Engine.postprod.bokehPass.uniforms['aperture'].value = this.camera.aperture;
             })
             .onComplete(async _ => {
+                this.testdom.setVisibility(true);
                 this.worker.addWork(10);
                 await Engine.wait(200);
                 this.worker2.addWork(10);

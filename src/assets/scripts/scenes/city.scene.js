@@ -75,11 +75,11 @@ export default new Scene({
         this.sun.position.x = -30;
         this.sun.position.y = 100;
         this.sun.position.z = 30;
-        this.sun.castShadow = Engine.isMobile ? false : true;
+        this.sun.castShadow = true;
         this.instance.add(this.sun);
 
-        this.sun.shadow.mapSize.width = Engine.quality < 4 ? 512 : 1024; // default
-        this.sun.shadow.mapSize.height = Engine.quality < 4 ? 512 : 1024; // default
+        this.sun.shadow.mapSize.width = Engine.quality < 4 ? 1024 : 2048; // default
+        this.sun.shadow.mapSize.height = Engine.quality < 4 ? 1024 : 2048; // default
         this.sun.shadow.camera.near = 1.0; // default
         this.sun.shadow.camera.far = 150; // default
         let size = 50.0;
@@ -89,13 +89,20 @@ export default new Scene({
         this.sun.shadow.camera.bottom = -size; // default
         // this.sun.shadow.bias = -0.0025;
 
+        this.sunTarget = new THREE.Object3D();
+        this.sunTarget.position.x = 12.0;
+        this.sunTarget.position.y = 20;
+        this.sunTarget.position.z = -30;
+        this.instance.add(this.sunTarget);
+        this.sun.target = this.sunTarget;
+
         let sky = new Sky({
             parent: this,
             size: 1000,
             sunPosition: this.sun.position,
-            turbidity: 1.0,
-            rayleight: 10.0,
-            mieCoefficient: 0.01,
+            turbidity: 2.0,
+            rayleight: 2.0,
+            mieCoefficient: 0.005,
             mieDirectionalG: 0.75
         })
 
@@ -122,21 +129,11 @@ export default new Scene({
 
     },
     onStart: async function() {
-        // this.camera.model.rotation.y = (0 / 180) * 3.14;
-        // this.camera.instance.rotation.x = -(10 / 180) * 3.14;
-        this.setCamera(this.camera.instance);
-
-        let sunTarget = new THREE.Object3D();
-        sunTarget.position.x = 12.0;
-        sunTarget.position.y = 20;
-        sunTarget.position.z = -30;
-        this.instance.add(sunTarget);
-        this.sun.target = sunTarget;
-
-        this.citySound.play(1000);
-
+        
         this.title.setVisibility(false)
         this.subtitle.setVisibility(false)
+
+        this.citySound.play(1000);
 
         let tween = new Tween({
                 y: 30,

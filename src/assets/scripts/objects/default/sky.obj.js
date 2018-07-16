@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import Engine from '../../engine/engine';
 
 import Obj from '../../engine/obj';
-import '../../vendors/Sky';
+import '../../../shaders/Sky';
 
 export class Sky extends Obj {
     constructor(opt = {}) {

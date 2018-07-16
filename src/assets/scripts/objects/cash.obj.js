@@ -2,10 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../engine/engine';
 import Obj from '../engine/obj';
-import {
-    Ease,
-    Tween
-} from '../engine/tween';
+import { Ease, Tween } from '../engine/tween';
 
 export class Cash extends Obj {
     constructor(opt = {}) {

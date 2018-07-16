@@ -38,16 +38,9 @@ export class City extends Obj {
 
             await super.created();
 
-            this.eoMotors = [];
-            this.clouds = [];
-            this.model.traverse(async(child) => {
-                if (child.name.indexOf('Eolienne_motor') > -1) {
-                    this.eoMotors.push(child)
-                }
-                if (child.name.indexOf('Cloud') > -1) {
-                    this.clouds.push(child)
-                }
-            });
+            this.eoMotors = await this.getChildModel('Eolienne_motor');
+            this.clouds = await this.getChildModel('Cloud');
+
             for (let i = 0; i < this.eoMotors.length; i++) {
                 this.eoMotors[i].rotation.x += Math.random() * 3.14;
             }

@@ -6,15 +6,13 @@ import PostProd from './postprod';
 import SceneManager from './sceneManager';
 import SoundEngine from './soundEngine';
 
-import { 
-    Thread
-} from '@thmsdmcrt_/concurrence';
+import { Thread } from '@thmsdmcrt_/concurrence';
 
 import './utils/watch-polyfill';
 import UUID from './utils/uuid';
 
 class Engine {
-    constructor(opt = {}) {
+    constructor() {
 
         if (Log.debug) {
             this.stats = new Stats();
@@ -107,6 +105,8 @@ class Engine {
         this.maxPerformanceCycle = 5; //3 Cycles
         this.performanceCycleLength = 10; //Every 8 frames
 
+        this.backgroundPreload = true;
+
         this.requestId = undefined;
         this.hasStarted = false;
         this.isPlaying = false;
@@ -132,56 +132,56 @@ class Engine {
     }
 
     init(container) {
-        if (this.hasPostProd) {
-            this.postprod = new PostProd({
-                width: this.width,
-                height: this.height,
-                pixelDensity: this.pixelDensity,
-                camera: this.mainCamera,
-                scene: undefined,
-                renderer: this.renderer,
-                passes: {
-                    fxaa: {
-                        enabled: this.quality < 2 ? true : true
-                    },
-                    bloom: {
-                        enabled: this.quality < 3 ? false : true,
-                        options: [0.75, 1.0, 0.95]
-                    },
-                    // bloom: { enabled: false, options: [0.5, 1.0, 0.9] },
-                    filmic: {
-                        enabled: true,
-                        noise: 0.1,
-                        useStaticNoise: true,
-                        rgbSplit: this.quality < 3 ? 0.0 : 5.0,
-                        vignette: this.quality < 2 ? 0.0 : 20.0,
-                        vignetteOffset: 0.15,
-                        lut: 0.90,
-                        lutURL: '/static/img/lut-gamma.png',
-                    },
-                    // bokehdof: { enabled: this.quality < 3 ? false : true, },
-                    bokehdof: {
-                        enabled: false,
-                    },
-                    blur: {
-                        enabled: true,
-                        strength: 3.0,
-                        sharpen: this.quality < 3 ? 0.05 : 0.15,
-                        blurRgbSplit: 1.25,
-                        gain: 1.20,
+        return (async() => {
+            if (this.hasPostProd) {
+                this.postprod = await new PostProd({
+                    width: this.width,
+                    height: this.height,
+                    pixelDensity: this.pixelDensity,
+                    camera: this.mainCamera,
+                    scene: undefined,
+                    renderer: this.renderer,
+                    passes: {
+                        fxaa: {
+                            enabled: this.quality < 2 ? true : true
+                        },
+                        bloom: {
+                            enabled: this.quality < 3 ? false : true,
+                            options: [0.7, 1.0, 0.95]
+                        },
+                        // bloom: { enabled: false, options: [0.5, 1.0, 0.9] },
+                        filmic: {
+                            enabled: true,
+                            noise: 0.1,
+                            useStaticNoise: true,
+                            rgbSplit: this.quality < 3 ? 0.0 : 5.0,
+                            vignette: this.quality < 2 ? 0.0 : 20.0,
+                            vignetteOffset: 0.15,
+                            lut: 0.90,
+                            lutURL: '/static/img/lut-gamma.png',
+                        },
+                        // bokehdof: { enabled: this.quality < 3 ? false : true, },
+                        bokehdof: { enabled: false, },
+                        blur: {
+                            enabled: true,
+                            strength: 5.0,
+                            sharpen: this.quality < 3 ? 0.05 : 0.15,
+                            blurRgbSplit: 1.25,
+                            gain: 1.1,
+                        }
                     }
-                }
+                });
+            }
+
+            this.container = container;
+            await this.container.appendChild(this.renderer.domElement);
+            if (Log.debug)
+                this.container.appendChild(this.stats.dom);
+
+            this.waitNextTick().then(_ => {
+                this.containerBoundingBox = this.container.getBoundingClientRect();
             });
-        }
-
-        this.container = container;
-        this.container.appendChild(this.renderer.domElement);
-        if (Log.debug)
-            this.container.appendChild(this.stats.dom);
-
-        this.waitNextTick().then(_ => {
-            this.containerBoundingBox = this.container.getBoundingClientRect();
-        });
+        })();
     }
 
     setFixedRatio(ratio) {
@@ -314,7 +314,7 @@ class Engine {
 
                 await SceneManager.currentScene.start();
 
-                if (SceneManager.currentScene.mainCamera == undefined) return Log.push('error', this.constructor.name, 'No camera has been added or specified, please use scene.setCamera(...) function');
+                // if (SceneManager.currentScene.mainCamera == undefined) return Log.push('error', this.constructor.name, 'No camera has been added or specified, please use scene.setCamera(...) function');
 
                 this.hasStarted = true;
 
@@ -409,7 +409,7 @@ class Engine {
 
     update(time) {
         if (!SceneManager.currentScene || !SceneManager.currentScene.mainCamera || !this.isPlaying) return;
-
+        
         this.requestId = window.requestAnimationFrame(time => this.update(time))
 
         if (Log.debug)
@@ -424,7 +424,8 @@ class Engine {
             this.adaptiveRenderer(time, delta);
 
         //Check if we're loading something in background
-        SceneManager.preloadScenesCheck();
+        if (this.backgroundPreload)
+            SceneManager.preloadScenesCheck();
 
         //Update & Render Post processing effects
         if (this.hasPostProd)

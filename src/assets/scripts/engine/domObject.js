@@ -22,7 +22,8 @@ export default class DomObject {
 
         this.parent = opt.parent || null;
         if (!this.parent) {
-            Log.push('warn', this.constructor.name, `DomObject parameter "parent" is mandatory and should be a Object or Scene type`);
+            if (this.constructor.name != 'Loader')
+                Log.push('warn', this.constructor.name, `DomObject parameter "parent" is mandatory and should be a Object or Scene type`);
         } else {
             this.scene = this.parent.isScene ? this.parent : this.parent.scene;
             this.scene.addObject(this);
@@ -51,8 +52,22 @@ export default class DomObject {
     }
 
     setVisibility(bool) {
-        if (this.dom)
-            this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+        if (this.dom){
+            if(bool === true){
+                if (!this.isLoader) {
+                    Engine.waitNextTick().then(_ => {
+                        this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+                    });
+                } else {
+                    requestAnimationFrame(_ => {
+                        this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+                    });
+                }
+                
+            }else{
+                this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+            }
+        }
         this.isVisible = bool;
     }
 
@@ -60,12 +75,14 @@ export default class DomObject {
         this.isActive = bool;
         if (this.isActive) {
             if (!this._isUpdating) {
-                Engine.addToUpdate(this.uuid, this.update.bind(this));
+                if (!this.isLoader)
+                    Engine.addToUpdate(this.uuid, this.update.bind(this));
                 this._isUpdating = true;
             }
         } else {
             if (this._isUpdating) {
-                Engine.removeFromUpdate(this.uuid);
+                if (!this.isLoader)
+                    Engine.removeFromUpdate(this.uuid);
                 this._isUpdating = false;
             }
         }
@@ -81,9 +98,15 @@ export default class DomObject {
             for (let data in this.data) {
                 this.data.watch(data, (id, oldval, newval) => {
                     if (newval !== oldval) {
-                        Engine.waitNextTick().then(_ => {
-                            this.updateData(id);
-                        });
+                        if (!this.isLoader){
+                            Engine.waitNextTick().then(_ => {
+                                this.updateData(id);
+                            });
+                        }else{
+                            requestAnimationFrame(_ => {
+                                this.updateData(id);
+                            })
+                        }
                     }
                     return newval;
                 });

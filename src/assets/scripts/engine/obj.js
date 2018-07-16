@@ -26,6 +26,7 @@ export default class Obj {
         this.lights = {};
         this.hasShadows = false;
 
+        this.isStatic = false;
         this.isActive = opt.active || true;
         this.isVisible = false;
 
@@ -46,9 +47,6 @@ export default class Obj {
 
     // Init happen when the entire project is loaded
     init(opt) {
-        /*this.materials.forEach(material => {
-            material.instance.name = material.name;
-        });*/
         for (let light in this.lights) {
             this.lights[light].name = light;
         }
@@ -87,12 +85,14 @@ export default class Obj {
         this.isActive = bool;
         if (this.isActive) {
             if (!this._isUpdating) {
-                Engine.addToUpdate(this.uuid, this.update.bind(this));
+                if(!this.isStatic)
+                    Engine.addToUpdate(this.uuid, this.update.bind(this));
                 this._isUpdating = true;
             }
         } else {
             if (this._isUpdating) {
-                Engine.removeFromUpdate(this.uuid);
+                if (!this.isStatic)
+                    Engine.removeFromUpdate(this.uuid);
                 this._isUpdating = false;
             }
         }
@@ -142,6 +142,10 @@ export default class Obj {
             this.model.rotation.x += this.rotation.x;
             this.model.rotation.y += this.rotation.y;
             this.model.rotation.z += this.rotation.z;
+
+            if (this.isStatic)
+                this.model.matrixAutoUpdate = false;
+
             // Add mesh instance to scene or parent
             if (this.parent.isScene) {
                 this.scene.instance.add(this.model);
@@ -167,10 +171,11 @@ export default class Obj {
         return (async() => {
             this.setActive(this.isActive);
             // Awake children now
-            if (this.children.length > 0)
+            if (this.children.length > 0){
                 await Promise.all(this.children.map(async child => {
                     await child.awake()
                 }))
+            }
         })();
     }
 
@@ -235,6 +240,8 @@ export default class Obj {
                 if (child.isMesh || child.isSkinnedMesh) {
                     child.castShadow = this.hasShadows;
                     child.receiveShadow = true;
+                    if (this.isStatic)
+                        child.matrixAutoUpdate = false;
                     child = await updateMaterials(child, this.materials);
                 } else {
                     child = await updateLights(child, this.lights);
@@ -243,6 +250,18 @@ export default class Obj {
 
             this.model.name = this.name;
 
+        })();
+    }
+
+    getChildModel(name){
+        let models = [];
+        return (async() => {
+            await this.model.traverse((child) => {
+                if(child.name.indexOf(name) > -1){
+                    models.push(child);
+                }
+            });
+            return models;
         })();
     }
 
