@@ -5,32 +5,18 @@ import Engine from '../engine/engine';
 import Scene from '../engine/scene';
 import SceneManager from '../engine/sceneManager';
 import Sound from '../engine/sound';
-import {
-    Ease,
-    Tween
-} from '../engine/tween';
+import { Ease,Tween } from '../engine/tween';
 
 // Objects
-import {
-    Camera
-} from '../objects/default/camera.obj';
-import {
-    Cubemap
-} from '../objects/default/cubemap.obj';
-import {
-    Sky
-} from '../objects/default/sky.obj';
-import {
-    City
-} from '../objects/city.obj';
+import { Camera } from '../objects/default/camera.obj';
+import { Light } from '../objects/default/light.obj';
+import { Cubemap } from '../objects/default/cubemap.obj';
+import { Sky } from '../objects/default/sky.obj';
+import { City } from '../objects/city.obj';
 
 // Dom Objects
-import {
-    TitleDom
-} from '../objects/title.dom.obj';
-import {
-    SubtitleDom
-} from '../objects/subtitle.dom.obj';
+import { TitleDom } from '../objects/title.dom.obj';
+import { SubtitleDom } from '../objects/subtitle.dom.obj';
 
 // Create scene
 export default new Scene({
@@ -48,7 +34,7 @@ export default new Scene({
             far: 500,
         });
 
-        this.mapTarget = new THREE.AxesHelper(2);
+        this.mapTarget = new THREE.AxesHelper(5);
         this.mapTarget.position.y = 22;
         this.mapTarget.position.z = 7;
         this.mapTarget.visible = false;
@@ -65,36 +51,33 @@ export default new Scene({
         });
 
         // Ambient Light
-        let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 30.0);
-        ambiantLight.name = "Ambient Light";
-        this.instance.add(ambiantLight);
+        let ambiantLight = new Light({
+            name: 'Ambient Light',
+            parent: this,
+            type: 'ambient',
+            color: '222e56',
+            colorGround: '323b2e',
+            power: 10.0,
+        })
 
-        // Sun
-        this.sun = new THREE.DirectionalLight(0xFFF4E6, 30.0);
-        this.sun.name = "Sun";
-        this.sun.position.x = -30;
-        this.sun.position.y = 100;
-        this.sun.position.z = 30;
-        this.sun.castShadow = true;
-        this.instance.add(this.sun);
-
-        this.sun.shadow.mapSize.width = Engine.quality < 4 ? 1024 : 2048; // default
-        this.sun.shadow.mapSize.height = Engine.quality < 4 ? 1024 : 2048; // default
-        this.sun.shadow.camera.near = 1.0; // default
-        this.sun.shadow.camera.far = 150; // default
-        let size = 50.0;
-        this.sun.shadow.camera.left = -size; // default
-        this.sun.shadow.camera.right = size; // default
-        this.sun.shadow.camera.top = size; // default
-        this.sun.shadow.camera.bottom = -size; // default
-        // this.sun.shadow.bias = -0.0025;
-
+        this.sun = new Light({
+            name: 'Sun',
+            parent: this,
+            type: 'directional',
+            color: 'FFF4E6',
+            power: 9.5,
+            castShadow: true,
+            shadowMapSize: 2048,
+            shadowCameraSize: 50.0,
+            position: new THREE.Vector3(-30, 100, 30),
+        })
+        
         this.sunTarget = new THREE.Object3D();
         this.sunTarget.position.x = 12.0;
         this.sunTarget.position.y = 20;
         this.sunTarget.position.z = -30;
         this.instance.add(this.sunTarget);
-        this.sun.target = this.sunTarget;
+        this.sun.setTarget(this.sunTarget)
 
         let sky = new Sky({
             parent: this,

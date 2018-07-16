@@ -23,7 +23,7 @@ export default class Obj {
 
         this.sounds = new Map();
         this.materials = new Map();
-        this.lights = {};
+        this.lights = new Map();
         this.hasShadows = false;
 
         this.isStatic = false;
@@ -47,10 +47,6 @@ export default class Obj {
 
     // Init happen when the entire project is loaded
     init(opt) {
-        for (let light in this.lights) {
-            this.lights[light].name = light;
-        }
-
         //Add object to the parent as children, and to the scene to register it
         this.scene.addObject(this);
         this.parent.addChildren(this);
@@ -124,7 +120,7 @@ export default class Obj {
             } else {
                 //There is no model, just name it properly
                 this.model.name = this.name;
-                if (!this.isCamera)
+                if (!this.isCamera && !this.isLight)
                     this.rotation.x += Math.PI / 2; //hack inverted axis
             }
             return;
@@ -183,31 +179,30 @@ export default class Obj {
         return (async() => {
 
             const updateLights = function(child, lights) {
-                if (child.isSpotLight && !child.isPointLight && child.isDirectionalLight) return;
+                if (!child.isSpotLight && !child.isPointLight && !child.isDirectionalLight) return child;
 
                 child.decay = 2;
                 child.penumbra = 0.8;
                 child.angle /= 2.;
-
+                /*
                 if (child.isPointLight) {
                     child.distance = 5.0;
-                }
+                }*/
                 //Overwrite lights
-                for (let light in lights) {
-                    if (child.name == light) {
-                        child.color = lights[light].color;
-                        child.intensity = lights[light].intensity;
-                        child.power = lights[light].power;
-                        child.castShadow = lights[light].castShadow;
-                        child.visible = lights[light].visible;
+                lights.forEach(light => {
+                    if (light.name == child.name) {
+                        child.color = light.instance.color;
+                        child.intensity = light.instance.intensity;
+                        child.power = light.instance.power;
+                        child.castShadow = light.instance.castShadow;
+                        child.visible = light.instance.visible;
                         if (child.isPointLight) {
-                            child.distance = lights[light].distance;
+                            child.distance = light.instance.distance;
                         }
-                        lights[light] = child;
-                        child = lights[light];
+                        light.instance = child;
+                        child = light.instance;
                     }
-                }
-
+                });
                 return child;
             }
 

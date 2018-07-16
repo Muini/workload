@@ -89,7 +89,7 @@ class Engine {
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
         // this.renderer.toneMapping = THREE.CineonToneMapping; //THREE.ACESToneMapping
         this.renderer.toneMappingExposure = Math.pow(0.68, 4.5);
-        this.renderer.physicallyCorrectLights = true;
+        this.renderer.physicallyCorrectLights = false;
         this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
@@ -154,7 +154,7 @@ class Engine {
                             enabled: true,
                             noise: 0.1,
                             useStaticNoise: true,
-                            rgbSplit: this.quality < 3 ? 0.0 : 5.0,
+                            rgbSplit: this.quality < 2 ? 0.0 : 5.0,
                             vignette: this.quality < 2 ? 0.0 : 20.0,
                             vignetteOffset: 0.15,
                             lut: 0.90,

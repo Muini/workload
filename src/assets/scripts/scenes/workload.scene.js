@@ -7,6 +7,7 @@ import { Ease, Tween } from '../engine/tween';
 
 // Objects
 import { Camera } from '../objects/default/camera.obj';
+import { Light } from '../objects/default/light.obj';
 import { Cubemap } from '../objects/default/cubemap.obj';
 import { Worker } from '../objects/worker.obj';
 
@@ -57,9 +58,14 @@ export default new Scene({
         this.instance.add(plane);
 
         // Ambient Light
-        let ambiantLight = new THREE.HemisphereLight(0x222e56, 0x323b2e, 15);
-        ambiantLight.name = "Ambient Light";
-        this.instance.add(ambiantLight);
+        let ambiantLight = new Light({
+            name: 'Ambient Light',
+            parent: this,
+            type: 'ambient',
+            color: '222e56',
+            colorGround: '323b2e',
+            power: 5.0,
+        })
 
         // Test Worker
         this.worker = new Worker({ parent: this });

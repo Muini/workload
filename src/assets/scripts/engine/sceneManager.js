@@ -42,7 +42,7 @@ class SceneManager {
             //TODO: reject setScene
             if (this.scenes.get(sceneName) === undefined) return Log.push('error', this.constructor.name, `Scene ${sceneName} is not registered`);
             this.currentScene = this.scenes.get(sceneName);
-            if (window.DEBUG)
+            if (Log.debug)
                 window.scene = this.currentScene.instance;
             if (this.currentScene.hasLoaded) {
                 // If the scene is already loaded, start it

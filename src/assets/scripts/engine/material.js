@@ -36,45 +36,19 @@ export default class Material {
                 dithering: false,
                 fog: this.params.fog,
             }, {
-                diffuse: {
-                    value: new THREE.Color().setHex('0x' + this.params.color)
-                },
-                map: {
-                    value: this.params.map
-                },
-                roughness: {
-                    value: this.params.roughness
-                },
-                roughnessMap: {
-                    value: this.params.roughnessMap
-                },
-                metalness: {
-                    value: this.params.metalness
-                },
-                metalnessMap: {
-                    value: this.params.metalnessMap
-                },
-                bumpMap: {
-                    value: this.params.bumpMap
-                },
-                bumpScale: {
-                    value: this.params.bumpScale
-                },
-                emissive: {
-                    value: new THREE.Color().setHex('0x' + this.params.emissive)
-                },
-                emissiveIntensity: {
-                    value: this.params.emissiveIntensity
-                },
-                envMapIntensity: {
-                    value: 6.
-                },
-                swayBlend: {
-                    value: this.params.sway
-                },
-                windForce: {
-                    value: new THREE.Vector3(25, -15)
-                },
+                diffuse: { value: new THREE.Color().setHex('0x' + this.params.color) },
+                map: { value: this.params.map },
+                roughness: { value: this.params.roughness },
+                roughnessMap: { value: this.params.roughnessMap },
+                metalness: { value: this.params.metalness },
+                metalnessMap: { value: this.params.metalnessMap },
+                bumpMap: { value: this.params.bumpMap },
+                bumpScale: { value: this.params.bumpScale },
+                emissive: { value: new THREE.Color().setHex('0x' + this.params.emissive) },
+                emissiveIntensity: { value: this.params.emissiveIntensity },
+                envMapIntensity: { value: 6. },
+                swayBlend: { value: this.params.sway },
+                windForce: { value: new THREE.Vector3(25, -15) },
             });
         } else {
             this.instance = new THREE.MeshStandardMaterial({

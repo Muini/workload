@@ -6,6 +6,7 @@ import Material from '../engine/material';
 import Sound from '../engine/sound';
 import Obj from '../engine/obj';
 
+import { Light } from '../objects/default/light.obj';
 import { PaperBlock } from './paperBlock.obj';
 import { CashPile } from './cashPile.obj';
 
@@ -27,21 +28,34 @@ export class Worker extends Obj {
         this.addMaterial('Bonhomme');
 
         //Init Lights
-        this.lights['Desk_Light'] = new THREE.PointLight(0xffa756, 1, 10);
-        this.lights['Desk_Light'].decay = 2;
-        this.lights['Desk_Light'].power = 200;
-        this.lights['Desk_Light'].castShadow = false;
+        new Light({
+            name: 'Desk_Light',
+            type: 'point',
+            parent: this,
+            color: 'ff9356',
+            power: 200,
+            castShadow: false,
+        })
 
-        this.lights['Desk_Screen_Light'] = new THREE.PointLight(0xB1C0E7, 1, 10);
-        this.lights['Desk_Screen_Light'].decay = 2;
-        this.lights['Desk_Screen_Light'].power = 150;
-        this.lights['Desk_Screen_Light'].castShadow = false;
+        new Light({
+            name: 'Desk_Screen_Light',
+            type: 'point',
+            parent: this,
+            color: 'B1C0E7',
+            power: 100,
+            distance: 5.0,
+            castShadow: false,
+        })
 
-        this.lights['Desk_Spot'] = new THREE.SpotLight(0xDFEEFF);
-        this.lights['Desk_Spot'].decay = 2;
-        this.lights['Desk_Spot'].power = 30;
-        this.lights['Desk_Spot'].castShadow = true;
-
+        new Light({
+            name: 'Desk_Spot',
+            type: 'spot',
+            parent: this,
+            color: 'DFEEFF',
+            power: 10,
+            castShadow: true,
+        })
+        
         super.init();
 
         this.timeElapsed = 0;
@@ -77,12 +91,11 @@ export class Worker extends Obj {
         return (async() => {
             await super.created();
 
-            this.lights['Desk_Spot'].target = this.model;
+            this.lights.get('Desk_Spot').setTarget(this.model);
             this.materials.get('Screen').params.emissiveIntensity = 0.0;
-            this.lights['Desk_Screen_Light'].power = 0;
+            this.lights.get('Desk_Screen_Light').setPower(0);
 
             this.bonhomme = await this.getChildModel('Bonhomme');
-            this.bonhomme.visible = false;
 
         })();
     }
@@ -90,6 +103,7 @@ export class Worker extends Obj {
     awake() {
         return (async () => {
             await super.awake();
+            this.bonhomme.visible = false;
         })();
     }
 
@@ -99,10 +113,8 @@ export class Worker extends Obj {
         this.animator.stop();
         this.materials.get('Screen').params.emissive = 'ff0000';
         this.materials.get('Screen').params.emissiveIntensity = 5.0;
-        this.lights['Desk_Screen_Light'].color.r = .75;
-        this.lights['Desk_Screen_Light'].color.g = .01;
-        this.lights['Desk_Screen_Light'].color.b = 0;
-        this.lights['Desk_Light'].power = 0;
+        this.lights.get('Desk_Screen_Light').setColor('fa0200');
+        this.lights.get('Desk_Light').setPower(0);
         this.isDead = true;
     }
 
@@ -121,7 +133,7 @@ export class Worker extends Obj {
         this.sounds.get('working').stop();
         this.isWorking = false;
         this.materials.get('Screen').params.emissiveIntensity = 0.0;
-        this.lights['Desk_Screen_Light'].power = 0;
+        this.lights.get('Desk_Screen_Light').setPower(0);
     }
 
     addWork(number){
@@ -137,7 +149,7 @@ export class Worker extends Obj {
 
         if (this.isDead) {
             this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(8, 9);
-            this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
+            this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
             return;
         }
 
@@ -159,7 +171,7 @@ export class Worker extends Obj {
 
         if(this.isWorking){
             this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(5, 6);
-            this.lights['Desk_Screen_Light'].power = THREE.Math.randFloat(140, 160);
+            this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
         }
     }
 
