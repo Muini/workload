@@ -160,8 +160,8 @@ class Engine {
                             lut: 0.90,
                             lutURL: '/static/img/lut-gamma.png',
                         },
-                        // bokehdof: { enabled: this.quality < 3 ? false : true, },
-                        bokehdof: { enabled: false, },
+                        bokehdof: { enabled: this.quality < 3 ? false : true, },
+                        // bokehdof: { enabled: false, },
                         blur: {
                             enabled: true,
                             strength: 5.0,

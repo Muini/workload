@@ -29,7 +29,7 @@ export default new Scene({
             aperture: 1.0,
         });
         this.camera.model.rotation.y = (45 / 180) * 3.14;
-        this.camera.instance.rotation.x = -(30 / 180) * 3.14;
+        this.camera.instance.rotation.x = -(27.5 / 180) * 3.14;
 
         let cubemap = new Cubemap({
             parent: this,
@@ -67,6 +67,8 @@ export default new Scene({
             power: 5.0,
         })
 
+        this.instance.fog = new THREE.FogExp2(0x30364c, 0.005);
+
         // Test Worker
         this.worker = new Worker({ parent: this });
 
@@ -81,21 +83,22 @@ export default new Scene({
 
     },
     onStart: async function() {
+        await Engine.wait(1000)
+        console.log(this.camera.params.aperture)
 
-        // this.testdom.setVisibility(false);
+        this.testdom.setVisibility(false);
 
-        let tween = new Tween({ x:30, y:30, z:30, aperture: 1.0 })
-            .to({ x:10, y:11, z:10, aperture: 3.5 }, 2000)
+        let tween = new Tween({ x:30, y:30, z:30, aperture: 0.2 })
+            .to({ x:10, y:11, z:10, aperture: 2.8 }, 2000)
             // .repeat(Infinity)
             // .yoyo(true)
-            .ease(Ease.Expo.Out)
+            .ease(Ease.Sine.Out)
             .onUpdate((props, progress) => {
                 this.camera.model.position.x = props.x;
                 this.camera.model.position.y = props.y;
                 this.camera.model.position.z = props.z;
-                this.camera.aperture = props.aperture;
-                if (Engine.postprod && Engine.postprod.bokehPass)
-                    Engine.postprod.bokehPass.uniforms['aperture'].value = this.camera.aperture;
+                this.camera.params.aperture = props.aperture;
+                console.log(this.camera.params.aperture, props.aperture)
             })
             .onComplete(async _ => {
                 this.testdom.setVisibility(true);

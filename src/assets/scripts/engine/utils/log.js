@@ -6,6 +6,19 @@ class Log {
 
         this.logsAtScreen = new Map();
 
+        this._styles = {
+            'color': 'white',
+            'font-size': '10px',
+            'padding': '.5em .5em .5em 1em',
+            'background': 'rgba(0,0,0,0.8)',
+            'position': 'fixed',
+            'top': '1em',
+            'right': '1em',
+            'border-radius': '.5em',
+            'opacity': '0',
+            'transition': `transform 325ms ease-out, opacity 325ms linear`,
+        }
+
         this._STAYTIME = 10000; //ms
     }
 
@@ -67,16 +80,10 @@ class Log {
         return (async() => {
         
             let elem = document.createElement('p');
-            elem.style['color'] = 'white';
-            elem.style['font-size'] = '10px';
-            elem.style['padding'] = '.5em .5em .5em 1em';
-            elem.style['background'] = 'rgba(0,0,0,0.8)';
-            elem.style['position'] = 'fixed';
-            elem.style['top'] = '1em';
-            elem.style['right'] = '1em';
-            elem.style['border-radius'] = '.5em';
-            elem.style['opacity'] = '0';
-            elem.style['transition'] = `transform 325ms ease-out, opacity 325ms linear`;
+
+            for(const style in this._styles){
+                elem.style[style] = this._styles[style];
+            }
 
             elem.innerHTML = `${log.message} <span style="background:${this.selectColor(log.type)};padding:.15em .5em">${log.class}</span>`;
 

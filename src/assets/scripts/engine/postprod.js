@@ -79,18 +79,14 @@ export default class PostProd {
             this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
             this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
             // this.depthComposer.reset();
-            if (Engine.quality < 3) {
-                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 2 ? 8 : 12;
-            } else {
-                THREE.BokehShader.defines.ITERATIONS = Engine.quality < 4 ? 16 : 24;
-            }
+            THREE.BokehShader.defines.ITERATIONS = Engine.quality < 3 ? Engine.quality * 4 : Engine.quality * 6;
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";
-            this.bokehPass.uniforms['nearClip'].value = this.camera ? this.camera.near : 1.0;
-            this.bokehPass.uniforms['farClip'].value = this.camera ? this.camera.far : 100.0;
-            this.bokehPass.uniforms['focalLength'].value = this.camera ? this.camera.getFocalLength() : 30.0;
-            this.bokehPass.uniforms['focusDistance'].value = this.camera ? this.camera.focus : 25.0;
-            this.bokehPass.uniforms['aperture'].value = this.camera ? this.camera.aperture : 1.2;
+            this.bokehPass.uniforms['near'].value = this.camera ? this.camera.near : 1.0;
+            this.bokehPass.uniforms['far'].value = this.camera ? this.camera.far : 1000.0;
+            this.bokehPass.uniforms['focalLength'].value = this.camera ? this.camera.getFocalLength() : 50.0;
+            this.bokehPass.uniforms['focus'].value = this.camera ? this.camera.focus : 100.0;
+            this.bokehPass.uniforms['aperture'].value = this.camera ? this.camera.aperture : 2.8;
             this.bokehPass.uniforms['maxblur'].value = 1.25;
             this.bokehPass.uniforms['tDepth'].value = this.depthRenderTarget.depthTexture;
         }
@@ -138,11 +134,7 @@ export default class PostProd {
 
         // Blur & Sharpen
         if (this.passes.blur.enabled) {
-            if (Engine.quality < 3) {
-                THREE.BlurSharpenShader.defines.SAMPLE = Engine.quality < 2 ? 6 : 8;
-            } else {
-                THREE.BlurSharpenShader.defines.SAMPLE = Engine.quality < 4 ? 10 : 12;
-            }
+            THREE.BlurSharpenShader.defines.SAMPLE = 6 + (Engine.quality * 2);
             this.blurDomElems = [];
             this.blurPos = [
                 new THREE.Vector4(0.0, 0.0, 0.0, 0.0),
@@ -207,11 +199,6 @@ export default class PostProd {
 
         if (this.passes.bokehdof.enabled) {
             this.composer.reset();
-            this.bokehPass.uniforms['nearClip'].value = this.camera.near;
-            this.bokehPass.uniforms['farClip'].value = this.camera.far;
-            this.bokehPass.uniforms['focalLength'].value = this.camera.getFocalLength();
-            this.bokehPass.uniforms['focusDistance'].value = this.camera.focus || 25.0;
-            this.bokehPass.uniforms['aperture'].value = this.camera.aperture || 1.2;
         }
 
         this.renderPassScene.scene = this.scene;

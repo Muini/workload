@@ -270,7 +270,7 @@ export default class Obj {
                 material.instance.envMap = this.scene.envMap;
             }
             if (material.isSwayShader) {
-                material.instance.uniforms['time'].value = time;
+                material.instance.uniforms['time'].value += delta;
             }
         })
     }

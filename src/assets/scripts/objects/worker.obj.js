@@ -112,7 +112,7 @@ export class Worker extends Obj {
             this.stopWorking();
         this.animator.stop();
         this.materials.get('Screen').params.emissive = 'ff0000';
-        this.materials.get('Screen').params.emissiveIntensity = 5.0;
+        this.materials.get('Screen').params.emissiveIntensity = 6.0;
         this.lights.get('Desk_Screen_Light').setColor('fa0200');
         this.lights.get('Desk_Light').setPower(0);
         this.isDead = true;
@@ -170,7 +170,7 @@ export class Worker extends Obj {
         }
 
         if(this.isWorking){
-            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(5, 6);
+            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(6, 7);
             this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
         }
     }

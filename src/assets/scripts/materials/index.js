@@ -8,6 +8,8 @@ import './glass.mat';
 import './glass2.mat';
 import './clouds.mat';
 import './leafs.mat';
+import './mountain.mat';
+import './snow.mat';
 
 import './money.mat';
 import './paper.mat';

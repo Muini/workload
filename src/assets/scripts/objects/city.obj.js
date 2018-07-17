@@ -4,8 +4,6 @@ import Engine from '../engine/engine';
 
 import Obj from '../engine/obj';
 
-import SwayShader from '../../shaders/sway/SwayShader';
-
 export class City extends Obj {
     constructor(opt = {}) {
         super(opt);
@@ -19,16 +17,18 @@ export class City extends Obj {
 
         // Init materials to be overwrite by name
 
-        this.addMaterial('Grass', true);
-        this.addMaterial('Floor', true);
-        this.addMaterial('Concrete', true);
-        this.addMaterial('Roof', true);
-        this.addMaterial('Metal', true);
-        this.addMaterial('White Metal', true);
-        this.addMaterial('Glass', true);
-        this.addMaterial('Glass2', true);
-        this.addMaterial('Clouds', true);
-        this.addMaterial('Leafs', true);
+        this.addMaterial('Grass');
+        this.addMaterial('Floor');
+        this.addMaterial('Concrete');
+        this.addMaterial('Roof');
+        this.addMaterial('Metal');
+        this.addMaterial('White Metal');
+        this.addMaterial('Glass');
+        this.addMaterial('Glass2');
+        this.addMaterial('Clouds');
+        this.addMaterial('Leafs');
+        this.addMaterial('Mountain');
+        this.addMaterial('Snow');
 
         super.init();
     }

@@ -17,11 +17,11 @@ THREE.BokehShader = {
 
         "tDiffuse": { value: null },
         "tDepth": { value: null },
-        "nearClip": { value: 1.0 },
-        "farClip": { value: 1000.0 },
+        "near": { value: 1.0 },
+        "far": { value: 1000.0 },
         "focalLength": { value: 50.0 },
-        "focusDistance": { value: 10.0 },
-        "aperture": { value: 1.4 },
+        "focus": { value: 100.0 },
+        "aperture": { value: 2.8 },
         "maxblur": { value: 1.0 },
 
     },

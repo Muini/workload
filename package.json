@@ -5,7 +5,7 @@
     "private": true,
     "main": "index.js",
     "scripts": {
-        "dev": "parcel -p 5000 --no-hmr ./index.html",
+        "dev": "parcel -p 5000 --no-cache --no-hmr ./index.html",
         "build": "parcel build ./index.html --public-url ./ "
     },
     "repository": {

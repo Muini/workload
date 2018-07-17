@@ -5,11 +5,11 @@ uniform sampler2D tDiffuse;
 uniform highp sampler2D tDepth;
 
 
-uniform float nearClip;
-uniform float farClip;
+uniform float near;
+uniform float far;
 
 uniform float focalLength;
-uniform float focusDistance;
+uniform float focus;
 uniform float aperture; // aperture - bigger values for shallower depth of field
 uniform float maxblur; // max blur amount
 
@@ -26,7 +26,7 @@ uniform float maxblur; // max blur amount
 // #define ITERATIONS 64
 
 #define DISTORTION_ANAMORPHIC	0.0;
-#define DISTORTION_BARREL       0.35;
+#define DISTORTION_BARREL       0.5;
 
 // Helpers-----------------------------------------------------------------------------------
 vec2 rotate(vec2 vector, float angle)
@@ -43,9 +43,9 @@ mat2 rotMatrix(float angle)
 }
 
 float readDepth( const in vec2 coord ) {
-        float cameraFarPlusNear = farClip + nearClip;
-        float cameraFarMinusNear = farClip - nearClip;
-        float cameraCoef = 2.0 * nearClip;
+        float cameraFarPlusNear = far + near;
+        float cameraFarMinusNear = far - near;
+        float cameraCoef = 2.0 * near;
 
         return cameraCoef / ( cameraFarPlusNear - texture2D(tDepth, coord ).r * cameraFarMinusNear );
 }
@@ -53,7 +53,7 @@ float readDepth( const in vec2 coord ) {
 // Additions by SolarLiner ------------------------------------------------------------------
 vec2 GetDistOffset(vec2 uv, vec2 pxoffset)
 {
-        vec2 tocenter = uv.xy+vec2(-0.5,0.5);
+        vec2 tocenter = uv.xy+vec2(-0.5,-0.5);
         vec3 prep = normalize(vec3(tocenter.y, -tocenter.x, 0.0));
 
         float angle = length(tocenter.xy)*2.221*DISTORTION_BARREL;
@@ -67,15 +67,15 @@ vec2 GetDistOffset(vec2 uv, vec2 pxoffset)
 }
 
 float getFocus(float blur, float depth, float mult){
-        float edge = 0.00025*mult*depth; //distance based edge smoothing
-        float focus = clamp(smoothstep(0.0,edge,blur),0.0,1.0);
-        return focus;
+        float edge = 0.5*mult*depth; //distance based edge smoothing
+        float focusColor = clamp(smoothstep(0.0,edge,blur),0.0,1.0);
+        return focusColor;
 }
 
 vec3 debugFocus(vec3 col, float blur, float depth) {
-        float focus = getFocus(blur, depth, 3.0);
-        col = mix(col,vec3(0.0,0.5,1.0),(focus)*0.25);
-        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focus)*0.5);
+        float focusColor = getFocus(blur, depth, 3.0);
+        col = mix(col,vec3(0.0,0.5,1.0),(focusColor)*0.1);
+        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focusColor)*0.05);
         return col;
 }
 
@@ -84,24 +84,24 @@ float Remap (float value, float from1, float to1, float from2, float to2) {
 }
 
 //-------------------------------------------------------------------------------------------
-vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount, float pixelDepth)
+vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float highlightBokehAmount, float pixelDepth)
 {
         vec3 acc = vec3(0.0);
         vec3 div = vec3(0.0);
         float r = 1.0;
-        vec2 vangle = vec2(0.0,radius / float(ITERATIONS) * 128.0); // Start angle
+        vec2 vangle = vec2(0.0,radius / 1024.0); // Start angle
         mat2 rot = rotMatrix(GOLDEN_ANGLE);
     
-        amount += radius*500.0;
+        highlightBokehAmount *= radius*100.0;
 
         //Background        
         for (int j = 0; j < ITERATIONS; j++)
         {
-                if(float(j) > float(ITERATIONS) * (1.0 - radius)) break;
+                if(float(j) > float(ITERATIONS) * radius) break; //Optimisation: More sample the blurier the object is
                 r += 1. / r;
                 vangle = rot * vangle;
                 // (r-1.0) here is the equivalent to sqrt(0, 1, 2, 3...)
-                vec2 pos = GetDistOffset(uv, uv*(r-1.)*vangle);
+                vec2 pos = GetDistOffset(uv, (radius / 2.0)*(r-1.)*vangle);
                 
                 float tapDepth = readDepth(uv + pos);
                 float leakingDepthThreshold = pixelDepth * pow(radius, 0.5) * 15.0;
@@ -109,11 +109,13 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float amount, float pixelDepth)
                         continue;
                 }
                 vec3 col = vec3(0.0);
-                col.x = texture2D(tex, uv + pos - vec2(0.5 * radius, 0.5 * radius)).x;
-                col.y = texture2D(tex, uv + pos).y;
-                col.z = texture2D(tex, uv + pos + vec2(0.5 * radius, 0.5 * radius)).z;
+                // col = texture2D(tex, uv + pos).rgb;
+                col.r = texture2D(tex, uv + pos + vec2(0.2 * pos.y)).r;
+                col.g = texture2D(tex, uv + pos).g;
+                col.b = texture2D(tex, uv + pos - vec2(0.2 * pos.y)).b;
+
                 // col = mix(vec3(0.0), col, vec3(pixelDepth));
-                vec3 bokeh = pow(col, vec3(9.0)) * amount+.4;
+                vec3 bokeh = pow(col, vec3(9.0)) * highlightBokehAmount +.4;
                 acc += col * bokeh;
                 div += bokeh;
         }
@@ -127,23 +129,10 @@ void main() {
 
         float CoC = 0.029; //circle of confusion size in mm (35mm film = 0.029mm)
 
-        // // Autofocus
-        float fDepth = 1.0;
-        // vec2 focusCoords = vec2(0.5,0.5);
-        // fDepth = readDepth(focusCoords);
+        float fDepth = ((focus - near) / far) * 2.0;
 
-        // No Autofocus
-        fDepth = ((focusDistance - nearClip) / farClip) * 2.0;
-        
-        float f = focalLength; // focal length in mm
-        float d = fDepth * 1000.0; // focal plane in mm
-        float o = depth * 1000.0; // depth in mm
+        float blur = clamp((abs(depth - fDepth) / aperture * CoC * 10.0) * focalLength, -maxblur, maxblur);
 
-        float a = (o*f)/(o-f);
-        float b = (d*f)/(d-f);
-        float c = (d-f)/(d*aperture*CoC*50000.0);
-
-        float blur = abs(a-b)*c;
         /*
         float layerSeparatorSharpness = 1.0;
         float focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness));
@@ -153,23 +142,25 @@ void main() {
         backgroundDepth -= focusDepth;
         focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness + 0.5));
         */
-        blur = clamp(blur,0.0,1.0);
+        // blur = Remap(blur, 0.0, 1.0, 0.0, 1.0);
+        blur = clamp(blur,0.0, maxblur);
         
-        vec4 col = vec4(0.0);
-        
-        float amount = 40.0;
-        
-        // vec4 backgroudColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
-        // vec4 foregroudColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
-        vec4 focusColor = vec4(Bokeh(tDiffuse, vUv, blur, amount, depth), 1.0);
+        // vec4 backgroudColor = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
+        // vec4 foregroudColor = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
+        if(blur < 0.02){
+                gl_FragColor = texture2D(tDiffuse, vUv);
+        }else{
+                float highlightBokehAmount = 40.0;
+                vec4 bokehDOF = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
+                // bokehDOF.rgb = debugFocus(bokehDOF.rgb, blur, depth);
+                gl_FragColor = bokehDOF;
+        }
 
         // gl_FragColor = vec4(focusDepth, foregroundDepth, backgroundDepth, 1.0);
 
-        // focusColor.rgb = debugFocus(focusColor.rgb, blur, depth);
 
-        gl_FragColor = focusColor;
 
         // float focus = 1.0 - getFocus(blur, depth, 3.0);
-        // gl_FragColor = vec4(depth, depth, depth, 1.0);
+        // gl_FragColor = vec4(1.0 - blur, 1.0 - blur, 1.0 - blur, 1.0);
 
 }

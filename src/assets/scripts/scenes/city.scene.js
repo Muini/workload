@@ -26,12 +26,12 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(0, 30, 62),
+            position: new THREE.Vector3(0, 40, 62),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 45,
-            aperture: 10.0,
-            focus: 55.0, //76.0 //32.0
-            far: 500,
+            aperture: 6.0,
+            focus: 50.0,
+            far: 900,
         });
 
         this.mapTarget = new THREE.AxesHelper(5);
@@ -39,6 +39,8 @@ export default new Scene({
         this.mapTarget.position.z = 7;
         this.mapTarget.visible = false;
         this.instance.add(this.mapTarget);
+
+        this.camera.setTargetMAP(this.mapTarget);
 
         let cubemap = new Cubemap({
             parent: this,
@@ -65,7 +67,7 @@ export default new Scene({
             parent: this,
             type: 'directional',
             color: 'FFF4E6',
-            power: 9.5,
+            power: 8.0,
             castShadow: true,
             shadowMapSize: 2048,
             shadowCameraSize: 50.0,
@@ -89,7 +91,7 @@ export default new Scene({
             mieDirectionalG: 0.75
         })
 
-        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.0075);
+        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.0025);
 
         this.city = new City({
             parent: this
@@ -111,21 +113,41 @@ export default new Scene({
         });
 
     },
-    onStart: async function() {
+    onStart: async function () {
         
         this.title.setVisibility(false)
         this.subtitle.setVisibility(false)
 
         this.citySound.play(1000);
 
+        console.log(this.camera, Engine.postprod.bokehPass.uniforms)
+
         let tween = new Tween({
-                y: 30,
+                y: 45,
+            })
+            .to({
+                y: 24,
+            }, 6000)
+            // .repeat(Infinity)
+            // .yoyo(true)
+            .ease(Ease.Sine.InOut)
+            .onUpdate((props, progress) => {
+                // console.log('update', props.y, props.z, progress)
+                this.camera.model.position.y = props.y;
+            })
+            .onComplete(_ => {
+                // console.log('complete')
+                tween2.start();
+            });
+
+        let tween2 = new Tween({
+                y: 24,
                 z: 62
             })
             .to({
-                y: 22,
+                y: 20,
                 z: 10
-            }, 6000)
+            }, 3000)
             // .repeat(Infinity)
             // .yoyo(true)
             .ease(Ease.Expo.In)
@@ -133,22 +155,19 @@ export default new Scene({
                 // console.log('update', props.y, props.z, progress)
                 this.camera.model.position.y = props.y;
                 this.camera.model.position.z = props.z;
-                this.camera.focus = this.mapTarget.position.distanceTo(this.camera.model.position);
-                if (Engine.postprod && Engine.postprod.bokehPass)
-                    Engine.postprod.bokehPass.uniforms['focusDistance'].value = this.camera.focus;
             })
             .onComplete(_ => {
                 // console.log('complete')
                 SceneManager.next();
             });
 
-        await Engine.wait(2000);
+        // await Engine.wait(1000);
         tween.start();
         await Engine.wait(1000);
         this.title.setVisibility(true);
-        await Engine.wait(1000);
+        await Engine.wait(2000);
         this.subtitle.setVisibility(true);
-        await Engine.wait(3000);
+        await Engine.wait(4000);
         this.title.setVisibility(false);
         this.subtitle.setVisibility(false);
 
