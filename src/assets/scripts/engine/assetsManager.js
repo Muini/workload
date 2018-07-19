@@ -56,6 +56,7 @@ class AssetsManager {
         this.assetsToLoad = 0;
         this.assetsLoaded = 0;
 
+        // TODO: Async everything
         for (let modelName in Assets[sceneName].models) {
             if (!this.assets[modelName].isLoaded) {
                 this.assetsToLoad++;
@@ -74,6 +75,7 @@ class AssetsManager {
                 );
             }
         }
+        // TODO: sound loading
         for (let textureName in Assets[sceneName].textures) {
             if (!this.assets[textureName].isLoaded) {
                 this.assetsToLoad++;
@@ -89,7 +91,7 @@ class AssetsManager {
     updateLoader() {
         this.assetsLoaded++;
         Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
-        Log.push('info', this.constructor.name, `${this.assetsLoaded}/${this.assetsToLoad} assets loaded`);
+        Log.push('info', this.constructor.name, `c:LightGreen{${this.assetsLoaded}/${this.assetsToLoad}} assets loaded`);
         if (this.assetsLoaded >= this.assetsToLoad) {
             this.onSceneLoaded();
         }

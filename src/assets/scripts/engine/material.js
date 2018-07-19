@@ -45,6 +45,8 @@ export default class Material {
             fog: this.params.fog,
         });
 
+        // TODO: Add ACES Tonemapping
+
         if (this.isSwayShader) {
             this.instance.onBeforeCompile = (shader) => {
 

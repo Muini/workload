@@ -22,14 +22,14 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(30, 30, 30),
+            position: new THREE.Vector3(50, 45, 50),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 50,
-            focus: 16.0,
-            aperture: 1.0,
+            focus: 42.0, //42
+            aperture: 1.2,
         });
         this.camera.model.rotation.y = (45 / 180) * 3.14;
-        this.camera.instance.rotation.x = -(27.5 / 180) * 3.14;
+        this.camera.instance.rotation.x = -(30 / 180) * 3.14;
 
         let cubemap = new Cubemap({
             parent: this,
@@ -67,7 +67,7 @@ export default new Scene({
             power: 5.0,
         })
 
-        this.instance.fog = new THREE.FogExp2(0x30364c, 0.005);
+        this.instance.fog = new THREE.FogExp2(0x30364c, 0.001);
 
         // Test Worker
         this.worker = new Worker({ parent: this });
@@ -83,13 +83,12 @@ export default new Scene({
 
     },
     onStart: async function() {
-        await Engine.wait(1000)
-        console.log(this.camera.params.aperture)
+        // await Engine.wait(1000)
 
         this.testdom.setVisibility(false);
 
-        let tween = new Tween({ x:30, y:30, z:30, aperture: 0.2 })
-            .to({ x:10, y:11, z:10, aperture: 2.8 }, 2000)
+        let tween = new Tween({ x:50, y:45, z:50, aperture: 1.2 })
+            .to({ x:25, y:26, z:25, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
             // .yoyo(true)
             .ease(Ease.Sine.Out)
@@ -98,7 +97,6 @@ export default new Scene({
                 this.camera.model.position.y = props.y;
                 this.camera.model.position.z = props.z;
                 this.camera.params.aperture = props.aperture;
-                console.log(this.camera.params.aperture, props.aperture)
             })
             .onComplete(async _ => {
                 this.testdom.setVisibility(true);

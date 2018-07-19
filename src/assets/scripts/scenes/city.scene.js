@@ -26,10 +26,10 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(0, 40, 62),
+            position: new THREE.Vector3(0, 45, 62),
             rotation: new THREE.Vector3(0, 0, 0),
-            focalLength: 45,
-            aperture: 6.0,
+            focalLength: 25,
+            aperture: 22.0,
             focus: 50.0,
             far: 900,
         });
@@ -120,8 +120,6 @@ export default new Scene({
 
         this.citySound.play(1000);
 
-        console.log(this.camera, Engine.postprod.bokehPass.uniforms)
-
         let tween = new Tween({
                 y: 45,
             })
@@ -161,7 +159,7 @@ export default new Scene({
                 SceneManager.next();
             });
 
-        // await Engine.wait(1000);
+        await Engine.wait(1000);
         tween.start();
         await Engine.wait(1000);
         this.title.setVisibility(true);

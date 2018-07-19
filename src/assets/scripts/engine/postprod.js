@@ -79,7 +79,7 @@ export default class PostProd {
             this.depthRenderTarget.depthTexture.type = THREE.UnsignedShortType;
             this.depthComposer = new THREE.EffectComposer(this.renderer, this.depthRenderTarget);
             // this.depthComposer.reset();
-            THREE.BokehShader.defines.ITERATIONS = Engine.quality < 3 ? Engine.quality * 4 : Engine.quality * 6;
+            THREE.BokehShader.defines.ITERATIONS = Engine.quality < 3 ? Engine.quality * 3 : Engine.quality * 4;
             this.bokehPass = new THREE.ShaderPass(THREE.BokehShader)
             this.bokehPass.name = "Bokeh DOF";
             this.bokehPass.uniforms['near'].value = this.camera ? this.camera.near : 1.0;
@@ -97,6 +97,8 @@ export default class PostProd {
             this.FXAAPass.name = "FXAA";
             this.FXAAPass.uniforms['resolution'].value = new THREE.Vector2(1 / this.width, 1 / this.height);
         }
+
+        // TODO: Implement TAA
 
         //Bloom
         if (this.passes.bloom.enabled) {
@@ -133,6 +135,7 @@ export default class PostProd {
         }
 
         // Blur & Sharpen
+        // TODO: Merge Filmic shader & Blur & Sharpen in one pass
         if (this.passes.blur.enabled) {
             THREE.BlurSharpenShader.defines.SAMPLE = 6 + (Engine.quality * 2);
             this.blurDomElems = [];

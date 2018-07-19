@@ -6,6 +6,7 @@ import AssetsManager from './assetsManager';
 import MaterialManager from './materialManager';
 import Animator from './animator';
 
+// TODO: Obj class lighter & upper level class for model based object
 export default class Obj {
     constructor(opt = {
         parent,
@@ -258,6 +259,14 @@ export default class Obj {
             });
             return models;
         })();
+    }
+
+    findObjectByName(name){
+        // TODO: findObjectByName(name)
+    }
+
+    findObjectById(uuid){
+        // TODO: findObjectById(uuid)
     }
 
     update(time, delta) {

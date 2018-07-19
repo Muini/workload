@@ -75,7 +75,7 @@ float getFocus(float blur, float depth, float mult){
 vec3 debugFocus(vec3 col, float blur, float depth) {
         float focusColor = getFocus(blur, depth, 3.0);
         col = mix(col,vec3(0.0,0.5,1.0),(focusColor)*0.1);
-        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focusColor)*0.05);
+        col = mix(col,vec3(1.0,0.2,0.2),(1.0-focusColor)*0.2);
         return col;
 }
 
@@ -89,7 +89,7 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float highlightBokehAmount, flo
         vec3 acc = vec3(0.0);
         vec3 div = vec3(0.0);
         float r = 1.0;
-        vec2 vangle = vec2(0.0,radius / 1024.0); // Start angle
+        vec2 vangle = vec2(0.0,radius / (float(ITERATIONS) / 2.0) / 128.0); // Start angle
         mat2 rot = rotMatrix(GOLDEN_ANGLE);
     
         highlightBokehAmount *= radius*100.0;
@@ -104,7 +104,7 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float highlightBokehAmount, flo
                 vec2 pos = GetDistOffset(uv, (radius / 2.0)*(r-1.)*vangle);
                 
                 float tapDepth = readDepth(uv + pos);
-                float leakingDepthThreshold = pixelDepth * pow(radius, 0.5) * 15.0;
+                float leakingDepthThreshold = 0.2;
                 if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold && tapDepth < pixelDepth) {
                         continue;
                 }
@@ -130,8 +130,14 @@ void main() {
         float CoC = 0.029; //circle of confusion size in mm (35mm film = 0.029mm)
 
         float fDepth = ((focus - near) / far) * 2.0;
+        /*
+        float a = (depth*focalLength)/(depth-focalLength);
+        float b = (fDepth*focalLength)/(fDepth-focalLength);
+        float c = (fDepth-focalLength)/(fDepth*aperture*CoC*10.0);
 
-        float blur = clamp((abs(depth - fDepth) / aperture * CoC * 10.0) * focalLength, -maxblur, maxblur);
+        float blur = clamp(abs(a-b)*c, -maxblur, maxblur);
+        */
+        float blur = clamp((abs(depth - fDepth) / aperture * CoC * focalLength) * 50.0, -maxblur, maxblur);
 
         /*
         float layerSeparatorSharpness = 1.0;
@@ -142,8 +148,6 @@ void main() {
         backgroundDepth -= focusDepth;
         focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness + 0.5));
         */
-        // blur = Remap(blur, 0.0, 1.0, 0.0, 1.0);
-        blur = clamp(blur,0.0, maxblur);
         
         // vec4 backgroudColor = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
         // vec4 foregroudColor = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);

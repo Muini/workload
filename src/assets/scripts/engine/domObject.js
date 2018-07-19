@@ -4,6 +4,7 @@ import Log from './utils/log';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
+// TODO: Make the domobject inherit the Obj class
 export default class DomObject {
     constructor(opt = {
         parent,
@@ -14,6 +15,7 @@ export default class DomObject {
 
         this.selector = undefined;
         this.dom = undefined;
+        // TODO: Datas for every Object & OnDataChanged function
         this.data = {};
 
         this.isActive = opt.active || true;
@@ -150,9 +152,10 @@ export default class DomObject {
 
             }
             // find class vars
+            // TODO: class management
             let classes = await this.dom.querySelectorAll('*[class]');
 
-
+            // TODO: style management
             // console.log(texts, this._vars);
 
             this._shouldUpdateVars = true;

@@ -44,6 +44,8 @@ class Loader extends DomObject {
         this.setActive(true);
         this.dom.style['visibility'] = 'visible';
         this.dom.classList.remove('hide');
+        this.data.percentage = 0;
+        this.updateGraphLoader();
     }
 
     hide() {

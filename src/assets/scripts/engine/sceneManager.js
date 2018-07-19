@@ -13,7 +13,14 @@ class SceneManager {
 
     register(scene) {
         this.scenes.set(scene.name, scene);
-        this.scenes.get(scene.name).initScene();
+    }
+
+    initScenes(){
+        return (async() => {
+            this.scenes.forEach(scene => {
+                scene.initScene();
+            });
+        })();
     }
 
     preloadScenesCheck() {

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import Engine from '../../engine/engine';
 import Obj from '../../engine/obj';
 
+// TODO: make the camera virtual, only data driven. If active, it updates the scene camera
 export class Camera extends Obj {
     constructor(opt = {}) {
         super(opt);

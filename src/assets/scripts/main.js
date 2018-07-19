@@ -8,10 +8,8 @@ import Loader from './engine/loader';
 // 
 // Register scene here
 //================
-import CityScene from './scenes/city.scene';
-SceneManager.register(CityScene);
-import WorkloadScene from './scenes/workload.scene';
-SceneManager.register(WorkloadScene);
+import './scenes/city.scene';
+import './scenes/workload.scene';
 
 //================
 // Load scene & Start Engine
@@ -19,12 +17,14 @@ SceneManager.register(WorkloadScene);
 (async() => {
     await requestAnimationFrame(async _ => {
 
-        await Engine.init(document.getElementById('film'));
-        Engine.setFixedRatio(2 / 1);
+        await Engine.init(
+            document.getElementById('film'), //Container
+            (2 / 1) //Film Ratio
+        );
 
         // Set Scene will start the loading process of scenes
         SceneManager.setOrder([
-            'city',
+            'city', //This is the name of the scene, not of the file
             'workload',
         ]);
 

@@ -7,9 +7,12 @@ class Log {
         this.logsAtScreen = new Map();
 
         this._styles = {
+            'display': 'flex',
+            'align-items': 'center',
             'color': 'white',
             'font-size': '10px',
-            'padding': '.5em .5em .5em 1em',
+            'line-height': '1.2em',
+            'padding': '0 0 0 1em',
             'background': 'rgba(0,0,0,0.8)',
             'position': 'fixed',
             'top': '1em',
@@ -27,10 +30,10 @@ class Log {
             uuid: UUID(),
             type: type,
             class: className,
-            message: this.parseMessage(message),
+            message: message,
         }
 
-        const logMessage = `%c${log.class}%c ${log.message}`;
+        const logMessage = `%c${log.class}%c ${this.parseMessage(log.message)}`;
         const styles = "color:white;background:" + this.selectColor(log.type) + ";padding:2px 4px;";
 
         // Write it in the console
@@ -49,7 +52,20 @@ class Log {
     }
 
     parseMessage(message){
-        const parsedMessage = message;
+        const parsedMessage = message.replace(/c:(\w*){(.*)}/gi, (cores, color, message) => {
+            return `${message}`;
+        });
+        return parsedMessage;
+    }
+
+    parseMessageForHtml(message) {
+        // new RegExp(/{{\s*[\w\.]+\s*}}/g);
+        const parsedMessage = message
+        .replace(/c:(\w*){(.*)}/g, (cores, color, message) => {
+            return `<span style="color:${color};">${message}</span>`;
+        })
+        .replace(/(\r\n|\n|\r)/g, '<br />')
+        ;
         return parsedMessage;
     }
 
@@ -79,13 +95,13 @@ class Log {
     createDomLog(log){
         return (async() => {
         
-            let elem = document.createElement('p');
+            let elem = document.createElement('div');
 
             for(const style in this._styles){
                 elem.style[style] = this._styles[style];
             }
 
-            elem.innerHTML = `${log.message} <span style="background:${this.selectColor(log.type)};padding:.15em .5em">${log.class}</span>`;
+            elem.innerHTML = `<p style="height:100%;padding:.25em 0;">${this.parseMessageForHtml(log.message)}</p><span style="flex-shrink:0;align-self:flex-start;margin-left:1em;height:100%;background:${this.selectColor(log.type)};padding:.5em .5em">${log.class}</span>`;
 
             log.elem = elem;
             document.body.appendChild(elem);
@@ -131,7 +147,7 @@ class Log {
     recalculateLogsPosition(){
         let index = this.logsAtScreen.size;
         this.logsAtScreen.forEach((log) => {
-            log.elem.style['transform'] = `translateZ(0) translateY(${2 * index}em)`;
+            log.elem.style['transform'] = `translateZ(0) translateY(${2.5 * index}em)`;
             index--;
         });
     }

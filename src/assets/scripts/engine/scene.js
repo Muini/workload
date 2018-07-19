@@ -3,7 +3,8 @@ import Engine from './engine';
 import UUID from './utils/uuid';
 import Log from './utils/log';
 
-import AssetsManager from '../engine/assetsManager';
+import SceneManager from './sceneManager';
+import AssetsManager from './assetsManager';
 
 export default class Scene {
     constructor(opt = {
@@ -18,8 +19,6 @@ export default class Scene {
         this.setup = opt.setup || function() {};
         this.onStart = opt.onStart || function() {};
 
-        this.assetsToLoad = 0;
-        this.assetsLoaded = 0;
         this.onPreloaded = function() {};
 
         this.instance = new THREE.Scene();
@@ -44,10 +43,13 @@ export default class Scene {
             'sounds': {},
             'textures': {},
         }
+
+        SceneManager.register(this);
     }
 
+    // TODO: Create default setup with sky, sun, plane, all optionnal
     initScene() {
-        return (async() => {
+        return (async () => {
             await this.setup();
             return;
         })();
@@ -68,7 +70,7 @@ export default class Scene {
     createObjects() {
         return (async() => {
             await Promise.all(this.children.map(async object => { await object.created() }))
-            Log.push('info', this.constructor.name, `Scene created ${this.children.length} object(s)`);
+            Log.push('info', this.constructor.name, `Scene created c:salmon{${this.children.length}} object(s)`);
             return;
         })();
     }
@@ -76,11 +78,12 @@ export default class Scene {
     awakeObjects() {
         return (async() => {
             await Promise.all(this.children.map(async object => { await object.awake() }))
-            Log.push('info', this.constructor.name, `Scene awaked ${this.children.length} object(s)`);
+            Log.push('info', this.constructor.name, `Scene awaked c:salmon{${this.children.length}} object(s)`);
             return;
         })();
     }
 
+    // TODO: Create default camera inside a scene automatically, then use virtual cameras
     setCamera(camera) {
         this.mainCamera = camera;
         this.resize();
@@ -95,6 +98,7 @@ export default class Scene {
     resize() {
         if (!this.mainCamera) return;
         if (!this.mainCamera.isOrthographicCamera) {
+            // Log.push('info', this.constructor.name, `Resize camera c:salmon{${Engine.width} & ${Engine.height}}`);
             this.mainCamera.aspect = Engine.width / Engine.height;
         } else {
             this.mainCamera.left = Engine.width / -this.mainCamera.distance;
@@ -109,14 +113,13 @@ export default class Scene {
         return (async() => {
             this.isLoading = true;
             // Get all entites, load their assets (sounds, models, textures)
-            this.assetsToLoad += this.objects.length;
 
             this.onPreloaded = callback;
 
             this.sounds.forEach(sound => sound.load());
 
             await AssetsManager.loadAssetsFromScene(this.name, async _ => {
-                Log.push('success', this.constructor.name, `Scene ${this.name} loaded`);
+                Log.push('success', this.constructor.name, `Scene c:LightGreen{${this.name}} loaded`);
                 await this.createObjects();
                 this.isLoading = false;
                 this.hasLoaded = true;

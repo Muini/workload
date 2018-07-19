@@ -27,6 +27,7 @@ class Engine {
         else
             this.height = window.innerHeight;
 
+        // TODO: Quality class with deep detection, benchmark, adapative renderer
         this.isMobile = (function() {
             let check = false;
             (function(a) {
@@ -96,16 +97,17 @@ class Engine {
 
         this.lastTick = 0;
         this.elapsedTime = 0;
+
+        this.hasAdapativeRenderer = true;
         this.fpsMedian = 0;
         this.tickNbr = 0;
-        this.hasAdapativeRenderer = true;
         this.adaptiveRendererDelay = 0;
         this.lastAdaptiveRendererTime = 0;
         this.performanceCycleNbr = 0;
         this.maxPerformanceCycle = 5; //3 Cycles
-        this.performanceCycleLength = 10; //Every 8 frames
+        this.performanceCycleLength = 20; //Every 8 frames
 
-        this.backgroundPreload = true;
+        this.hasBackgroundPreload = true;
 
         this.requestId = undefined;
         this.hasStarted = false;
@@ -119,10 +121,12 @@ class Engine {
         this.hasPostProd = true;
         this.postprod = undefined;
 
+        const GPU = this.renderer.getContext().getParameter(this.renderer.extensions.get('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL);
+
         Log.push(
             'success',
             this.constructor.name,
-            'Init - width: ' + this.width + 'px - height: ' + this.height + 'px - Quality: ' + this.quality + ' - pixelRatio: ' + this.pixelDensity + ' - Three.js r' + THREE.REVISION
+            `Init\nSize: c:orange{${this.width}px x ${this.height}px}\nQuality: c:orange{${this.quality}}\nPixelDensity: c:orange{${this.pixelDensity}}\nThree.js: c:orange{r${THREE.REVISION}}\nGPU: c:orange{${GPU}}\n`
         );
 
         if (Log.debug) {
@@ -131,7 +135,7 @@ class Engine {
         }
     }
 
-    init(container) {
+    init(container, fixedRatio = undefined) {
         return (async() => {
             if (this.hasPostProd) {
                 this.postprod = await new PostProd({
@@ -160,12 +164,12 @@ class Engine {
                             lut: 0.90,
                             lutURL: '/static/img/lut-gamma.png',
                         },
-                        bokehdof: { enabled: this.quality < 3 ? false : true, },
+                        bokehdof: { enabled: this.quality < 2 ? false : true, },
                         // bokehdof: { enabled: false, },
                         blur: {
                             enabled: true,
-                            strength: 5.0,
-                            sharpen: this.quality < 3 ? 0.05 : 0.15,
+                            strength: 4.0,
+                            sharpen: this.quality < 3 ? 0.05 : 0.2,
                             blurRgbSplit: 1.25,
                             gain: 1.1,
                         }
@@ -177,6 +181,12 @@ class Engine {
             await this.container.appendChild(this.renderer.domElement);
             if (Log.debug)
                 this.container.appendChild(this.stats.dom);
+
+            if(fixedRatio !== undefined){
+                this.setFixedRatio(fixedRatio);
+            }
+
+            await SceneManager.initScenes();
 
             this.waitNextTick().then(_ => {
                 this.containerBoundingBox = this.container.getBoundingClientRect();
@@ -281,8 +291,8 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(this.pixelDensity);
 
-        this.container.style['width'] = this.width + 'px';
-        this.container.style['height'] = this.height + 'px';
+        this.container.style['width'] = `${this.width}px`;
+        this.container.style['height'] = `${this.height}px`;
         this.containerBoundingBox = this.container.getBoundingClientRect();
 
         this.resizeFunctions.forEach(fct => {
@@ -350,7 +360,7 @@ class Engine {
     adaptiveRenderer(time, delta) {
         if (!this.hasAdapativeRenderer) return;
 
-        if (this.lastTick == null ||
+        if (delta == 0 ||
             // this.performanceCycleNbr >= this.maxPerformanceCycle || 
             (time - this.lastAdaptiveRendererTime < this.adaptiveRendererDelay)
         ) return;
@@ -358,16 +368,15 @@ class Engine {
         this.tickNbr++;
 
         //Check current FPS
-        let fps = 1000 / (time - this.lastTick);
-        this.fpsMedian += fps;
+        this.fpsMedian += (1000 / delta);
 
         //Check median FPS by cycle
         if (this.tickNbr % this.performanceCycleLength === 0) {
             //Get the mediam FPS of the cycle
             this.fpsMedian /= this.performanceCycleLength;
-
+            
             let hasBeenResized = false;
-
+            
             //Adjust pixelDensity based on the fps but not on the first cycle
             if (this.performanceCycleNbr !== 0) {
 
@@ -395,7 +404,7 @@ class Engine {
                     hasBeenResized = true;
                     this.adaptiveRendererDelay = 500;
                     this.lastAdaptiveRendererTime = time;
-                    Log.push('info', this.constructor.name, `Adapting renderer to ${newPixelDensity} pixelRatio`);
+                    Log.push('info', this.constructor.name, `Adapting renderer to c:salmon{${newPixelDensity}} pixelRatio`);
                 }
 
             }
@@ -403,6 +412,7 @@ class Engine {
             //Reset vars to start a new cycle
             if (!hasBeenResized)
                 this.performanceCycleNbr++;
+
             this.fpsMedian = 0;
         }
     }
@@ -424,7 +434,7 @@ class Engine {
             this.adaptiveRenderer(time, delta);
 
         //Check if we're loading something in background
-        if (this.backgroundPreload)
+        if (this.hasBackgroundPreload)
             SceneManager.preloadScenesCheck();
 
         //Update & Render Post processing effects
