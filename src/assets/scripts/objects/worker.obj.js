@@ -34,7 +34,7 @@ export class Worker extends Obj {
             parent: this,
             color: 'ff9356',
             power: 200,
-            castShadow: false,
+            castShadow: true,
         })
 
         new Light({
@@ -44,7 +44,7 @@ export class Worker extends Obj {
             color: 'B1C0E7',
             power: 100,
             distance: 5.0,
-            castShadow: false,
+            castShadow: true,
         })
 
         new Light({

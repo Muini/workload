@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
 import Obj from '../../engine/obj';
+import Log from '../../engine/utils/log';
 
 // TODO: make the camera virtual, only data driven. If active, it updates the scene camera
 export class Camera extends Obj {
@@ -54,11 +55,11 @@ export class Camera extends Obj {
     }
 
     updateBokehShader(param){
-        if (!Engine.postprod || !Engine.postprod.bokehPass) return;
+        if (!Engine.postprod || !Engine.postprod.bokeh) return;
         if (param == 'focalLength') {
-            Engine.postprod.bokehPass.uniforms[param].value = this.instance.getFocalLength();
+            Engine.postprod.bokeh.uniforms[param].value = this.instance.getFocalLength();
         } else {
-            Engine.postprod.bokehPass.uniforms[param].value = this.instance[param];
+            Engine.postprod.bokeh.uniforms[param].value = this.instance[param];
         }
     }
 
@@ -87,6 +88,30 @@ export class Camera extends Obj {
                     this.instance[param] = this.params[param];
                 }
                 this.updateBokehShader(param);
+            }
+
+            if (Log.debug) {
+                // Add GUI
+                let guiChanger = (value, item) => {
+                    // console.log(parseFloat(value), item)
+                    try {
+                        this.params[item] = value;
+                    } catch (e) {
+                        console.log(e)
+                    }
+                }
+
+                if (window.gui.__folders['Camera'])
+                    window.gui.removeFolder(window.gui.__folders['Camera']);
+
+                let folder = window.gui.addFolder('Camera');
+                folder.add(this.params, 'focalLength', 12.0, 200.0).onChange(value => guiChanger(value, 'focalLength'));
+                folder.add(this.params, 'near').onChange(value => guiChanger(value, 'near'));
+                folder.add(this.params, 'far').onChange(value => guiChanger(value, 'far'));
+                if(!this.targetMAP)
+                    folder.add(this.params, 'focus').onChange(value => guiChanger(value, 'focus'));
+                folder.add(this.params, 'aperture', 1.0, 22.0).onChange(value => guiChanger(value, 'aperture'));
+
             }
             // Is fired when the object is added to the scene
         })();

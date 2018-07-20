@@ -23,6 +23,7 @@ THREE.BokehShader = {
         "focus": { value: 100.0 },
         "aperture": { value: 2.8 },
         "maxblur": { value: 1.0 },
+        "noiseTexture": { value: null },
 
     },
 

@@ -15,8 +15,8 @@ class Log {
             'padding': '0 0 0 1em',
             'background': 'rgba(0,0,0,0.8)',
             'position': 'fixed',
-            'top': '1em',
-            'right': '1em',
+            'bottom': '2em',
+            'right': '2em',
             'border-radius': '.5em',
             'opacity': '0',
             'transition': `transform 325ms ease-out, opacity 325ms linear`,
@@ -147,7 +147,7 @@ class Log {
     recalculateLogsPosition(){
         let index = this.logsAtScreen.size;
         this.logsAtScreen.forEach((log) => {
-            log.elem.style['transform'] = `translateZ(0) translateY(${2.5 * index}em)`;
+            log.elem.style['transform'] = `translateZ(0) translateY(-${2.5 * index}em)`;
             index--;
         });
     }

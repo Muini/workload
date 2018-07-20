@@ -1446,6 +1446,10 @@ contains-path@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/contains-path/-/contains-path-0.1.0.tgz#fe8cf184ff6670b6baef01a9d4861a5cbec4120a"
 
+controlkit@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/controlkit/-/controlkit-0.1.9.tgz#00a0598a2a3c25f85494327d86d3daf1b11f08ab"
+
 convert-source-map@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-1.5.1.tgz#b8278097b9bc229365de5c62cf5fcaed8b5599e5"
@@ -1727,6 +1731,10 @@ dashdash@^1.12.0:
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
   dependencies:
     assert-plus "^1.0.0"
+
+dat.gui@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/dat.gui/-/dat.gui-0.7.2.tgz#57056f286d0f989e83f5adec196f24fd69c01ae3"
 
 date-now@^0.1.4:
   version "0.1.4"

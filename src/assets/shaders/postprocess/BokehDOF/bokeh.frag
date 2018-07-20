@@ -12,6 +12,7 @@ uniform float focalLength;
 uniform float focus;
 uniform float aperture; // aperture - bigger values for shallower depth of field
 uniform float maxblur; // max blur amount
+uniform sampler2D noiseTexture;
 
 // Bokeh disc.
 // by David Hoskins.
@@ -91,7 +92,7 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float highlightBokehAmount, flo
         float r = 1.0;
         vec2 vangle = vec2(0.0,radius / (float(ITERATIONS) / 2.0) / 128.0); // Start angle
         mat2 rot = rotMatrix(GOLDEN_ANGLE);
-    
+        
         highlightBokehAmount *= radius*100.0;
 
         //Background        
@@ -110,9 +111,9 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float highlightBokehAmount, flo
                 }
                 vec3 col = vec3(0.0);
                 // col = texture2D(tex, uv + pos).rgb;
-                col.r = texture2D(tex, uv + pos + vec2(0.2 * pos.y)).r;
+                col.r = texture2D(tex, uv + pos + vec2(0.1 * pos.y)).r;
                 col.g = texture2D(tex, uv + pos).g;
-                col.b = texture2D(tex, uv + pos - vec2(0.2 * pos.y)).b;
+                col.b = texture2D(tex, uv + pos - vec2(0.1 * pos.y)).b;
 
                 // col = mix(vec3(0.0), col, vec3(pixelDepth));
                 vec3 bokeh = pow(col, vec3(9.0)) * highlightBokehAmount +.4;
@@ -130,15 +131,8 @@ void main() {
         float CoC = 0.029; //circle of confusion size in mm (35mm film = 0.029mm)
 
         float fDepth = ((focus - near) / far) * 2.0;
-        /*
-        float a = (depth*focalLength)/(depth-focalLength);
-        float b = (fDepth*focalLength)/(fDepth-focalLength);
-        float c = (fDepth-focalLength)/(fDepth*aperture*CoC*10.0);
 
-        float blur = clamp(abs(a-b)*c, -maxblur, maxblur);
-        */
-        float blur = clamp((abs(depth - fDepth) / aperture * CoC * focalLength) * 50.0, -maxblur, maxblur);
-
+        float blur = clamp(((abs(depth - fDepth) / (aperture * aperture) * CoC ) * focalLength * focalLength) / (focus / 100.0), -maxblur * 2.0, maxblur * 2.0);
         /*
         float layerSeparatorSharpness = 1.0;
         float focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness));
@@ -155,7 +149,9 @@ void main() {
                 gl_FragColor = texture2D(tDiffuse, vUv);
         }else{
                 float highlightBokehAmount = 40.0;
-                vec4 bokehDOF = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
+                vec4 noise = texture2D(noiseTexture, mod(vUv, 0.1) / 0.1);
+                float randomOffset = ((noise.r + noise.g + noise.b) / 3.0);
+                vec4 bokehDOF = vec4(Bokeh(tDiffuse, vUv + (randomOffset * blur * 0.0015), blur, highlightBokehAmount, depth), 1.0);
                 // bokehDOF.rgb = debugFocus(bokehDOF.rgb, blur, depth);
                 gl_FragColor = bokehDOF;
         }

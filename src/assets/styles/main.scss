@@ -47,38 +47,38 @@ body {
     position: absolute;
     z-index: 1;
     visibility: hidden;
-}
-
-.title {
-    @include fluid-type( $mq-min-width, $mq-xxlarge-min, 30px, 60px);
-    // width: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) translateY(-.5em);
-    color: rgba(255, 255, 255, .9);
-    font-family: 'Quattrocento', serif;
-    padding: .25em 1em;
-    padding-bottom: .1em;
-    text-align: center;
-}
-
-.subtitle {
-    @include fluid-type( $mq-min-width, $mq-xxlarge-min, 16px, 22px);
-    // width: 100%;
-    left: 50%;
-    bottom: 50%;
-    transform: translate(-50%, -50%) translateY(5em);
-    color: rgba(255, 255, 255, .9);
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 100;
-    letter-spacing: 0.1em;
-    padding: .25em 1em;
-    line-height: 1.4em;
-    text-align: center;
-    span {
-        color: greenyellow
+    &.title {
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 30px, 60px);
+        // width: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) translateY(-.5em);
+        color: rgba(255, 255, 255, .9);
+        font-family: 'Quattrocento', serif;
+        padding: .25em 1em;
+        padding-bottom: .1em;
+        text-align: center;
+    }
+    &.subtitle {
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 16px, 22px);
+        // width: 100%;
+        left: 50%;
+        bottom: 50%;
+        transform: translate(-50%, -50%) translateY(5em);
+        color: rgba(255, 255, 255, .9);
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 100;
+        letter-spacing: 0.1em;
+        padding: .25em 1em;
+        line-height: 1.4em;
+        text-align: center;
+        span {
+            color: greenyellow
+        }
     }
 }
+
+
 
 .hud-test {
     position: absolute;

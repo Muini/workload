@@ -29,7 +29,7 @@ export default new Scene({
             position: new THREE.Vector3(0, 45, 62),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 25,
-            aperture: 22.0,
+            aperture: 6.0,
             focus: 50.0,
             far: 900,
         });
@@ -69,8 +69,8 @@ export default new Scene({
             color: 'FFF4E6',
             power: 8.0,
             castShadow: true,
-            shadowMapSize: 2048,
-            shadowCameraSize: 50.0,
+            shadowMapSize: 1024,
+            shadowCameraSize: 60.0,
             position: new THREE.Vector3(-30, 100, 30),
         })
         
@@ -91,7 +91,7 @@ export default new Scene({
             mieDirectionalG: 0.75
         })
 
-        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.0025);
+        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002);
 
         this.city = new City({
             parent: this

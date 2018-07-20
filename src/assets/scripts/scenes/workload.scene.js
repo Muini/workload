@@ -26,7 +26,7 @@ export default new Scene({
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 50,
             focus: 42.0, //42
-            aperture: 1.2,
+            aperture: 1.8,
         });
         this.camera.model.rotation.y = (45 / 180) * 3.14;
         this.camera.instance.rotation.x = -(30 / 180) * 3.14;
@@ -83,11 +83,11 @@ export default new Scene({
 
     },
     onStart: async function() {
-        // await Engine.wait(1000)
+        await Engine.wait(1000)
 
         this.testdom.setVisibility(false);
 
-        let tween = new Tween({ x:50, y:45, z:50, aperture: 1.2 })
+        let tween = new Tween({ x:50, y:45, z:50, aperture: 2.0 })
             .to({ x:25, y:26, z:25, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
             // .yoyo(true)

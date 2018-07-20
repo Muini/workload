@@ -2,7 +2,7 @@
 
 	#ifdef FOG_EXP2
 
-		float fogFactor = min( whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) ), 0.90);
+		float fogFactor = min( whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) ), 0.925);
 
 	#else
 

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
+import Quality from '../../engine/quality';
 import Obj from '../../engine/obj';
 
 export class Light extends Obj{
@@ -60,9 +61,9 @@ export class Light extends Obj{
         this.instance.name = this.name;
 
         if (!this.instance.isHemisphereLight){
-            this.instance.castShadow = Engine.quality > 1 ? this.params.castShadow : false;
-            this.instance.shadow.mapSize.y = this.params.shadowMapSize / (5 - Engine.quality);
-            this.instance.shadow.mapSize.x = this.params.shadowMapSize / (5 - Engine.quality);
+            this.instance.castShadow = Quality.score >= (this.type == 'directional' ? 500 : 2000) ? this.params.castShadow : false;
+            this.instance.shadow.mapSize.y = this.params.shadowMapSize / Quality.settings.shadows.resolutionDivider;
+            this.instance.shadow.mapSize.x = this.params.shadowMapSize / Quality.settings.shadows.resolutionDivider;
         }
 
         if(!this.parent.isScene){

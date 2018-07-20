@@ -39,6 +39,8 @@
     "dependencies": {
         "@thmsdmcrt_/concurrence": "^0.1.1",
         "babel-runtime": "^6.26.0",
+        "controlkit": "^0.1.9",
+        "dat.gui": "^0.7.2",
         "glsl-lut": "^1.1.0",
         "howler": "^2.0.13",
         "stats.js": "^0.17.0",

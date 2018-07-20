@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
-
+import Quality from '../../engine/quality';
 import Obj from '../../engine/obj';
 
 export class Cubemap extends Obj {
@@ -16,23 +16,10 @@ export class Cubemap extends Obj {
         let resolution = opt.resolution || 128;
         let shouldUpdate = opt.shouldUpdate;
         let tickRate = opt.tickRate || 2;
-        switch (Engine.quality) {
-            case 1:
-                resolution /= 8;
-                shouldUpdate = false;
-                tickRate *= 8;
-                break;
-            case 2:
-                resolution /= 4;
-                tickRate *= 4;
-                break;
-            case 3:
-                resolution /= 2;
-                tickRate *= 2;
-                break;
-            case 4:
-                break;
-        }
+
+        resolution /= Quality.settings.cubemaps.resolutionDivider;
+        tickRate *= Quality.settings.cubemaps.resolutionDivider;
+        shouldUpdate = Quality.settings.cubemaps.canBeRealtime ? shouldUpdate : false;
 
         this.debug = opt.debug || false;
 
