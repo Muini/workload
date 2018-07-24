@@ -197,6 +197,7 @@ export default class Obj {
                         child.power = light.instance.power;
                         child.castShadow = light.instance.castShadow;
                         child.visible = light.instance.visible;
+                        child.shadow = light.instance.shadow;
                         if (child.isPointLight) {
                             child.distance = light.instance.distance;
                         }

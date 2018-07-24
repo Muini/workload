@@ -24,7 +24,7 @@ export class Light extends Obj{
             power: opt.power || 200,
             distance: opt.distance || 4.0,
             castShadow: opt.castShadow || false,
-            shadowMapSize: opt.shadowMapSize || 64,
+            shadowMapSize: opt.shadowMapSize || (this.type === 'point' ? 16 : 128),
             shadowCameraSize: opt.shadowCameraSize || 50,
         }
 
@@ -38,6 +38,7 @@ export class Light extends Obj{
                 this.instance = new THREE.SpotLight('#' + this.params.color);
                 this.instance.decay = 2;
                 this.instance.power = this.params.power;
+                this.instance.castShadow = Quality.score >= 1500 ? this.params.castShadow : false;
                 break;
 
             case 'directional':
@@ -46,6 +47,7 @@ export class Light extends Obj{
                 this.instance.shadow.camera.right = this.params.shadowCameraSize; // default
                 this.instance.shadow.camera.top = this.params.shadowCameraSize; // default
                 this.instance.shadow.camera.bottom = -this.params.shadowCameraSize; // default
+                this.instance.castShadow = Quality.score >= 500 ? this.params.castShadow : false;
                 break;
 
             case 'ambient':
@@ -56,12 +58,12 @@ export class Light extends Obj{
             case 'point':
                 this.instance = new THREE.PointLight('#' + this.params.color, 1.0, this.params.distance, 2);
                 this.instance.power = this.params.power;
+                this.instance.castShadow = Quality.score >= 4000 ? this.params.castShadow : false;
                 break;
         }
         this.instance.name = this.name;
 
         if (!this.instance.isHemisphereLight){
-            this.instance.castShadow = Quality.score >= (this.type == 'directional' ? 500 : 2000) ? this.params.castShadow : false;
             this.instance.shadow.mapSize.y = this.params.shadowMapSize / Quality.settings.shadows.resolutionDivider;
             this.instance.shadow.mapSize.x = this.params.shadowMapSize / Quality.settings.shadows.resolutionDivider;
         }

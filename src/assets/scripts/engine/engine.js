@@ -87,6 +87,7 @@ class Engine {
             // Shadow settings
             this.renderer.shadowMap.enabled = Quality.settings.shadows.enabled;
             this.renderer.shadowMap.type = (_ => {
+                // return THREE.BasicShadowMap;
                 switch (Quality.settings.shadows.quality) {
                     case 0:
                     default:
@@ -130,13 +131,13 @@ class Engine {
                             enabled: true,
                             noise: 0.1,
                             useStaticNoise: true,
-                            rgbSplit: Quality.score > 200 ? 5.0 : 0.0,
+                            rgbSplit: Quality.score >= 1000 ? 5.0 : 0.0,
                             vignette: 20.0,
                             vignetteOffset: 0.15,
-                            lut: 0.90,
+                            lut: 1.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },
-                        bokehdof: { enabled: Quality.score >= 500 ? true : false, },
+                        bokehdof: { enabled: Quality.score >= 1000 ? true : false, },
                         // bokehdof: { enabled: false, },
                         blur: {
                             enabled: true,

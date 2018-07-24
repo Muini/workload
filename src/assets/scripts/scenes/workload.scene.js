@@ -13,6 +13,7 @@ import { Worker } from '../objects/worker.obj';
 
 // Dom Objects
 import { ExempleDom } from '../objects/default/exemple.dom.obj';
+import MaterialManager from '../engine/materialManager';
 
 // Create scene
 export default new Scene({
@@ -43,13 +44,7 @@ export default new Scene({
 
         // Floor
         let floorGeometry = new THREE.PlaneGeometry(150, 150, 1, 1);
-        let floorMaterial = new THREE.MeshStandardMaterial({
-            name: 'Floor',
-            color: new THREE.Color(0x383733),
-            roughness: .9,
-            metalness: .0,
-            dithering: true,
-        })
+        let floorMaterial = MaterialManager.get('Floor').instance;
         let plane = new THREE.Mesh(floorGeometry, floorMaterial);
         plane.name = "Floor";
         plane.rotation.x = -3.14 / 2;

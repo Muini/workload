@@ -105,6 +105,7 @@ export default class PostProd {
             this.bokeh.uniforms['focus'].value = this.camera ? this.camera.focus : 100.0;
             this.bokeh.uniforms['aperture'].value = this.camera ? this.camera.aperture : 2.8;
             this.bokeh.uniforms['maxblur'].value = 1.25;
+            this.bokeh.uniforms['threshold'].value = 0.1;
             this.bokeh.uniforms['tDepth'].value = this.depthRenderTarget.depthTexture;
 
             

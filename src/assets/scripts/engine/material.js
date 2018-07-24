@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import UUID from './utils/uuid';
 import MaterialManager from './materialManager';
 
+let noiseTexture = new THREE.TextureLoader().load('/static/img/noise.png');
+noiseTexture.minFilter = THREE.NearestFilter;
+noiseTexture.magFilter = THREE.NearestFilter;
+
 export default class Material {
     constructor(name, opt, isCloning = false) {
         this.uuid = UUID();
@@ -53,6 +57,8 @@ export default class Material {
                 shader = this.addSwayShader(shader);
 
                 shader = this.modifyFogShader(shader);
+                
+                shader = this.modifyShadowShader(shader);
 
                 this.instance.uniforms = shader.uniforms;
 
@@ -62,6 +68,8 @@ export default class Material {
 
                 shader = this.modifyFogShader(shader);
 
+                shader = this.modifyShadowShader(shader);
+
                 this.instance.uniforms = shader.uniforms;
             };
         }
@@ -70,6 +78,17 @@ export default class Material {
 
         if (!isCloning)
             MaterialManager.register(this);
+    }
+
+    modifyShadowShader(shader){
+        shader.uniforms.noiseTexture = {
+            value: noiseTexture
+        };
+        shader.fragmentShader = 'uniform sampler2D noiseTexture;\n' + shader.fragmentShader;
+        shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <shadowmap_pars_fragment>', require('../../shaders/partials/shadowmap_pars_fragment.glsl')
+        );
+        return shader
     }
 
     modifyFogShader(shader){

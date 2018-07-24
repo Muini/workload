@@ -12,6 +12,7 @@ uniform float focalLength;
 uniform float focus;
 uniform float aperture; // aperture - bigger values for shallower depth of field
 uniform float maxblur; // max blur amount
+uniform float threshold; 
 uniform sampler2D noiseTexture;
 
 // Bokeh disc.
@@ -104,16 +105,19 @@ vec3 Bokeh(sampler2D tex, vec2 uv, float radius, float highlightBokehAmount, flo
                 // (r-1.0) here is the equivalent to sqrt(0, 1, 2, 3...)
                 vec2 pos = GetDistOffset(uv, (radius / 2.0)*(r-1.)*vangle);
                 
-                float tapDepth = readDepth(uv + pos);
-                float leakingDepthThreshold = 0.2;
-                if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold && tapDepth < pixelDepth) {
-                        continue;
+                if(radius > 1.0){
+                        float tapDepth = readDepth(uv + pos);
+                        float leakingDepthThreshold = max(threshold * pow(radius, 3.0), 0.01);
+                        if (abs( tapDepth - pixelDepth ) > leakingDepthThreshold && tapDepth < pixelDepth) {
+                                continue;
+                        }
                 }
                 vec3 col = vec3(0.0);
-                // col = texture2D(tex, uv + pos).rgb;
-                col.r = texture2D(tex, uv + pos + vec2(0.1 * pos.y)).r;
+
+                col = texture2D(tex, uv + pos).rgb;
+                /*col.r = texture2D(tex, uv + pos + vec2(0.1 * pos.y)).r;
                 col.g = texture2D(tex, uv + pos).g;
-                col.b = texture2D(tex, uv + pos - vec2(0.1 * pos.y)).b;
+                col.b = texture2D(tex, uv + pos - vec2(0.1 * pos.y)).b;*/
 
                 // col = mix(vec3(0.0), col, vec3(pixelDepth));
                 vec3 bokeh = pow(col, vec3(9.0)) * highlightBokehAmount +.4;
@@ -132,7 +136,7 @@ void main() {
 
         float fDepth = ((focus - near) / far) * 2.0;
 
-        float blur = clamp(((abs(depth - fDepth) / (aperture * aperture) * CoC ) * focalLength * focalLength) / (focus / 100.0), -maxblur * 2.0, maxblur * 2.0);
+        float blur = clamp(((abs(depth - fDepth) / pow(aperture, 2.0) * CoC ) * pow(focalLength, 1.75)) / (focus / 100.0), -maxblur * 2.0, maxblur * 2.0);
         /*
         float layerSeparatorSharpness = 1.0;
         float focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness));

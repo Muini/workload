@@ -9,6 +9,18 @@ const clamp = function(value, min, max){
     return Math.min(Math.max(value, min), max);
 }
 
+const nearestPow2 = function(n) {
+    let m = n;
+    for (var i = 0; m > 1; i++) {
+        m = m >>> 1;
+    }
+    // Round to nearest power
+    if (n & 1 << i - 1) {
+        i++;
+    }
+    return 1 << i;
+}
+
 class Quality{
     constructor(){
         this.gpu = 'Unknown';
@@ -25,7 +37,7 @@ class Quality{
         const screenWidth = window.innerWidth;
         if(screenWidth <= 640){
             this.isMobile = true;
-        }else if(screenWidth <= 1024){
+        }else if(screenWidth <= 1200){
             this.isTablet = true;
         }else if(screenWidth <= 1440){
             this.isLaptop = true;
@@ -62,7 +74,7 @@ class Quality{
                 },
                 blur: {
                     enabled: true,
-                    samples: clamp(parseInt(this.score / 200), 4, 16),
+                    samples: clamp(nearestPow2(parseInt(this.score / 300)), 4, 16),
                 }
             },
             // Lights settings
@@ -72,12 +84,12 @@ class Quality{
             // Shadows settings
             shadows: {
                 enabled: this.score >= 500 ? true : false,
-                quality: this.score < 2000 ? 0 : (this.score > 3000 ? 2 : 1),
-                resolutionDivider: clamp(10 - parseInt(this.score / 400), 1, 4),
+                quality: this.score < 1000 ? 0 : (this.score > 3000 ? 2 : 1),
+                resolutionDivider: clamp(nearestPow2(10 - parseInt(this.score / 400)), 1, 4),
             },
             // Cubemaps settings
             cubemaps: {
-                resolutionDivider: clamp(10 - parseInt(this.score / 400), 1, 8),
+                resolutionDivider: clamp(nearestPow2(10 - parseInt(this.score / 400)), 1, 8),
                 canBeRealtime: this.score >= 1000 ? true : false,
             }
         }

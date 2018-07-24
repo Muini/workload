@@ -28,8 +28,8 @@ export default new Scene({
             parent: this,
             position: new THREE.Vector3(0, 45, 62),
             rotation: new THREE.Vector3(0, 0, 0),
-            focalLength: 25,
-            aperture: 6.0,
+            focalLength: 25, //25
+            aperture: 4.0,
             focus: 50.0,
             far: 900,
         });
@@ -70,7 +70,7 @@ export default new Scene({
             power: 8.0,
             castShadow: true,
             shadowMapSize: 1024,
-            shadowCameraSize: 60.0,
+            shadowCameraSize: 50.0,
             position: new THREE.Vector3(-30, 100, 30),
         })
         
