@@ -17,6 +17,7 @@ export class Camera extends Obj {
             focalLength: opt.focalLength || 30,
             aperture: opt.aperture || 2.8,
             focus: opt.focus || 100.0,
+            threshold: 0.01,
         }
 
         //Init variables
@@ -108,6 +109,7 @@ export class Camera extends Obj {
                 folder.add(this.params, 'focalLength', 12.0, 200.0).onChange(value => guiChanger(value, 'focalLength'));
                 folder.add(this.params, 'near').onChange(value => guiChanger(value, 'near'));
                 folder.add(this.params, 'far').onChange(value => guiChanger(value, 'far'));
+                folder.add(this.params, 'threshold', 0.0, 0.01).onChange(value => { console.log(value); Engine.postprod.bokeh.uniforms['threshold'].value = value });
                 if(!this.targetMAP)
                     folder.add(this.params, 'focus').onChange(value => guiChanger(value, 'focus'));
                 folder.add(this.params, 'aperture', 1.0, 22.0).onChange(value => guiChanger(value, 'aperture'));
