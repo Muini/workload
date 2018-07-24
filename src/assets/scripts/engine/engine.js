@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-// import '../vendors/WebGLDeferredRenderer';
 import Log from './utils/log';
 import * as dat from 'dat.gui';
 import Quality from './quality';
@@ -44,6 +43,7 @@ class Engine {
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
 
+        this.timeScale = 1.0;
         this.lastTick = 0;
         this.elapsedTime = 0;
 
@@ -404,12 +404,14 @@ class Engine {
             this.stats.begin();
 
         // Calculate delta
-        const now = time,
-            delta = now - (this.lastTick || now);
+        const delta = time - (this.lastTick || time);
 
         //Check if we need to downgrade the renderer
         if (this.hasAdapativeRenderer)
             this.adaptiveRenderer(time, delta);
+
+        // Scale the time
+        const deltaScaled = delta * this.timeScale;
 
         //Check if we're loading something in background
         if (this.hasBackgroundPreload)
@@ -417,12 +419,12 @@ class Engine {
 
         //Update & Render Post processing effects
         if (this.hasPostProd)
-            this.postprod.update(time, delta);
+            this.postprod.update(time, deltaScaled);
 
         //Update all objects
         this.updateFunctions.forEach(fct => {
             try {
-                fct(time, delta);
+                fct(time, deltaScaled);
             } catch (error) {
                 Log.push('error', this.constructor.name, `${error}`)
                 this.pause();
@@ -433,7 +435,7 @@ class Engine {
         this.renderer.render(SceneManager.currentScene.instance, SceneManager.currentScene.mainCamera);
 
         //Store elapsed time
-        this.elapsedTime += delta;
+        this.elapsedTime += deltaScaled;
 
         //Store lastTick
         this.lastTick = time;

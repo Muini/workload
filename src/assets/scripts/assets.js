@@ -1,10 +1,25 @@
 export default {
+    // Global assets
+    'global': {
+        models: {
+            'city.model': '/static/models/city.glb',
+        },
+        textures: {
+
+        },
+        sounds: {
+
+        }
+    },
     //Scene name
     'city': {
         models: {
             'city.model': '/static/models/city.glb',
         },
         textures: {
+            
+        },
+        sounds: {
 
         }
     },
@@ -15,6 +30,9 @@ export default {
             'cash.model': '/static/models/cash.glb',
         },
         textures: {
+
+        },
+        sounds: {
 
         }
     },

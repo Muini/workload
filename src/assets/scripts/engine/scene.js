@@ -15,6 +15,10 @@ export default class Scene {
     }) {
         this.uuid = UUID();
         this.name = opt.name || 'unamed scene';
+        if(this.name === 'global'){
+            Log.push('warn', this.constructor.name, `Scene name 'global' is reserved, changed to 'global2'`)
+            this.name = 'global2'
+        }
         this.data = opt.data || {};
         this.setup = opt.setup || function() {};
         this.onStart = opt.onStart || function() {};
@@ -121,10 +125,13 @@ export default class Scene {
             await AssetsManager.loadAssetsFromScene(this.name, async _ => {
                 Log.push('success', this.constructor.name, `Scene c:LightGreen{${this.name}} loaded`);
                 await this.createObjects();
+                console.log('compile scene', this.name)
+                await Engine.renderer.compile(this.instance, this.camera.instance);
                 this.isLoading = false;
                 this.hasLoaded = true;
                 return this.onPreloaded();
             });
+
         })();
     }
 

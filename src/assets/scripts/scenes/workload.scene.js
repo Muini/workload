@@ -83,7 +83,7 @@ export default new Scene({
 
     },
     onStart: async function() {
-        await Engine.wait(1000)
+        // await Engine.wait(1000)
 
         this.testdom.setVisibility(false);
 

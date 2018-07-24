@@ -17,8 +17,8 @@ class SceneManager {
 
     initScenes(){
         return (async() => {
-            this.scenes.forEach(scene => {
-                scene.initScene();
+            this.scenes.forEach(async scene => {
+                await scene.initScene();
             });
         })();
     }
