@@ -1,7 +1,7 @@
 import Engine from './engine';
-import DomObject from '../classes/domObject';
+import DomEntity from '../classes/domEntity';
 
-class Loader extends DomObject {
+class Loader extends DomEntity {
     constructor(opt = {}) {
         super(opt);
         this.isLoader = true;

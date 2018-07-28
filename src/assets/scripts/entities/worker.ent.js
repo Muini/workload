@@ -3,13 +3,13 @@ import * as THREE from 'three';
 import Engine from '../engine/core/engine';
 
 import Sound from '../engine/classes/sound';
-import Obj from '../engine/classes/obj';
+import Entity from '../engine/classes/entity';
 
-import { Light } from '../objects/default/light.obj';
-import { PaperBlock } from './paperBlock.obj';
-import { CashPile } from './cashPile.obj';
+import { Light } from './default/light.ent';
+import { PaperBlock } from './paperBlock.ent';
+import { CashPile } from './cashPile.ent';
 
-export class Worker extends Obj {
+export class Worker extends Entity {
     constructor(opt) {
         super(opt);
     }

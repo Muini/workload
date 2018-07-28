@@ -2,9 +2,9 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/core/engine';
 
-import Obj from '../../engine/classes/obj';
+import Entity from '../../engine/classes/entity';
 
-export class Exemple extends Obj {
+export class Exemple extends Entity {
     constructor(opt = {}) {
         super(opt);
     }
@@ -15,13 +15,8 @@ export class Exemple extends Obj {
         this.modelName = 'exemple.model';
         this.hasShadows = true;
 
-        // Init materials to be overwrite by name
-        this.materials['ExempleMaterial'] = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0xCFCFCF),
-            roughness: .85,
-            metalness: .0,
-            dithering: true,
-        })
+        // Init materials to be overwrite by name, second argument is 'isInstancedMaterial'
+        this.addMaterial('Grass', true);
 
         // Init lights to be overwrite by name
         this.lights['ExempleLight'] = new THREE.PointLight(0xE7B47F, 3, 5);
@@ -35,7 +30,7 @@ export class Exemple extends Obj {
     created() {
         return (async() => {
             await super.created();
-            // Is fired when the object is created after assets are loaded
+            // Is fired when the entity is created after assets are loaded
         })();
     }
 

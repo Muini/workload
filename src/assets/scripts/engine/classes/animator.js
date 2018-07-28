@@ -9,7 +9,7 @@ export default class Animator {
     }) {
 
         this.model = opt.model;
-        if (!this.model) return Log.push('error', this.constructor.name, `Animator parameter "model" is mandatory and should be a Object or Scene type`);
+        if (!this.model) return Log.push('error', this.constructor.name, `Animator parameter "model" is mandatory and should be a Entity or Scene type`);
 
         this.animations = opt.animations || undefined;
 

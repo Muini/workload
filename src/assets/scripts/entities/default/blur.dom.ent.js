@@ -2,9 +2,9 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/core/engine';
 import Log from '../../engine/utils/log';
-import DomObject from '../../engine/classes/domObject';
+import DomEntity from '../../engine/classes/domEntity';
 
-export class BlurDom extends DomObject {
+export class BlurDom extends DomEntity {
     constructor(opt = {}) {
         super(opt);
     }
@@ -55,7 +55,7 @@ export class BlurDom extends DomObject {
         else if (Engine.postprod)
             Engine.postprod.addBlurPosition(this);
         else
-            Log.push('warn', this.constructor.name, `Blur Dom Objects require postprocessing effects on`);
+            Log.push('warn', this.constructor.name, `Blur DomEntity require postprocessing effects on`);
     }
 
     update(time, delta) {

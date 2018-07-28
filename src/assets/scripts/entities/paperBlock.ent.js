@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 
 import Engine from '../engine/core/engine'
-import Obj from '../engine/classes/obj';
+import Entity from '../engine/classes/entity';
 
-import { Paper } from './paper.obj';
+import { Paper } from './paper.ent';
 
-export class PaperBlock extends Obj {
+export class PaperBlock extends Entity {
     constructor(opt = {}) {
         super(opt);
     }

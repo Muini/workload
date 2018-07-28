@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { BlurDom } from './blur.dom.obj';
+import { BlurDom } from './blur.dom.ent';
 
 export class ExempleDom extends BlurDom {
     constructor(opt = {}) {
@@ -25,8 +25,7 @@ export class ExempleDom extends BlurDom {
     awake() {
         return (async() => {
             await super.awake();
-
-            // Is fired when the object is added to the scene
+            // Is fired when the entity is added to the scene
         })();
     }
 

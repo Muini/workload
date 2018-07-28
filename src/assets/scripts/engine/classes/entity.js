@@ -7,7 +7,7 @@ import MaterialManager from '../core/materialManager';
 import Animator from './animator';
 
 // TODO: Rename Obj class as Entity class, Add Model based class inherit from Entity
-export default class Obj {
+export default class Entity {
     constructor(opt = {
         parent,
         position,
@@ -15,7 +15,7 @@ export default class Obj {
         active,
     }) {
         this.uuid = UUID();
-        this.name = 'unnamed object';
+        this.name = 'unnamed entity';
 
         this.model = new THREE.Group();
         this.modelName = undefined;
@@ -31,10 +31,10 @@ export default class Obj {
         this.isActive = opt.active || true;
         this.isVisible = false;
 
-        this.isObject = true;
+        this.isEntity = true;
 
         this.parent = opt.parent || undefined;
-        if (!this.parent) return Log.push('error', this.constructor.name, `Object parameter "parent" is mandatory and should be a Object or Scene type`);
+        if (!this.parent) return Log.push('error', this.constructor.name, `Entity parameter "parent" is mandatory and should be a Object or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.children = [];
 
@@ -49,7 +49,7 @@ export default class Obj {
     // Init happen when the entire project is loaded
     init(opt) {
         //Add object to the parent as children, and to the scene to register it
-        this.scene.addObject(this);
+        this.scene.addEntity(this);
         this.parent.addChildren(this);
 
         //If the engine has started, it means it's an instanciation

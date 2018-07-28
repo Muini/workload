@@ -2,9 +2,9 @@ import * as THREE from 'three';
 
 import Engine from '../engine/core/engine';
 
-import Obj from '../engine/classes/obj';
+import Entity from '../engine/classes/entity';
 
-export class City extends Obj {
+export class City extends Entity {
     constructor(opt = {}) {
         super(opt);
     }

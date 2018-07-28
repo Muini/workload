@@ -3,10 +3,10 @@ import * as THREE from 'three';
 import Engine from '../../engine/core/engine';
 import Log from '../../engine/utils/log'
 
-import Obj from '../../engine/classes/obj';
+import Entity from '../../engine/classes/entity';
 import '../../../shaders/sky/Sky';
 
-export class Sky extends Obj {
+export class Sky extends Entity {
     constructor(opt = {}) {
         super(opt);
     }
@@ -60,7 +60,7 @@ export class Sky extends Obj {
         return (async() => {
             await super.awake();
 
-            // Is fired when the object is added to the scene
+            // Is fired when the entity is added to the scene
         })();
     }
 

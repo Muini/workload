@@ -38,7 +38,7 @@ export default class Scene {
 
         this.mainCamera = undefined;
 
-        this.objects = [];
+        this.entities = [];
         this.children = [];
         this.sounds = [];
 
@@ -63,26 +63,26 @@ export default class Scene {
         this.sounds.push(sound);
     }
 
-    addObject(object) {
-        this.objects.push(object);
+    addEntity(entity) {
+        this.entities.push(entity);
     }
 
     addChildren(child){
         this.children.push(child);
     }
 
-    createObjects() {
+    createEntities() {
         return (async() => {
-            await Promise.all(this.children.map(async object => { await object.created() }))
-            Log.push('info', this.constructor.name, `Scene created c:salmon{${this.children.length}} object(s)`);
+            await Promise.all(this.children.map(async entity => { await entity.created() }))
+            Log.push('info', this.constructor.name, `Scene created c:salmon{${this.children.length}} entity(ies)`);
             return;
         })();
     }
 
-    awakeObjects() {
+    awakeEntities() {
         return (async() => {
-            await Promise.all(this.children.map(async object => { await object.awake() }))
-            Log.push('info', this.constructor.name, `Scene awaked c:salmon{${this.children.length}} object(s)`);
+            await Promise.all(this.children.map(async entity => { await entity.awake() }))
+            Log.push('info', this.constructor.name, `Scene awaked c:salmon{${this.children.length}} entity(ies)`);
             return;
         })();
     }
@@ -124,7 +124,7 @@ export default class Scene {
 
             await AssetsManager.loadAssetsFromScene(this.name, async _ => {
                 Log.push('success', this.constructor.name, `Scene c:LightGreen{${this.name}} loaded`);
-                await this.createObjects();
+                await this.createEntities();
                 await Engine.renderer.compile(this.instance, this.camera.instance);
                 this.isLoading = false;
                 this.hasLoaded = true;
@@ -138,7 +138,7 @@ export default class Scene {
         return (async() => {
             Engine.addToResize(this.uuid, this.resize.bind(this));
             this.resize();
-            await this.awakeObjects();
+            await this.awakeEntities();
             if (!this.camera || !this.camera.instance) return Log.push('error', this.constructor.name, `No camera has been specified in the scene ${this.name}`);
             this.setCamera(this.camera.instance);
             this.isPlaying = true;
@@ -151,8 +151,9 @@ export default class Scene {
     stop() {
         //This is the end of the scene
         // Desactivate every objects
-        for (let i = 0; i < this.objects.length; i++) {
-            this.objects[i].setActive(false);
+        let i = this.entities.length;
+        while (i--) {
+            this.entities[i].setActive(false);
         }
         // Stop all sounds
         this.sounds.forEach(elem => elem.stop());
@@ -165,8 +166,9 @@ export default class Scene {
         Log.push('info', this.constructor.name, `Clear scene ${this.name}`);
 
         this.sounds.forEach(elem => elem.destroy());
-        for (let i = 0; i < this.objects.length; i++) {
-            this.objects[i].destroy();
+        let i = this.entities.length;
+        while (i--) {
+            this.entities[i].destroy();
         }
         Engine.removeFromResize(this.uuid);
     }

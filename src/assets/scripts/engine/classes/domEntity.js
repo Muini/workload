@@ -4,31 +4,31 @@ import Log from '../utils/log';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
-// TODO: Make the domobject inherit the Obj class
-export default class DomObject {
+// TODO: Make the dom inherit the Entity class
+export default class DomEntity {
     constructor(opt = {
         parent,
         active,
     }) {
         this.uuid = UUID();
-        this.name = 'unnamed dom object';
+        this.name = 'unnamed dom entity';
 
         this.selector = undefined;
         this.dom = undefined;
-        // TODO: Datas for every Object & OnDataChanged function
+        // TODO: Datas for every Entity & OnDataChanged function
         this.data = {};
 
         this.isActive = opt.active || true;
         this.isVisible = false;
-        this.isDomObject = true;
+        this.isDomEntity = true;
 
         this.parent = opt.parent || null;
         if (!this.parent) {
             if (this.constructor.name != 'Loader')
-                Log.push('warn', this.constructor.name, `DomObject parameter "parent" is mandatory and should be a Object or Scene type`);
+                Log.push('warn', this.constructor.name, `DomEntity parameter "parent" is mandatory and should be a Entity or Scene type`);
         } else {
             this.scene = this.parent.isScene ? this.parent : this.parent.scene;
-            this.scene.addObject(this);
+            this.scene.addEntity(this);
             this.parent.addChildren(this);
         }
 

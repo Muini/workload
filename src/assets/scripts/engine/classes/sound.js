@@ -4,7 +4,7 @@ import UUID from '../utils/uuid';
 import Log from '../utils/log';
 import SoundEngine from '../core/soundEngine';
 
-// TODO: Inherit Obj class when Obj class has been lighten
+// TODO: Inherit Entity class when Entity class has been lighten
 export default class Sound {
     constructor(opt = {
         name,
@@ -23,7 +23,7 @@ export default class Sound {
             volume: opt.volume ? opt.volume : 1.0,
         })
         this.parent = opt.parent ? opt.parent : null; //Parent mush be THREE object to get 3D position
-        if (!this.parent) return Log.push('error', this.constructor.name, `Sound parameter "parent" is mandatory and should be a Object or Scene type`);
+        if (!this.parent) return Log.push('error', this.constructor.name, `Sound parameter "parent" is mandatory and should be a Entity or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this.nominalVolume = opt.volume ? opt.volume : 1.0;
 
@@ -33,11 +33,11 @@ export default class Sound {
     }
 
     init() {
-        // Add the sound to the scene, either if the parent is an object or not
+        // Add the sound to the scene, either if the parent is an entity or not
         if (this.parent.isScene) {
             this.scene.addSound(this);
         } else {
-            // If its an object, add it to the object for quick ref and to the scene for preloading
+            // If its an entity, add it to the entity for quick ref and to the scene for preloading
             this.parent.sounds.set(this.name, this);
             this.scene.addSound(this);
         }

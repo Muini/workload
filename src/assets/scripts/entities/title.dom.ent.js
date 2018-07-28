@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import { BlurDom } from './default/blur.dom.obj';
+import { BlurDom } from './default/blur.dom.ent';
 
-export class SubtitleDom extends BlurDom {
+export class TitleDom extends BlurDom {
     constructor(opt = {}) {
         super(opt);
     }
@@ -10,8 +10,8 @@ export class SubtitleDom extends BlurDom {
     init() {
 
         //Init variables
-        this.name = 'Subtitle';
-        this.selector = '.subtitle';
+        this.name = 'Title';
+        this.selector = '.title';
 
         super.init();
 
@@ -23,8 +23,6 @@ export class SubtitleDom extends BlurDom {
     awake() {
         return (async() => {
             await super.awake();
-
-            // Is fired when the object is added to the scene
         })();
     }
 

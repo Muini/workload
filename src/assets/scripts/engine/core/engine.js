@@ -426,7 +426,7 @@ class Engine {
         if (this.hasPostProd)
             this.postprod.update(time, deltaScaled);
 
-        //Update all objects
+        //Update all entities
         this.updateFunctions.forEach(fct => {
             try {
                 fct(time, deltaScaled);

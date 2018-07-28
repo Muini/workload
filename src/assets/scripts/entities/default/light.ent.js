@@ -2,9 +2,9 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/core/engine';
 import Quality from '../../engine/core/quality';
-import Obj from '../../engine/classes/obj';
+import Entity from '../../engine/classes/entity';
 
-export class Light extends Obj{
+export class Light extends Entity{
     constructor(opt = {}) {
         super(opt);
     }

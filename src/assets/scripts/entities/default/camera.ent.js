@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 
 import Engine from '../../engine/core/engine';
-import Obj from '../../engine/classes/obj';
+import Entity from '../../engine/classes/entity';
 import Log from '../../engine/utils/log';
 
 // TODO: make the camera virtual, only data driven. If active, it updates the scene camera
-export class Camera extends Obj {
+export class Camera extends Entity {
     constructor(opt = {}) {
         super(opt);
     }
@@ -115,7 +115,7 @@ export class Camera extends Obj {
                 folder.add(this.params, 'aperture', 1.0, 22.0).onChange(value => guiChanger(value, 'aperture'));
 
             }
-            // Is fired when the object is added to the scene
+            // Is fired when the entity is added to the scene
         })();
     }
 

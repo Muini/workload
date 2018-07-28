@@ -8,16 +8,16 @@ import Scene from '../engine/classes/scene';
 import Sound from '../engine/classes/sound';
 import { Ease,Tween } from '../engine/classes/tween';
 
-// Objects
-import { Camera } from '../objects/default/camera.obj';
-import { Light } from '../objects/default/light.obj';
-import { Cubemap } from '../objects/default/cubemap.obj';
-import { Sky } from '../objects/default/sky.obj';
-import { City } from '../objects/city.obj';
+// Entities
+import { Camera } from '../entities/default/camera.ent';
+import { Light } from '../entities/default/light.ent';
+import { Cubemap } from '../entities/default/cubemap.ent';
+import { Sky } from '../entities/default/sky.ent';
+import { City } from '../entities/city.ent';
 
-// Dom Objects
-import { TitleDom } from '../objects/title.dom.obj';
-import { SubtitleDom } from '../objects/subtitle.dom.obj';
+// Dom Entities
+import { TitleDom } from '../entities/title.dom.ent';
+import { SubtitleDom } from '../entities/subtitle.dom.ent';
 
 // Create scene
 export default new Scene({

@@ -7,13 +7,13 @@ import Scene from '../engine/classes/scene';
 import { Ease, Tween } from '../engine/classes/tween';
 
 // Objects
-import { Camera } from '../objects/default/camera.obj';
-import { Light } from '../objects/default/light.obj';
-import { Cubemap } from '../objects/default/cubemap.obj';
-import { Worker } from '../objects/worker.obj';
+import { Camera } from '../entities/default/camera.ent';
+import { Light } from '../entities/default/light.ent';
+import { Cubemap } from '../entities/default/cubemap.ent';
+import { Worker } from '../entities/worker.ent';
 
 // Dom Objects
-import { ExempleDom } from '../objects/default/exemple.dom.obj';
+import { ExempleDom } from '../entities/default/exemple.dom.ent';
 
 // Create scene
 export default new Scene({

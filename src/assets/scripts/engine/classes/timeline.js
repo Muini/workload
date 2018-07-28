@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import Engine from '../core/engine.js';
 
 // Timeline is meant to be used as Sequence
-// You can add virtual camera, object animations, sounds and music.
+// You can add virtual camera, entities animations, sounds and music.
 export default class Timeline {
     constructor(opt = {
         onFinished
