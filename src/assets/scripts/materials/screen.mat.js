@@ -1,4 +1,4 @@
-import Material from '../engine/material';
+import Material from '../engine/classes/material';
 
 export default new Material('Screen', {
     color: '555555',

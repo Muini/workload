@@ -1,4 +1,4 @@
-import Material from '../engine/material';
+import Material from '../engine/classes/material';
 
 export default new Material( 'Clouds', {
     color: 'E7E7E7',

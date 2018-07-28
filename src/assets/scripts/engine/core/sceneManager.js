@@ -1,6 +1,6 @@
 import Engine from './engine';
 import Loader from './loader';
-import Log from './utils/log';
+import Log from '../utils/log';
 
 class SceneManager {
     constructor() {

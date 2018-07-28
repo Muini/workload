@@ -1,7 +1,7 @@
-import Engine from './engine/engine';
-import SceneManager from './engine/sceneManager';
+import Engine from './engine/core/engine';
+import SceneManager from './engine/core/sceneManager';
+import Loader from './engine/core/loader';
 import './materials/index';
-import Loader from './engine/loader';
 
 //================
 // Scenes

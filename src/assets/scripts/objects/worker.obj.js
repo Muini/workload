@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
+import Engine from '../engine/core/engine';
 
-import Material from '../engine/material';
-import Sound from '../engine/sound';
-import Obj from '../engine/obj';
+import Sound from '../engine/classes/sound';
+import Obj from '../engine/classes/obj';
 
 import { Light } from '../objects/default/light.obj';
 import { PaperBlock } from './paperBlock.obj';

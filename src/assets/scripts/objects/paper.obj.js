@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine';
-import Obj from '../engine/obj';
-import { Ease, Tween } from '../engine/tween';
+import Engine from '../engine/core/engine';
+import Obj from '../engine/classes/obj';
+import { Ease, Tween } from '../engine/classes/tween';
 
 export class Paper extends Obj {
     constructor(opt = {}) {

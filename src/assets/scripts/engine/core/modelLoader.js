@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-import './utils/GLTFLoader';
-import Log from './utils/log';
+import '../utils/GLTFLoader';
+import Log from '../utils/log';
 
 class ModelLoader {
     constructor(opt = {}) {

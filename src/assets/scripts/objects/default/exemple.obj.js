@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import Engine from '../../engine/engine';
+import Engine from '../../engine/core/engine';
 
-import Obj from '../../engine/obj';
+import Obj from '../../engine/classes/obj';
 
 export class Exemple extends Obj {
     constructor(opt = {}) {

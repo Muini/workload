@@ -1,6 +1,6 @@
-import Engine from './engine';
-import UUID from './utils/uuid';
-import Log from './utils/log';
+import Engine from '../core/engine';
+import UUID from '../utils/uuid';
+import Log from '../utils/log';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
@@ -152,10 +152,9 @@ export default class DomObject {
 
             }
             // find class vars
-            // TODO: class management
-            let classes = await this.dom.querySelectorAll('*[class]');
-
-            // TODO: style management
+            // TODO: Parse every attributes to find variables
+            // let classes = await this.dom.querySelectorAll('*[]');
+            
             // console.log(texts, this._vars);
 
             this._shouldUpdateVars = true;

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-import Engine from '../../engine/engine';
+import Engine from '../../engine/core/engine';
 import Log from '../../engine/utils/log'
 
-import Obj from '../../engine/obj';
+import Obj from '../../engine/classes/obj';
 import '../../../shaders/sky/Sky';
 
 export class Sky extends Obj {

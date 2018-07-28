@@ -1,5 +1,5 @@
-import Engine from './engine';
-import UUID from './utils/uuid';
+import Engine from '../core/engine';
+import UUID from '../utils/uuid';
 
 // Almost everything here comes from https://github.com/tweenjs/tween.js
 

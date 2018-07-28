@@ -2,9 +2,10 @@ import * as THREE from 'three';
 
 import Engine from './engine';
 import Loader from './loader';
-import Log from './utils/log';
+import Log from '../utils/log';
 
-import Assets from '../assets';
+//TODO: Auto detect assets to load. Use class delectation to 
+import Assets from '../../assets';
 import ModelLoader from './modelLoader';
 
 class AssetsManager {

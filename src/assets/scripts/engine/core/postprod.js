@@ -2,20 +2,20 @@ import * as THREE from 'three';
 
 import Engine from './engine';
 import Quality from './quality';
-import Log from './utils/log';
+import Log from '../utils/log';
 
-import '../../shaders/postprocess/EffectComposer';
+import '../../../shaders/postprocess/EffectComposer';
 // import { ShaderPass } from 'three/examples/js/postprocessing/ShaderPass';
-import '../../shaders/postprocess/ShaderPass';
-import '../../shaders/postprocess/RenderPass';
+import '../../../shaders/postprocess/ShaderPass';
+import '../../../shaders/postprocess/RenderPass';
 
-import '../../shaders/postprocess/CopyShader';
-import '../../shaders/postprocess/LuminosityHighPass/LuminosityHighPassShader';
-import '../../shaders/postprocess/FXAA/FXAAShader';
-import '../../shaders/postprocess/Bloom/BloomShader';
-import '../../shaders/postprocess/Filmic/FilmicShader';
-import '../../shaders/postprocess/BokehDOF/BokehShader';
-import '../../shaders/postprocess/BlurSharpen/BlurSharpenShader';
+import '../../../shaders/postprocess/CopyShader';
+import '../../../shaders/postprocess/LuminosityHighPass/LuminosityHighPassShader';
+import '../../../shaders/postprocess/FXAA/FXAAShader';
+import '../../../shaders/postprocess/Bloom/BloomShader';
+import '../../../shaders/postprocess/Filmic/FilmicShader';
+import '../../../shaders/postprocess/BokehDOF/BokehShader';
+import '../../../shaders/postprocess/BlurSharpen/BlurSharpenShader';
 
 export default class PostProd {
     constructor(opt = {

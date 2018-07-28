@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import Engine from '../../engine/engine';
-import Quality from '../../engine/quality';
-import Obj from '../../engine/obj';
+import Engine from '../../engine/core/engine';
+import Quality from '../../engine/core/quality';
+import Obj from '../../engine/classes/obj';
 
 export class Light extends Obj{
     constructor(opt = {}) {

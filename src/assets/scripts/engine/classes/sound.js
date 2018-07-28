@@ -1,8 +1,8 @@
 import { Howl, Howler } from 'howler';
 
-import UUID from './utils/uuid';
-import Log from './utils/log';
-import SoundEngine from './soundEngine';
+import UUID from '../utils/uuid';
+import Log from '../utils/log';
+import SoundEngine from '../core/soundEngine';
 
 // TODO: Inherit Obj class when Obj class has been lighten
 export default class Sound {

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Log from './utils/log';
+import Log from '../utils/log';
 import * as dat from 'dat.gui';
 import Quality from './quality';
 import Stats from 'stats.js';
@@ -7,13 +7,16 @@ import PostProd from './postprod';
 import SceneManager from './sceneManager';
 import SoundEngine from './soundEngine';
 
-import './utils/watch-polyfill';
-import UUID from './utils/uuid';
+import '../utils/watch-polyfill';
+import UUID from '../utils/uuid';
 
 class Engine {
     constructor() {
 
+        // TODO: event based engine to avoid import in every files. With naming convention for event
+
         if (Log.debug) {
+            // TODO: remove stats.js, use chrome fps instead and add renderer info gui
             this.stats = new Stats();
             this.stats.showPanel(0);
         }

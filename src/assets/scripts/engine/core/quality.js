@@ -1,9 +1,9 @@
-import MobileGPUs from './utils/gpu/mobile';
-import LaptopGPUs from './utils/gpu/laptop';
-import DesktopGPUs from './utils/gpu/desktop';
+import MobileGPUs from '../utils/gpu/mobile';
+import LaptopGPUs from '../utils/gpu/laptop';
+import DesktopGPUs from '../utils/gpu/desktop';
 
 import Engine from './engine';
-import Log from './utils/log';
+import Log from '../utils/log';
 
 const clamp = function(value, min, max){
     return Math.min(Math.max(value, min), max);

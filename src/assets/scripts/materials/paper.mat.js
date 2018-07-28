@@ -1,4 +1,4 @@
-import Material from '../engine/material';
+import Material from '../engine/classes/material';
 
 export default new Material('Paper', {
     color: 'e5e5e5',

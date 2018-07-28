@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import Engine from './engine';
-import Log from './utils/log';
-import UUID from './utils/uuid';
-import AssetsManager from './assetsManager';
-import MaterialManager from './materialManager';
+import Engine from '../core/engine';
+import Log from '../utils/log';
+import UUID from '../utils/uuid';
+import AssetsManager from '../core/assetsManager';
+import MaterialManager from '../core/materialManager';
 import Animator from './animator';
 
-// TODO: Obj class lighter & upper level class for model based object
+// TODO: Rename Obj class as Entity class, Add Model based class inherit from Entity
 export default class Obj {
     constructor(opt = {
         parent,

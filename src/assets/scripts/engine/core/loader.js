@@ -1,5 +1,5 @@
 import Engine from './engine';
-import DomObject from './domObject';
+import DomObject from '../classes/domObject';
 
 class Loader extends DomObject {
     constructor(opt = {}) {

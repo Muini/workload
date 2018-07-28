@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-import Engine from '../engine/engine'
-import Obj from '../engine/obj';
+import Engine from '../engine/core/engine'
+import Obj from '../engine/classes/obj';
 
 import { Cash } from './cash.obj';
 

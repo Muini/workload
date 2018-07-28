@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 
 // Engine
-import Engine from '../engine/engine';
-import Scene from '../engine/scene';
-import { Ease, Tween } from '../engine/tween';
+import Engine from '../engine/core/engine';
+import MaterialManager from '../engine/core/materialManager';
+import Scene from '../engine/classes/scene';
+import { Ease, Tween } from '../engine/classes/tween';
 
 // Objects
 import { Camera } from '../objects/default/camera.obj';
@@ -13,7 +14,6 @@ import { Worker } from '../objects/worker.obj';
 
 // Dom Objects
 import { ExempleDom } from '../objects/default/exemple.dom.obj';
-import MaterialManager from '../engine/materialManager';
 
 // Create scene
 export default new Scene({

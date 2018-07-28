@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import UUID from './utils/uuid';
-import Log from './utils/log';
-import MaterialManager from './materialManager';
+import UUID from '../utils/uuid';
+import Log from '../utils/log';
+import MaterialManager from '../core/materialManager';
 
 let noiseTexture = new THREE.TextureLoader().load('/static/img/noise.png');
 noiseTexture.minFilter = THREE.NearestFilter;
@@ -89,10 +89,10 @@ export default class Material {
 
     modifyToneMapping(shader){
         shader.fragmentShader = shader.fragmentShader.replace(
-            '#include <color_pars_fragment>', require('../../shaders/tonemapping/aces.frag') + '\n#include <color_pars_fragment>'
+            '#include <color_pars_fragment>', require('../../../shaders/tonemapping/aces.frag') + '\n#include <color_pars_fragment>'
         );
         shader.fragmentShader = shader.fragmentShader.replace(
-            '#include <tonemapping_fragment>', require('../../shaders/tonemapping/tonemapping.frag')
+            '#include <tonemapping_fragment>', require('../../../shaders/tonemapping/tonemapping.frag')
         );
         return shader;
     }
@@ -103,17 +103,17 @@ export default class Material {
         };
         shader.fragmentShader = 'uniform sampler2D noiseTexture;\n' + shader.fragmentShader;
         shader.fragmentShader = shader.fragmentShader.replace(
-            '#include <shadowmap_pars_fragment>', require('../../shaders/partials/shadowmap_pars_fragment.glsl')
+            '#include <shadowmap_pars_fragment>', require('../../../shaders/partials/shadowmap_pars_fragment.glsl')
         );
         return shader;
     }
 
     modifyFogShader(shader){
         shader.vertexShader = shader.vertexShader.replace(
-            '#include <fog_vertex>', require('../../shaders/heightfog/fog.vert')
+            '#include <fog_vertex>', require('../../../shaders/heightfog/fog.vert')
         );
         shader.fragmentShader = shader.fragmentShader.replace(
-            '#include <fog_fragment>', require('../../shaders/heightfog/fog.frag')
+            '#include <fog_fragment>', require('../../../shaders/heightfog/fog.frag')
         );
         return shader;
     }
@@ -134,7 +134,7 @@ export default class Material {
         shader.vertexShader = 'uniform float swayBlend;\n' + shader.vertexShader;
         shader.vertexShader = 'uniform vec2 windForce;\n' + shader.vertexShader;
         shader.vertexShader = shader.vertexShader.replace(
-            '#include <project_vertex>', require('../../shaders/sway/sway.vert')
+            '#include <project_vertex>', require('../../../shaders/sway/sway.vert')
         );
 
         return shader;

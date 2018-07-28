@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 
 // Engine
-import Engine from '../engine/engine';
-import Scene from '../engine/scene';
-import SceneManager from '../engine/sceneManager';
-import Sound from '../engine/sound';
-import { Ease,Tween } from '../engine/tween';
+import Engine from '../engine/core/engine';
+import SceneManager from '../engine/core/sceneManager';
+
+import Scene from '../engine/classes/scene';
+import Sound from '../engine/classes/sound';
+import { Ease,Tween } from '../engine/classes/tween';
 
 // Objects
 import { Camera } from '../objects/default/camera.obj';

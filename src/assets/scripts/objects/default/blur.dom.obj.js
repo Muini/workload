@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import Engine from '../../engine/engine';
+import Engine from '../../engine/core/engine';
 import Log from '../../engine/utils/log';
-import DomObject from '../../engine/domObject';
+import DomObject from '../../engine/classes/domObject';
 
 export class BlurDom extends DomObject {
     constructor(opt = {}) {

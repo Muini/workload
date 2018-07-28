@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Engine from './engine.js';
+import Engine from '../core/engine.js';
 
 // Timeline is meant to be used as Sequence
 // You can add virtual camera, object animations, sounds and music.

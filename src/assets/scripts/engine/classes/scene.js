@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import Engine from './engine';
-import UUID from './utils/uuid';
-import Log from './utils/log';
+import Engine from '../core/engine';
+import UUID from '../utils/uuid';
+import Log from '../utils/log';
 
-import SceneManager from './sceneManager';
-import AssetsManager from './assetsManager';
+import SceneManager from '../core/sceneManager';
+import AssetsManager from '../core/assetsManager';
 
 export default class Scene {
     constructor(opt = {
