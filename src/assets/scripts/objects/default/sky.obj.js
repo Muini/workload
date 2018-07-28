@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 
 import Engine from '../../engine/engine';
+import Log from '../../engine/utils/log'
 
 import Obj from '../../engine/obj';
-import '../../../shaders/Sky';
+import '../../../shaders/sky/Sky';
 
 export class Sky extends Obj {
     constructor(opt = {}) {
@@ -29,6 +30,29 @@ export class Sky extends Obj {
 
         super.init(opt);
 
+        if (Log.debug) {
+            let folder = window.gui.addFolder('Sky');
+            let uniforms = {
+                turbidity: this.uniforms.turbidity.value,
+                rayleigh: this.uniforms.rayleigh.value,
+                luminance: this.uniforms.luminance.value,
+                mieCoefficient: this.uniforms.mieCoefficient.value,
+                mieDirectionalG: this.uniforms.mieDirectionalG.value,
+                sunPosition: this.uniforms.sunPosition.value,
+            }
+            try{
+                folder.add(uniforms, 'turbidity', 0.0, 30.0).onChange(value => {
+                    this.uniforms['turbidity'].value = value
+                });
+                folder.add(uniforms, 'rayleigh', 0.0, 10.0).onChange(value => { this.uniforms['rayleigh'].value = value });
+                folder.add(uniforms, 'luminance', 0.5, 2.0).onChange(value => { this.uniforms['luminance'].value = value });
+                folder.add(uniforms, 'mieCoefficient', 0.0, 1.0).onChange(value => { this.uniforms['mieCoefficient'].value = value });
+                folder.add(uniforms, 'mieDirectionalG', 0.0, 1.0).onChange(value => { this.uniforms['mieDirectionalG'].value = value });
+                folder.add(uniforms.sunPosition, 'x').onChange(value => { this.uniforms['sunPosition'].value.x = value });
+                folder.add(uniforms.sunPosition, 'y').onChange(value => { this.uniforms['sunPosition'].value.y = value });
+                folder.add(uniforms.sunPosition, 'z').onChange(value => { this.uniforms['sunPosition'].value.z = value });
+            }catch(e){}
+        }
         // Define & init here custom variables
     }
 

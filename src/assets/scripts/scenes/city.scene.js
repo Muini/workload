@@ -59,7 +59,8 @@ export default new Scene({
             type: 'ambient',
             color: '222e56',
             colorGround: '323b2e',
-            power: 10.0,
+            power: 10.0, //Day
+            // power: 6.0, //Sunset
         })
 
         this.sun = new Light({
@@ -71,7 +72,8 @@ export default new Scene({
             castShadow: true,
             shadowMapSize: 1024,
             shadowCameraSize: 50.0,
-            position: new THREE.Vector3(-30, 100, 30),
+            position: new THREE.Vector3(-30, 100, 30), //Day
+            // position: new THREE.Vector3(-80, 100, -600), //Sunset
         })
         
         this.sunTarget = new THREE.Object3D();
@@ -85,13 +87,14 @@ export default new Scene({
             parent: this,
             size: 1000,
             sunPosition: this.sun.position,
-            turbidity: 2.0,
-            rayleight: 2.0,
+            turbidity: 4.0,
+            rayleight: 3.0,
             mieCoefficient: 0.005,
-            mieDirectionalG: 0.75
+            mieDirectionalG: 0.5
         })
 
-        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002);
+        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002); //Day
+        // this.instance.fog = new THREE.FogExp2(0xbcb2a4, 0.025);
 
         this.city = new City({
             parent: this

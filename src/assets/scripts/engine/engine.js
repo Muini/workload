@@ -37,7 +37,7 @@ class Engine {
         this.renderer.autoClear = false;
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
         // this.renderer.toneMapping = THREE.CineonToneMapping; //THREE.ACESToneMapping
-        this.renderer.toneMappingExposure = Math.pow(0.68, 4.5);
+        this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
         this.renderer.physicallyCorrectLights = false;
         this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
@@ -124,7 +124,7 @@ class Engine {
                         },
                         bloom: {
                             enabled: Quality.score >= 500 ? true : false,
-                            options: [0.7, 1.0, 0.95]
+                            options: [0.4, 1.0, 0.9]
                         },
                         // bloom: { enabled: false, options: [0.5, 1.0, 0.9] },
                         filmic: {
@@ -134,6 +134,7 @@ class Engine {
                             rgbSplit: Quality.score >= 1000 ? 5.0 : 0.0,
                             vignette: 20.0,
                             vignetteOffset: 0.15,
+                            contrast: 1.25,
                             lut: 1.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },

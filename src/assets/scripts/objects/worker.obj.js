@@ -148,7 +148,7 @@ export class Worker extends Obj {
         super.update(time, delta);
 
         if (this.isDead) {
-            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(8, 9);
+            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(9, 10);
             this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
             return;
         }
@@ -170,7 +170,7 @@ export class Worker extends Obj {
         }
 
         if(this.isWorking){
-            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(6, 7);
+            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(8, 9);
             this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
         }
     }

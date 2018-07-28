@@ -43,6 +43,7 @@ export default class PostProd {
                 rgbSplit: 1.0,
                 vignette: 1.0,
                 vignetteOffset: 1.0,
+                contrast: 1.0,
                 lut: 1.0,
                 lutURL: '/static/img/lut.png',
             },
@@ -144,6 +145,8 @@ export default class PostProd {
             this.filmic.uniforms['vignetteStrength'].value = this.passes.filmic.vignette;
             this.filmic.uniforms['vignetteOffset'].value = this.passes.filmic.vignetteOffset;
 
+            this.filmic.uniforms['contrast'].value = this.passes.filmic.contrast;
+
             let lutTexture = new THREE.TextureLoader().load(this.passes.filmic.lutURL);
             lutTexture.minFilter = THREE.NearestFilter;
             lutTexture.magFilter = THREE.NearestFilter;
@@ -159,12 +162,14 @@ export default class PostProd {
                     rgbSplitStrength: this.passes.filmic.rgbSplit,
                     vignetteStrength: this.passes.filmic.vignette,
                     vignetteOffset: this.passes.filmic.vignetteOffset,
+                    contrast: this.passes.filmic.contrast,
                     LUTstrength: this.passes.filmic.lut,
                 }
                 folder.add(uniforms, 'noiseStrength', 0.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'noiseStrength'));
                 folder.add(uniforms, 'rgbSplitStrength', -10.0, 10.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'rgbSplitStrength'));
                 folder.add(uniforms, 'vignetteStrength', 0.0, 100.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'vignetteStrength'));
                 folder.add(uniforms, 'vignetteOffset', 0.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'vignetteOffset'));
+                folder.add(uniforms, 'contrast', 0.0, 2.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'contrast'));
                 folder.add(uniforms, 'LUTstrength', 0.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'LUTstrength'));
             }
         }
@@ -228,11 +233,12 @@ export default class PostProd {
             this.bokeh.uniforms['tDiffuse'].value = this.renderTarget.texture;
             this.composer.addPass(this.bokeh);
         }
-        if (this.passes.bloom.enabled) {
-            this.composer.addPass(this.bloom);
-        }
+        
         if (this.passes.filmic.enabled) {
             this.composer.addPass(this.filmic);
+        }
+        if (this.passes.bloom.enabled) {
+            this.composer.addPass(this.bloom);
         }
         if (this.passes.fxaa.enabled) {
             this.composer.addPass(this.fxaa);

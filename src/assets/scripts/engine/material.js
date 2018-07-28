@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import UUID from './utils/uuid';
+import Log from './utils/log';
 import MaterialManager from './materialManager';
 
 let noiseTexture = new THREE.TextureLoader().load('/static/img/noise.png');
@@ -49,12 +50,12 @@ export default class Material {
             fog: this.params.fog,
         });
 
-        // TODO: Add ACES Tonemapping
-
         if (this.isSwayShader) {
             this.instance.onBeforeCompile = (shader) => {
 
                 shader = this.addSwayShader(shader);
+
+                shader = this.modifyToneMapping(shader);
 
                 shader = this.modifyFogShader(shader);
                 
@@ -62,15 +63,21 @@ export default class Material {
 
                 this.instance.uniforms = shader.uniforms;
 
+                // Log.push('info', this.constructor.name, `Compile shader ${this.name}`);
             };
         }else{
             this.instance.onBeforeCompile = (shader) => {
+
+                shader = this.modifyToneMapping(shader);
 
                 shader = this.modifyFogShader(shader);
 
                 shader = this.modifyShadowShader(shader);
 
+
                 this.instance.uniforms = shader.uniforms;
+
+                // Log.push('info', this.constructor.name, `Compile shader ${this.name}`);
             };
         }
         
@@ -78,6 +85,16 @@ export default class Material {
 
         if (!isCloning)
             MaterialManager.register(this);
+    }
+
+    modifyToneMapping(shader){
+        shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <color_pars_fragment>', require('../../shaders/tonemapping/aces.frag') + '\n#include <color_pars_fragment>'
+        );
+        shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <tonemapping_fragment>', require('../../shaders/tonemapping/tonemapping.frag')
+        );
+        return shader;
     }
 
     modifyShadowShader(shader){
@@ -88,7 +105,7 @@ export default class Material {
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <shadowmap_pars_fragment>', require('../../shaders/partials/shadowmap_pars_fragment.glsl')
         );
-        return shader
+        return shader;
     }
 
     modifyFogShader(shader){
@@ -98,7 +115,7 @@ export default class Material {
         shader.fragmentShader = shader.fragmentShader.replace(
             '#include <fog_fragment>', require('../../shaders/heightfog/fog.frag')
         );
-        return shader
+        return shader;
     }
 
     addSwayShader(shader){

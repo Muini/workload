@@ -57,9 +57,9 @@ export default new Scene({
             name: 'Ambient Light',
             parent: this,
             type: 'ambient',
-            color: '222e56',
+            color: '2f364f',
             colorGround: '323b2e',
-            power: 5.0,
+            power: 10.0,
         })
 
         this.instance.fog = new THREE.FogExp2(0x30364c, 0.001);

@@ -2,7 +2,7 @@ import UUID from './uuid';
 
 class Log {
     constructor() {
-        this.debug = false;
+        this.debug = true;
 
         this.logsAtScreen = new Map();
 

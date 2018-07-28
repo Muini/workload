@@ -125,7 +125,6 @@ export default class Scene {
             await AssetsManager.loadAssetsFromScene(this.name, async _ => {
                 Log.push('success', this.constructor.name, `Scene c:LightGreen{${this.name}} loaded`);
                 await this.createObjects();
-                console.log('compile scene', this.name)
                 await Engine.renderer.compile(this.instance, this.camera.instance);
                 this.isLoading = false;
                 this.hasLoaded = true;

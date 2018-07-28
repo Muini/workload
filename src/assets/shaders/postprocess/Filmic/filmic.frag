@@ -19,6 +19,8 @@ uniform float rgbSplitStrength;
 uniform float vignetteStrength;
 uniform float vignetteOffset;
 
+uniform float contrast;
+
 uniform sampler2D LUTtexture;
 uniform float LUTstrength;
 
@@ -73,7 +75,9 @@ void main() {
             gl_FragColor.rgb = noiseColor;
         #endif
     }
-    
+
+    gl_FragColor.rgb = ((gl_FragColor.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
+
     vec3 lut = lookup(gl_FragColor, LUTtexture).rgb;
     gl_FragColor.rgb = mix(gl_FragColor.rgb, lut, LUTstrength);
     
