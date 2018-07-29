@@ -1,15 +1,12 @@
 import * as THREE from 'three';
 
 import Engine from '../engine/core/engine';
-import Entity from '../engine/classes/entity';
+import Model from '../engine/classes/model';
 import { Ease, Tween } from '../engine/classes/tween';
 
-export class Cash extends Entity {
+export class Cash extends Model {
     constructor(opt = {}) {
         super(opt);
-    }
-
-    init() {
         //Init variables
         this.name = 'cash';
         this.modelName = 'cash.model';
@@ -18,10 +15,8 @@ export class Cash extends Entity {
         // Init materials
         this.addMaterial('Paper', false);
         this.addMaterial('Money', false);
-
-        super.init();
     }
-
+    
     created() {
         return (async() => {
             await super.created();

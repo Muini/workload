@@ -8,9 +8,6 @@ import { Paper } from './paper.ent';
 export class PaperBlock extends Entity {
     constructor(opt = {}) {
         super(opt);
-    }
-
-    init() {
         //Init variables
         this.name = 'paper_block';
 
@@ -18,8 +15,6 @@ export class PaperBlock extends Entity {
         this.papersMax = 30;
         
         this.paperHeight = .12;
-        
-        super.init();
     }
 
     created() {

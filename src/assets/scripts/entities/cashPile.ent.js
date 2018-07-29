@@ -8,9 +8,6 @@ import { Cash } from './cash.ent';
 export class CashPile extends Entity {
     constructor(opt = {}) {
         super(opt);
-    }
-
-    init() {
         //Init variables
         this.name = 'cash_pile';
         
@@ -20,8 +17,6 @@ export class CashPile extends Entity {
         this.cashHeight = .1;
         
         this.pileColumn = 2;
-        
-        super.init();
     }
 
     created() {

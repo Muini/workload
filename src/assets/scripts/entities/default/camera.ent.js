@@ -8,9 +8,7 @@ import Log from '../../engine/utils/log';
 export class Camera extends Entity {
     constructor(opt = {}) {
         super(opt);
-    }
 
-    init(opt) {
         this.params = {
             near: opt.near || 1.0,
             far: opt.far || 1000.0,
@@ -37,9 +35,6 @@ export class Camera extends Entity {
         this.model.add(this.instance);
 
         this.watchParams();
-
-        super.init(opt);
-
     }
 
     watchParams(){

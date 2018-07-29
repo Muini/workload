@@ -7,9 +7,7 @@ import Entity from '../../engine/classes/entity';
 export class Cubemap extends Entity {
     constructor(opt = {}) {
         super(opt);
-    }
 
-    init(opt) {
         //Init variables
         this.name = 'cubemap';
 
@@ -26,13 +24,13 @@ export class Cubemap extends Entity {
         this.cubeCamera1 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera1.name = 'Cubemap CubeCamera1';
         this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
-        this.cubeCamera1.rotation.x = -3.14 / 2;
+        // this.cubeCamera1.rotation.x = -3.14 / 2;
         this.model.add(this.cubeCamera1);
 
         this.cubeCamera2 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera2.name = 'Cubemap CubeCamera1';
         this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
-        this.cubeCamera2.rotation.x = -3.14 / 2;
+        // this.cubeCamera2.rotation.x = -3.14 / 2;
         this.model.add(this.cubeCamera2);
 
 
@@ -56,8 +54,6 @@ export class Cubemap extends Entity {
             let debugSphere = new THREE.Mesh(geometry, this.debugMaterial);
             this.model.add(debugSphere);
         }
-        
-        super.init(opt);
     }
 
     awake() {

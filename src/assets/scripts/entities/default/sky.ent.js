@@ -9,9 +9,7 @@ import '../../../shaders/sky/Sky';
 export class Sky extends Entity {
     constructor(opt = {}) {
         super(opt);
-    }
 
-    init(opt) {
         //Init variables
         this.name = 'sky';
 
@@ -27,8 +25,6 @@ export class Sky extends Entity {
         this.uniforms.mieCoefficient.value = opt.mieCoefficient || 0.005;
         this.uniforms.mieDirectionalG.value = opt.mieDirectionalG || 0.8;
         this.uniforms.sunPosition.value.copy(opt.sunPosition || new THREE.Vector3(0, 100, 0));
-
-        super.init(opt);
 
         if (Log.debug) {
             let folder = window.gui.addFolder('Sky');
@@ -53,7 +49,6 @@ export class Sky extends Entity {
                 folder.add(uniforms.sunPosition, 'z').onChange(value => { this.uniforms['sunPosition'].value.z = value });
             }catch(e){}
         }
-        // Define & init here custom variables
     }
 
     awake() {

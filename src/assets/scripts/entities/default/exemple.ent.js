@@ -2,14 +2,12 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/core/engine';
 
-import Entity from '../../engine/classes/entity';
+import Model from '../../engine/classes/model';
 
-export class Exemple extends Entity {
+export class Exemple extends Model {
     constructor(opt = {}) {
         super(opt);
-    }
 
-    init(opt) {
         //Init variables
         this.name = 'exemple';
         this.modelName = 'exemple.model';
@@ -21,10 +19,6 @@ export class Exemple extends Entity {
         // Init lights to be overwrite by name
         this.lights['ExempleLight'] = new THREE.PointLight(0xE7B47F, 3, 5);
         this.lights['ExempleLight'].castShadow = false;
-
-        super.init(opt);
-
-        // Define & init here custom variables
     }
 
     created() {

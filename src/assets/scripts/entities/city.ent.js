@@ -2,21 +2,18 @@ import * as THREE from 'three';
 
 import Engine from '../engine/core/engine';
 
-import Entity from '../engine/classes/entity';
+import Model from '../engine/classes/model';
 
-export class City extends Entity {
+export class City extends Model {
     constructor(opt = {}) {
         super(opt);
-    }
 
-    init() {
         //Init variables
         this.name = 'city';
         this.modelName = 'city.model';
         this.hasShadows = true;
 
         // Init materials to be overwrite by name
-
         this.addMaterial('Grass');
         this.addMaterial('Floor');
         this.addMaterial('Concrete');
@@ -28,9 +25,6 @@ export class City extends Entity {
         this.addMaterial('Clouds');
         this.addMaterial('Leafs');
         this.addMaterial('Mountain');
-        this.addMaterial('Snow');
-
-        super.init();
     }
 
     created() {

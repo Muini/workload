@@ -7,10 +7,7 @@ import Entity from '../../engine/classes/entity';
 export class Light extends Entity{
     constructor(opt = {}) {
         super(opt);
-    }
 
-    init(opt) {
-        
         this.name = opt.name || 'unnamed light';
         this.type = opt.type ? opt.type.toLowerCase() : 'point';
 
@@ -73,8 +70,6 @@ export class Light extends Entity{
         }else{
             this.model.add(this.instance);
         }
-
-        super.init(opt);
     }
 
     created() {

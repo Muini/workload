@@ -3,22 +3,21 @@ import * as THREE from 'three';
 import Engine from '../engine/core/engine';
 
 import Sound from '../engine/classes/sound';
-import Entity from '../engine/classes/entity';
+import Model from '../engine/classes/model';
 
 import { Light } from './default/light.ent';
 import { PaperBlock } from './paperBlock.ent';
 import { CashPile } from './cashPile.ent';
 
-export class Worker extends Entity {
+export class Worker extends Model {
     constructor(opt) {
         super(opt);
-    }
-
-    init() {
         //Init variables
         this.name = 'worker';
         this.modelName = 'worker.model';
         this.hasShadows = true;
+
+        console.log(this)
 
         // Init materials
         this.addMaterial('ABS');
@@ -54,8 +53,6 @@ export class Worker extends Entity {
             power: 10,
             castShadow: true,
         })
-        
-        super.init();
 
         this.timeElapsed = 0;
 
