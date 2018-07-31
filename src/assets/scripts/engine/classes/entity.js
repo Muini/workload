@@ -74,6 +74,12 @@ export default class Entity {
 
     created() {
         return (async () => {
+            //Name it properly
+            this.model.name = this.name;
+
+            // TODO: Import model correctly to invert axis
+            if (!this.isCamera && !this.isLight && !this.isModelEntity)
+                this.rotation.x += Math.PI / 2; //hack inverted axis
 
             // Set original coord
             this.model.position.x += this.position.x;
@@ -94,10 +100,11 @@ export default class Entity {
             }
 
             // Create children now
-            if (this.children.length > 0)
+            if (this.children.length > 0){
                 await Promise.all(this.children.map(async child => {
                     await child.created()
                 }))
+            }
 
             // Awake
             if (this.scene && this.scene.isPlaying) {
@@ -127,8 +134,17 @@ export default class Entity {
         return this.children.filter(item => item.uuid === uuid)[0];
     }
 
-    update(time, delta) {
+    setPosition(x = null, y = null, z = null) {
+        // TODO: Create set position & rotation methods to avoid THREE implementation
+        // if (x != null)
+        //     this.model.position.setX(x);
+        // if (y != null)
+        //     this.model.position.setY(y);
+        // if (z != null)
+        //     this.model.position.setZ(z);
     }
+
+    update(time, delta) {}
 
     onClicked() {
         if (!this.isActive) return;

@@ -32,25 +32,20 @@ export default class Model extends Entity{
     getModel() {
         return (async () => {
             //Is there a model ?
-            if (this.modelName) {
-                //Get the model from the assets manager
-                const asset = await AssetsManager.getAsset('model', this.modelName);
-                this.model = asset.model;
-                //Create an animator if there is animations
-                if (asset.animations.length) {
-                    this.animator = new Animator({
-                        model: this.model,
-                        animations: asset.animations
-                    });
-                }
-                //Update local parameters
-                await this.overwriteModelParameters();
-            } else {
-                //There is no model, just name it properly
-                this.model.name = this.name;
-                if (!this.isCamera && !this.isLight)
-                    this.rotation.x += Math.PI / 2; //hack inverted axis
+            if (!this.modelName) return;
+            //Get the model from the assets manager
+            const asset = await AssetsManager.getAsset('model', this.modelName);
+            this.model = asset.model;
+            //Create an animator if there is animations
+            if (asset.animations.length) {
+                this.animator = new Animator({
+                    model: this.model,
+                    animations: asset.animations
+                });
             }
+            //Update local parameters
+            await this.overwriteModelParameters();
+
             return;
         })();
     }
@@ -147,6 +142,10 @@ export default class Model extends Entity{
             });
             return models;
         })();
+    }
+
+    fade(duration, onUpdate){
+        // TODO: fade in and fade out method
     }
 
     update(time, delta) {

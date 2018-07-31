@@ -17,8 +17,6 @@ export class Worker extends Model {
         this.modelName = 'worker.model';
         this.hasShadows = true;
 
-        console.log(this)
-
         // Init materials
         this.addMaterial('ABS');
         this.addMaterial('Metal');

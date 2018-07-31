@@ -3,6 +3,7 @@ import Log from '../utils/log';
 import * as dat from 'dat.gui';
 import Quality from './quality';
 import Stats from 'stats.js';
+import RendererStats from 'three-webgl-stats';
 import PostProd from './postprod';
 import SceneManager from './sceneManager';
 import SoundEngine from './soundEngine';
@@ -19,6 +20,7 @@ class Engine {
             // TODO: remove stats.js, use chrome fps instead and add renderer info gui
             this.stats = new Stats();
             this.stats.showPanel(0);
+            this.rendererStats = new RendererStats();
         }
 
         this.fixedRatio = (16 / 9);
@@ -126,7 +128,7 @@ class Engine {
                             enabled: Quality.score > 200 ? true : false
                         },
                         bloom: {
-                            enabled: Quality.score >= 500 ? true : false,
+                            enabled: Quality.score >= 1000 ? true : false,
                             options: [0.4, 1.0, 0.9]
                         },
                         // bloom: { enabled: false, options: [0.5, 1.0, 0.9] },
@@ -135,13 +137,13 @@ class Engine {
                             noise: 0.1,
                             useStaticNoise: true,
                             rgbSplit: Quality.score >= 1000 ? 5.0 : 0.0,
-                            vignette: 20.0,
+                            vignette: Quality.score >= 1000 ? 20.0 : 0.0,
                             vignetteOffset: 0.15,
                             contrast: 1.25,
                             lut: 1.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },
-                        bokehdof: { enabled: Quality.score >= 1000 ? true : false, },
+                        bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
                         // bokehdof: { enabled: false, },
                         blur: {
                             enabled: true,
@@ -156,8 +158,13 @@ class Engine {
 
             this.container = container;
             await this.container.appendChild(this.renderer.domElement);
-            if (Log.debug)
+            if (Log.debug){
                 this.container.appendChild(this.stats.dom);
+                this.rendererStats.domElement.style.position = 'absolute'
+                this.rendererStats.domElement.style.left = '0px'
+                this.rendererStats.domElement.style.bottom = '0px'
+                document.body.appendChild(this.rendererStats.domElement)
+            }
 
             if(fixedRatio !== undefined){
                 this.setFixedRatio(fixedRatio);
@@ -445,8 +452,10 @@ class Engine {
         //Store lastTick
         this.lastTick = time;
 
-        if (Log.debug)
+        if (Log.debug){
             this.stats.end();
+            this.rendererStats.update(this.renderer);
+        }
 
     }
 }

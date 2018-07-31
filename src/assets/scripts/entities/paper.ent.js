@@ -59,7 +59,6 @@ export class Paper extends Model {
                     this.model.position.z = initialPosZ + ((1 - props.opacity) * 1.);
                 })
                 .onComplete(_ => {
-                    this.destroy();
                     resolve();
                 })
                 .start();

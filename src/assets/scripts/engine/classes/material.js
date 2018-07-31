@@ -48,7 +48,10 @@ export default class Material {
             dithering: false,
             envMapIntensity: 6.,
             fog: this.params.fog,
+            wireframe: false
         });
+
+        // TODO: Remove ACES back to Uncharted2 tonemapping
 
         if (this.isSwayShader) {
             this.instance.onBeforeCompile = (shader) => {

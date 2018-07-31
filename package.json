@@ -46,6 +46,7 @@
         "howler": "^2.0.13",
         "stats.js": "^0.17.0",
         "three": "0.94.0",
+        "three-webgl-stats": "^1.0.5",
         "webfontloader": "^1.6.28"
     }
 }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../engine/core/engine'
 import Entity from '../engine/classes/entity';
+import Pool from '../engine/classes/pool';
 
 import { Paper } from './paper.ent';
 
@@ -13,8 +14,11 @@ export class PaperBlock extends Entity {
 
         this.papers = [];
         this.papersMax = 30;
+        this.papersNbr = 0;
         
         this.paperHeight = .12;
+
+        this.paperPool = new Pool(Paper, this, this.papersMax);
     }
 
     created() {
@@ -34,12 +38,15 @@ export class PaperBlock extends Entity {
     }
 
     addPaper() {
-        if (this.papers.length >= this.papersMax) return;
-        let newPaper = new Paper({
-            parent: this,
-            position: new THREE.Vector3(THREE.Math.randFloat(-0.05, 0.05), this.paperHeight * (this.papers.length), THREE.Math.randFloat(-0.05, 0.05))
-        })
+        if (this.papersNbr >= this.papersMax) return;
+        let newPaper = this.paperPool.getEntity();
+        newPaper.model.position.set(
+            THREE.Math.randFloat(-0.05, 0.05), 
+            this.paperHeight * this.papersNbr, 
+            THREE.Math.randFloat(-0.05, 0.05)
+        )
         this.papers.push(newPaper)
+        this.papersNbr++;
         Engine.waitNextTick().then(_ => {
             newPaper.appear();
         })
@@ -47,17 +54,20 @@ export class PaperBlock extends Entity {
 
     removePaper() {
         return (async () => {
-            if (this.papers.length <= 0) return;
-            this.papers[0].disappear();
-            this.papers.splice(0, 1);
+            if (this.papersNbr <= 0) return;
+            this.papers[0].disappear().then(_ => {
+                this.paperPool.putEntity(this.papers[0]);
+                this.papers.splice(0,1);
+            });
             await this.movePapersDown();
+            this.papersNbr--;
             return;
         })();
     }
 
     movePapersDown() {
-        let i = this.papers.length;
-        while (i--) {
+        let i = this.papersNbr;
+        while (i-- > 1) {
             this.papers[i].moveDown(this.paperHeight);
         }
     }
