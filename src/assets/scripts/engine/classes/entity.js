@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Engine from '../core/engine';
 import Log from '../utils/log';
 import UUID from '../utils/uuid';
+import Data from '../utils/data';
 
 export default class Entity {
     constructor(opt = {
@@ -17,6 +18,7 @@ export default class Entity {
 
         this.sounds = new Map();
         this.lights = new Map();
+        this.data = new Data();
 
         this.isStatic = false;
         this.isActive = opt.active || true;
@@ -27,7 +29,7 @@ export default class Entity {
         this.parent = opt.parent || undefined;
         if (!this.parent) return Log.push('error', this.constructor.name, `Entity parameter "parent" is mandatory and should be a Object or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
-        this.children = [];
+        this._children = [];
 
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
         this.rotation = opt.rotation || new THREE.Vector3(0, 0, 0);
@@ -40,7 +42,7 @@ export default class Entity {
     }
 
     addChildren(child) {
-        this.children.push(child);
+        this._children.push(child);
     }
 
     setVisibility(bool) {
@@ -100,8 +102,8 @@ export default class Entity {
             }
 
             // Create children now
-            if (this.children.length > 0){
-                await Promise.all(this.children.map(async child => {
+            if (this._children.length > 0){
+                await Promise.all(this._children.map(async child => {
                     await child.created()
                 }))
             }
@@ -118,8 +120,8 @@ export default class Entity {
         return (async() => {
             this.setActive(this.isActive);
             // Awake children now
-            if (this.children.length > 0){
-                await Promise.all(this.children.map(async child => {
+            if (this._children.length > 0){
+                await Promise.all(this._children.map(async child => {
                     await child.awake()
                 }))
             }
@@ -127,11 +129,11 @@ export default class Entity {
     }
 
     findEntityByName(name){
-        return this.children.filter(item => item.name === name)[0];
+        return this._children.filter(item => item.name === name)[0];
     }
 
     findEntityById(uuid) {
-        return this.children.filter(item => item.uuid === uuid)[0];
+        return this._children.filter(item => item.uuid === uuid)[0];
     }
 
     setPosition(x = null, y = null, z = null) {
@@ -152,11 +154,11 @@ export default class Entity {
 
     destroy() {
         this.setActive(false);
-        this.children.forEach(child => child.destroy());
+        this._children.forEach(child => child.destroy());
         this.sounds.forEach((sound, index) => {
             sound.destroy();
         });
-        this.children = [];
+        this._children = [];
         this.name = null;
         this.model = null;
         this.lights = null;

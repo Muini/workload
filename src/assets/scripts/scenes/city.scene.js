@@ -16,8 +16,7 @@ import { Sky } from '../entities/default/sky.ent';
 import { City } from '../entities/city.ent';
 
 // Dom Entities
-import { TitleDom } from '../entities/title.dom.ent';
-import { SubtitleDom } from '../entities/subtitle.dom.ent';
+import { BlurDom } from '../entities/default/blur.dom.ent';
 
 // Create scene
 export default new Scene({
@@ -109,18 +108,24 @@ export default new Scene({
             volume: 0.4,
         });
 
-        this.title = new TitleDom({
-            parent: this
+        this.startButton = new BlurDom({
+            selector: '.btn-start',
+            parent: this,
+            active: false,
+        })
+        this.title = new BlurDom({
+            selector: '.title',
+            parent: this,
+            active: false
         });
-        this.subtitle = new SubtitleDom({
-            parent: this
+        this.subtitle = new BlurDom({
+            selector: '.subtitle',
+            parent: this,
+            active: false
         });
 
     },
     onStart: async function () {
-        
-        this.title.setVisibility(false)
-        this.subtitle.setVisibility(false)
 
         this.citySound.play(1000);
 
@@ -139,7 +144,6 @@ export default new Scene({
             })
             .onComplete(_ => {
                 // console.log('complete')
-                tween2.start();
             });
 
         let tween2 = new Tween({
@@ -163,15 +167,23 @@ export default new Scene({
                 SceneManager.next();
             });
 
+        this.startButton.onClick = async e => {
+            this.startButton.setActive(false);
+            tween2.start();
+            await Engine.wait(1000);
+            this.subtitle.setVisibility(false);
+            await Engine.wait(300);
+            this.title.setVisibility(false);
+        }
+
         await Engine.wait(1000);
         tween.start();
         await Engine.wait(1000);
-        this.title.setVisibility(true);
+        this.title.setActive(true);
         await Engine.wait(2000);
-        this.subtitle.setVisibility(true);
-        await Engine.wait(4000);
-        this.title.setVisibility(false);
-        this.subtitle.setVisibility(false);
+        this.subtitle.setActive(true);
+        await Engine.wait(2000);
+        this.startButton.setActive(true);
 
     }
 })

@@ -2,32 +2,41 @@
 export default class Pool {
     constructor(entityClass, parent, number){
         
-        this.pool = [];
+        this._pool = [];
+        this._entity = entityClass;
+        this.parent = parent;
         
         let i = number;
         while(i--){
-            const ent = new entityClass({
-                parent: parent,
-                active: false
-            })
-            ent.inUse = false;
-            this.pool.push(ent);
+            this.fill();
         }
+    }
+
+    fill(){
+        const ent = new this._entity({
+            parent: this.parent,
+            active: false
+        })
+        ent.inUse = false;
+        this._pool.push(ent);
     }
 
     getEntity(){
         // Check if the pool is empty
         // TODO: Instantiate new object if pool is empty
-        if(this.pool.length <= 0) return;
+        if(this._pool.length <= 0) this.fill();
         // Get the first unused item
         let ent = undefined;
-        for (let i = 0; i < this.pool.length; i++) {
-            if (!this.pool[i].inUse) {
-                ent = this.pool[i];
+        for (let i = 0; i < this._pool.length; i++) {
+            if (!this._pool[i].inUse) {
+                ent = this._pool[i];
                 break;
             }
         }
-        if(ent === undefined) return;
+        if(ent === undefined){
+            this.fill();
+            return this.getEntity();
+        }
         ent.setActive(true);
         ent.inUse = true;
         return ent;

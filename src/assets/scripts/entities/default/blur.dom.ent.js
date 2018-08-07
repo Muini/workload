@@ -7,10 +7,6 @@ import DomEntity from '../../engine/classes/domEntity';
 export class BlurDom extends DomEntity {
     constructor(opt = {}) {
         super(opt);
-    }
-
-    init() {
-        super.init();
 
         this.x = 0;
         this.y = 0;
@@ -22,7 +18,6 @@ export class BlurDom extends DomEntity {
         this.onDataChanged = _ => {
             this.shouldUpdate = true;
         }
-
     }
 
     updatePositions() {

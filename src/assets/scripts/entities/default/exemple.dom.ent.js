@@ -3,18 +3,15 @@ import * as THREE from 'three';
 import { BlurDom } from './blur.dom.ent';
 
 export class ExempleDom extends BlurDom {
-    constructor(opt = {}) {
-        super(opt);
-    }
-
-    init() {
+    constructor(opt) {
+        super({
+            selector: '.hud-test',
+            parent: opt.parent,
+            visible: opt.visible
+        });
 
         //Init variables
         this.name = 'test';
-        this.selector = '.hud-test';
-
-        super.init();
-
         // Define & init here custom variables
 
         this.data = {

@@ -7,18 +7,19 @@ const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 // TODO: Make the dom inherit the Entity class
 export default class DomEntity {
     constructor(opt = {
+        selector,
         parent,
         active,
     }) {
         this.uuid = UUID();
         this.name = 'unnamed dom entity';
 
-        this.selector = undefined;
+        this.selector = opt.selector || undefined;
         this.dom = undefined;
         // TODO: Datas for every Entity & OnDataChanged function
         this.data = {};
 
-        this.isActive = opt.active || true;
+        this.isActive = opt.active || false;
         this.isVisible = false;
         this.isDomEntity = true;
 
@@ -38,19 +39,20 @@ export default class DomEntity {
         this._isUpdating = false;
 
         this.onDataChanged = function() {};
+        this.onClick = function() {};
 
-        this.init();
-    }
-
-    // Init happen when the entire project is loaded
-    init() {
         if (this.selector) {
             this.dom = document.querySelector(this.selector);
         }
-        //If the engine has started, it means it's an instanciation
-        if (this.parent && Engine.hasStarted) {
-            this.created();
-        }
+
+        this.bindEvents();
+    }
+
+    bindEvents(){
+        this.dom.addEventListener('click', e => {
+            e.preventDefault();
+            this.onClick(e);
+        }, false);
     }
 
     setVisibility(bool) {

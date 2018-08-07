@@ -23,11 +23,11 @@ class Engine {
             this.rendererStats = new RendererStats();
         }
 
-        this.fixedRatio = (16 / 9);
+        this._fixedRatio = (16 / 9);
         this.hasFixedRatio = false;
         this.width = window.innerWidth;
         if (this.hasFixedRatio)
-            this.height = this.width / this.fixedRatio;
+            this.height = this.width / this._fixedRatio;
         else
             this.height = window.innerHeight;
 
@@ -41,7 +41,6 @@ class Engine {
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
-        // this.renderer.toneMapping = THREE.CineonToneMapping; //THREE.ACESToneMapping
         this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
         this.renderer.physicallyCorrectLights = false;
         this.renderer.gammaFactor = 2.2;
@@ -55,22 +54,22 @@ class Engine {
         this.hasAdapativeRenderer = true;
         this.pixelDensity = 1.0;
         this.pixelDensityDefault = 1.0;
-        this.fpsMedian = 0;
-        this.tickNbr = 0;
-        this.adaptiveRendererDelay = 0;
-        this.lastAdaptiveRendererTime = 0;
-        this.performanceCycleNbr = 0;
-        this.maxPerformanceCycle = 5; //3 Cycles
-        this.performanceCycleLength = 30; //Every 8 frames
+        this._fpsMedian = 0;
+        this._tickNbr = 0;
+        this._adaptiveRendererDelay = 0;
+        this._lastAdaptiveRendererTime = 0;
+        this._performanceCycleNbr = 0;
+        this._maxPerformanceCycle = 5; //3 Cycles
+        this._performanceCycleLength = 30; //Every 8 frames
 
         this.hasBackgroundPreload = true;
 
-        this.requestId = undefined;
+        this._requestId = undefined;
         this.hasStarted = false;
         this.isPlaying = false;
 
-        this.updateFunctions = new Map();
-        this.resizeFunctions = new Map();
+        this._updateFunctions = new Map();
+        this._resizeFunctions = new Map();
 
         this.bindEvents();
 
@@ -131,10 +130,9 @@ class Engine {
                             enabled: Quality.score >= 1000 ? true : false,
                             options: [0.4, 1.0, 0.9]
                         },
-                        // bloom: { enabled: false, options: [0.5, 1.0, 0.9] },
                         filmic: {
                             enabled: true,
-                            noise: 0.1,
+                            noise: 0.075,
                             useStaticNoise: true,
                             rgbSplit: Quality.score >= 1000 ? 5.0 : 0.0,
                             vignette: Quality.score >= 1000 ? 20.0 : 0.0,
@@ -144,13 +142,12 @@ class Engine {
                             lutURL: '/static/img/lut-gamma.png',
                         },
                         bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
-                        // bokehdof: { enabled: false, },
                         blur: {
                             enabled: true,
-                            strength: 4.0,
+                            strength: 10.0,
                             sharpen: Quality.isMobile ? 0.05 : 0.2,
-                            blurRgbSplit: 1.25,
-                            gain: 1.1,
+                            blurRgbSplit: 1.5,
+                            gain: 1.3,
                         }
                     }
                 });
@@ -185,15 +182,15 @@ class Engine {
     }
 
     setFixedRatio(ratio) {
-        this.fixedRatio = ratio;
+        this._fixedRatio = ratio;
         this.hasFixedRatio = true;
         this.resize();
     }
 
     bindEvents() {
         window.addEventListener('resize', _ => {
-            this.adaptiveRendererDelay = 100;
-            this.performanceCycleNbr = 0;
+            this._adaptiveRendererDelay = 100;
+            this._performanceCycleNbr = 0;
             this.resize();
         }, false);
         // if (Log.debug) return;
@@ -231,18 +228,18 @@ class Engine {
 
     addToResize(uuid, fct) {
         if (typeof fct !== 'function' || uuid === undefined) return;
-        this.resizeFunctions.set(uuid, fct);
+        this._resizeFunctions.set(uuid, fct);
     }
     removeFromResize(uuid) {
-        this.resizeFunctions.delete(uuid)
+        this._resizeFunctions.delete(uuid)
     }
 
     addToUpdate(uuid, fct) {
         if (typeof fct !== 'function' || uuid === undefined) return;
-        this.updateFunctions.set(uuid, fct);
+        this._updateFunctions.set(uuid, fct);
     }
     removeFromUpdate(uuid) {
-        this.updateFunctions.delete(uuid)
+        this._updateFunctions.delete(uuid)
     }
 
     waitNextTick() {
@@ -269,10 +266,10 @@ class Engine {
     resize() {
         this.width = window.innerWidth;
         if (this.hasFixedRatio) {
-            this.height = this.width / this.fixedRatio;
+            this.height = this.width / this._fixedRatio;
             if (window.innerHeight < this.height) {
                 this.height = window.innerHeight;
-                this.width = this.height * this.fixedRatio;
+                this.width = this.height * this._fixedRatio;
             }
         } else {
             this.height = window.innerHeight;
@@ -285,7 +282,7 @@ class Engine {
         this.container.style['height'] = `${this.height}px`;
         this.containerBoundingBox = this.container.getBoundingClientRect();
 
-        this.resizeFunctions.forEach(fct => {
+        this._resizeFunctions.forEach(fct => {
             fct();
         });
 
@@ -327,15 +324,15 @@ class Engine {
         if (!this.hasStarted || this.isPlaying) return;
         this.update = this.update.bind(this);
         this.lastTick = 0;
-        this.requestId = window.requestAnimationFrame(time => this.update(time));
+        this._requestId = window.requestAnimationFrame(time => this.update(time));
         this.isPlaying = true;
         // Log.push('info', this.constructor.name, '▶️ Play');
     }
 
     pause() {
         if (!this.hasStarted || !this.isPlaying) return;
-        window.cancelAnimationFrame(this.requestId);
-        this.requestId = undefined;
+        window.cancelAnimationFrame(this._requestId);
+        this._requestId = undefined;
         this.isPlaying = false;
         // Log.push('info', this.constructor.name, '⏸️ Pause');
     }
@@ -351,33 +348,33 @@ class Engine {
         if (!this.hasAdapativeRenderer) return;
 
         if (delta == 0 ||
-            // this.performanceCycleNbr >= this.maxPerformanceCycle || 
-            (time - this.lastAdaptiveRendererTime < this.adaptiveRendererDelay)
+            // this._performanceCycleNbr >= this._maxPerformanceCycle || 
+            (time - this._lastAdaptiveRendererTime < this._adaptiveRendererDelay)
         ) return;
 
-        this.tickNbr++;
+        this._tickNbr++;
 
         //Check current FPS
-        this.fpsMedian += (1000 / delta);
+        this._fpsMedian += (1000 / delta);
 
         //Check median FPS by cycle
-        if (this.tickNbr % this.performanceCycleLength === 0) {
+        if (this._tickNbr % this._performanceCycleLength === 0) {
             //Get the mediam FPS of the cycle
-            this.fpsMedian /= this.performanceCycleLength;
+            this._fpsMedian /= this._performanceCycleLength;
             
             let hasBeenResized = false;
             
             //Adjust pixelDensity based on the fps but not on the first cycle
-            if (this.performanceCycleNbr !== 0) {
+            if (this._performanceCycleNbr !== 0) {
 
                 let newPixelDensity = this.pixelDensity;
-                if (this.fpsMedian > 60) {
+                if (this._fpsMedian > 60) {
                     newPixelDensity *= 1.05;
-                } else if (this.fpsMedian < 10) {
+                } else if (this._fpsMedian < 10) {
                     newPixelDensity /= 1.5;
-                } else if (this.fpsMedian < 25) {
+                } else if (this._fpsMedian < 25) {
                     newPixelDensity /= 1.2;
-                } else if (this.fpsMedian < 50) {
+                } else if (this._fpsMedian < 50) {
                     newPixelDensity /= 1.1;
                 }
 
@@ -392,25 +389,25 @@ class Engine {
                     //Trigger the resize
                     this.resize();
                     hasBeenResized = true;
-                    this.adaptiveRendererDelay = 1000;
-                    this.lastAdaptiveRendererTime = time;
-                    Log.push('info', this.constructor.name, `Adapting renderer to c:salmon{${newPixelDensity}} pixelRatio because ${this.fpsMedian}fps`);
+                    this._adaptiveRendererDelay = 1000;
+                    this._lastAdaptiveRendererTime = time;
+                    Log.push('info', this.constructor.name, `Adapting renderer to c:salmon{${newPixelDensity}} pixelRatio because ${this._fpsMedian}fps`);
                 }
 
             }
 
             //Reset vars to start a new cycle
             if (!hasBeenResized)
-                this.performanceCycleNbr++;
+                this._performanceCycleNbr++;
 
-            this.fpsMedian = 0;
+            this._fpsMedian = 0;
         }
     }
 
     update(time) {
         if (!SceneManager.currentScene || !SceneManager.currentScene.mainCamera || !this.isPlaying) return;
         
-        this.requestId = window.requestAnimationFrame(time => this.update(time))
+        this._requestId = window.requestAnimationFrame(time => this.update(time))
 
         if (Log.debug)
             this.stats.begin();
@@ -434,7 +431,7 @@ class Engine {
             this.postprod.update(time, deltaScaled);
 
         //Update all entities
-        this.updateFunctions.forEach(fct => {
+        this._updateFunctions.forEach(fct => {
             try {
                 fct(time, deltaScaled);
             } catch (error) {

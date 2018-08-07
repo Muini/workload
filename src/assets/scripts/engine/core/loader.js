@@ -2,17 +2,12 @@ import Engine from './engine';
 import DomEntity from '../classes/domEntity';
 
 class Loader extends DomEntity {
-    constructor(opt = {}) {
-        super(opt);
+    constructor() {
+        super({
+            selector: '.loader'
+        });
+
         this.isLoader = true;
-    }
-
-    init() {
-        //Init variables
-        this.name = 'loader';
-        this.selector = '.loader';
-
-        super.init();
 
         this.data = {
             percentage: 0,
@@ -22,6 +17,9 @@ class Loader extends DomEntity {
         }
 
         this.created();
+    }
+
+    init() {
     }
 
     created() {

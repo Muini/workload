@@ -4,7 +4,7 @@ class Log {
     constructor() {
         this.debug = true;
 
-        this.logsAtScreen = new Map();
+        this._logsAtScreen = new Map();
 
         this._styles = {
             'display': 'flex',
@@ -105,7 +105,7 @@ class Log {
 
             log.elem = elem;
             document.body.appendChild(elem);
-            this.logsAtScreen.set(log.uuid, log);
+            this._logsAtScreen.set(log.uuid, log);
             this.recalculateLogsPosition();
 
             requestAnimationFrame(_ => {
@@ -114,7 +114,7 @@ class Log {
                     elem.style['opacity'] = '0';
                     setTimeout(_ => {
                         document.body.removeChild(elem);
-                        this.logsAtScreen.delete(log.uuid);
+                        this._logsAtScreen.delete(log.uuid);
                         this.recalculateLogsPosition();
                     }, 325);
                 }, this.getDrawTime(log.type));
@@ -145,8 +145,8 @@ class Log {
     }
 
     recalculateLogsPosition(){
-        let index = this.logsAtScreen.size;
-        this.logsAtScreen.forEach((log) => {
+        let index = this._logsAtScreen.size;
+        this._logsAtScreen.forEach((log) => {
             log.elem.style['transform'] = `translateZ(0) translateY(-${2.5 * index}em)`;
             index--;
         });

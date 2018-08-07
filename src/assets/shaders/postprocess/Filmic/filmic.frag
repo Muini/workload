@@ -27,7 +27,8 @@ uniform float LUTstrength;
 void main() {
 
     gl_FragColor = texture2D(tDiffuse, vUv);
-    
+
+    // Slit RGB
     if(rgbSplitStrength > 0.0){
         
         vec2 dir = vUv - vec2( .5 );
@@ -44,12 +45,14 @@ void main() {
         gl_FragColor.rgb = mix(gl_FragColor.rgb, rgbSplitColor.rgb, 1.0);
     }
 
+    // Vignette
     if(vignetteStrength > 0.0){
 
         vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( vignetteOffset );
         gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3( 1.0 - vignetteStrength ), dot( uv, uv ) );
     }
     
+    // Noise
     if(noiseStrength > 0.0){
 
         #if STATIC_NOISE
@@ -76,8 +79,10 @@ void main() {
         #endif
     }
 
+    // Contrast
     gl_FragColor.rgb = ((gl_FragColor.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
 
+    // LUT
     vec3 lut = lookup(gl_FragColor, LUTtexture).rgb;
     gl_FragColor.rgb = mix(gl_FragColor.rgb, lut, LUTstrength);
     

@@ -38,8 +38,8 @@ export default class Scene {
 
         this.mainCamera = undefined;
 
-        this.entities = [];
-        this.children = [];
+        this._entities = [];
+        this._children = [];
         this.sounds = [];
 
         this.assets = {
@@ -64,25 +64,25 @@ export default class Scene {
     }
 
     addEntity(entity) {
-        this.entities.push(entity);
+        this._entities.push(entity);
     }
 
     addChildren(child){
-        this.children.push(child);
+        this._children.push(child);
     }
 
     createEntities() {
         return (async() => {
-            await Promise.all(this.children.map(async entity => { await entity.created() }))
-            Log.push('info', this.constructor.name, `Scene created c:salmon{${this.children.length}} entity(ies)`);
+            await Promise.all(this._children.map(async entity => { await entity.created() }))
+            Log.push('info', this.constructor.name, `Scene created c:salmon{${this._children.length}} entity(ies)`);
             return;
         })();
     }
 
     awakeEntities() {
         return (async() => {
-            await Promise.all(this.children.map(async entity => { await entity.awake() }))
-            Log.push('info', this.constructor.name, `Scene awaked c:salmon{${this.children.length}} entity(ies)`);
+            await Promise.all(this._children.map(async entity => { await entity.awake() }))
+            Log.push('info', this.constructor.name, `Scene awaked c:salmon{${this._children.length}} entity(ies)`);
             return;
         })();
     }
@@ -151,9 +151,9 @@ export default class Scene {
     stop() {
         //This is the end of the scene
         // Desactivate every objects
-        let i = this.entities.length;
+        let i = this._entities.length;
         while (i--) {
-            this.entities[i].setActive(false);
+            this._entities[i].setActive(false);
         }
         // Stop all sounds
         this.sounds.forEach(elem => elem.stop());
@@ -166,9 +166,9 @@ export default class Scene {
         Log.push('info', this.constructor.name, `Clear scene ${this.name}`);
 
         this.sounds.forEach(elem => elem.destroy());
-        let i = this.entities.length;
+        let i = this._entities.length;
         while (i--) {
-            this.entities[i].destroy();
+            this._entities[i].destroy();
         }
         Engine.removeFromResize(this.uuid);
     }

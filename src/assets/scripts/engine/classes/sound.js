@@ -15,7 +15,7 @@ export default class Sound {
     }) {
         this.uuid = UUID();
         this.name = opt.name || null;
-        this.howl = new Howl({
+        this._howl = new Howl({
             src: [opt.url],
             autoplay: false,
             preload: false,
@@ -25,9 +25,9 @@ export default class Sound {
         this.parent = opt.parent ? opt.parent : null; //Parent mush be THREE object to get 3D position
         if (!this.parent) return Log.push('error', this.constructor.name, `Sound parameter "parent" is mandatory and should be a Entity or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
-        this.nominalVolume = opt.volume ? opt.volume : 1.0;
+        this._nominalVolume = opt.volume ? opt.volume : 1.0;
 
-        this.wasPlaying = false;
+        this._wasPlaying = false;
 
         this.init();
     }
@@ -45,44 +45,44 @@ export default class Sound {
     }
 
     load(callback) {
-        this.howl.once('load', _ => {
+        this._howl.once('load', _ => {
             if (typeof callback == 'function')
                 callback();
         });
-        this.howl.on('end', _ => {
+        this._howl.on('end', _ => {
             this.isPlaying = false;
-            this.wasPlaying = false;
+            this._wasPlaying = false;
         })
-        this.howl.load();
+        this._howl.load();
     }
 
     play(fadeLength) {
-        this.howl.volume(.0);
-        this.howl.play();
-        this.howl.fade(0, this.nominalVolume, fadeLength ? fadeLength : 0);
+        this._howl.volume(.0);
+        this._howl.play();
+        this._howl.fade(0, this._nominalVolume, fadeLength ? fadeLength : 0);
     }
 
     pause(){
-        this.wasPlaying = true;
-        this.howl.pause();
+        this._wasPlaying = true;
+        this._howl.pause();
     }
 
     setRate(rate){
-        this.howl.rate(rate);
+        this._howl.rate(rate);
     }
 
     resume(){
-        if(!this.wasPlaying) return;
-        this.wasPlaying = false;
-        this.howl.play();
+        if(!this._wasPlaying) return;
+        this._wasPlaying = false;
+        this._howl.play();
     }
 
     stop(fadeLength) {
-        this.wasPlaying = false;
-        this.howl.once('fade', _ => {
-            this.howl.stop();
+        this._wasPlaying = false;
+        this._howl.once('fade', _ => {
+            this._howl.stop();
         });
-        this.howl.fade(this.nominalVolume, 0, fadeLength ? fadeLength : 60);
+        this._howl.fade(this._nominalVolume, 0, fadeLength ? fadeLength : 60);
     }
 
     destroy() {
@@ -90,9 +90,9 @@ export default class Sound {
         SoundEngine.unregister(this);
         this.uuid = null;
         this.name = null;
-        this.howl.unload();
-        this.howl = null;
+        this._howl.unload();
+        this._howl = null;
         this.parent = null;
-        this.nominalVolume = null;
+        this._nominalVolume = null;
     }
 }

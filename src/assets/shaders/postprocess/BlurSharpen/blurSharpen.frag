@@ -69,9 +69,9 @@ void main() {
         if(vUv.x > blurPos[i].x && vUv.y < blurPos[i].y && vUv.x < blurPos[i].z && vUv.y > blurPos[i].w){
             
             for (float i=0.0;i<Sample; i++) {
-            color.r += texture2D(tDiffuse, uv + Circle(Start, Sample, i) * randomOffset * Scale * blurRgbSplitStrength).r * W;
-            color.g += texture2D(tDiffuse, uv + Circle(Start, Sample, i) * randomOffset * Scale ).g * W;
-            color.b += texture2D(tDiffuse, uv + Circle(Start, Sample, i) * randomOffset * Scale / blurRgbSplitStrength).b * W;
+                color.r += texture2D(tDiffuse, uv + Circle(Start, Sample, i) * randomOffset * Scale * blurRgbSplitStrength).r * W;
+                color.g += texture2D(tDiffuse, uv + Circle(Start, Sample, i) * randomOffset * Scale ).g * W;
+                color.b += texture2D(tDiffuse, uv + Circle(Start, Sample, i) * randomOffset * Scale / blurRgbSplitStrength).b * W;
             }
             color.rgb *= gain;
 

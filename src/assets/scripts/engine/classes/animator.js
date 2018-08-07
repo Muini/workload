@@ -15,7 +15,7 @@ export default class Animator {
 
         this.instance = new THREE.AnimationMixer(this.model);
 
-        this.currentAction = undefined;
+        this._currentAction = undefined;
 
         this.isPlaying = false;
 
@@ -27,25 +27,25 @@ export default class Animator {
 
         if (!clip) return;
 
-        this.currentAction = this.instance.clipAction(clip);
-        this.currentAction.play();
+        this._currentAction = this.instance.clipAction(clip);
+        this._currentAction.play();
 
         this.isPlaying = true;
     }
 
     setSpeed(speed){
-        this.currentAction.timeScale = speed || 1.0;
+        this._currentAction.timeScale = speed || 1.0;
     }
 
     pause() {
         if (!this.isPlaying) return;
-        this.currentAction.paused = true;
+        this._currentAction.paused = true;
     }
 
     stop() {
         if (!this.isPlaying) return;
         this.instance.stopAllAction();
-        this.currentAction = undefined;
+        this._currentAction = undefined;
         this.isPlaying = false;
     }
 

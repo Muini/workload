@@ -80,8 +80,6 @@ export default new Scene({
     onStart: async function() {
         // await Engine.wait(1000)
 
-        this.testdom.setVisibility(false);
-
         let tween = new Tween({ x:50, y:45, z:50, aperture: 2.0 })
             .to({ x:25, y:26, z:25, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
@@ -94,7 +92,7 @@ export default new Scene({
                 this.camera.params.aperture = props.aperture;
             })
             .onComplete(async _ => {
-                this.testdom.setVisibility(true);
+                this.testdom.setActive(true);
                 this.worker.addWork(10);
                 await Engine.wait(200);
                 this.worker2.addWork(10);

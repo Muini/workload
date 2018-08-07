@@ -4,6 +4,7 @@ import Engine from '../engine/core/engine';
 
 import Sound from '../engine/classes/sound';
 import Model from '../engine/classes/model';
+import Random from '../engine/utils/random';
 
 import { Light } from './default/light.ent';
 import { PaperBlock } from './paperBlock.ent';
@@ -16,6 +17,8 @@ export class Worker extends Model {
         this.name = 'worker';
         this.modelName = 'worker.model';
         this.hasShadows = true;
+
+        this.isWomen = Random.int(0,1) === 0 ? true : false;
 
         // Init materials
         this.addMaterial('ABS');
@@ -90,6 +93,7 @@ export class Worker extends Model {
             this.lights.get('Desk_Screen_Light').setPower(0);
 
             this.bonhomme = await this.getChildModel('Bonhomme');
+            this.bonhomme = this.bonhomme[0];
 
         })();
     }
@@ -142,8 +146,8 @@ export class Worker extends Model {
         super.update(time, delta);
 
         if (this.isDead) {
-            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(9, 10);
-            this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
+            this.materials.get('Screen').params.emissiveIntensity = Random.float(9, 10);
+            this.lights.get('Desk_Screen_Light').setPower(Random.float(90, 110));
             return;
         }
 
@@ -164,8 +168,8 @@ export class Worker extends Model {
         }
 
         if(this.isWorking){
-            this.materials.get('Screen').params.emissiveIntensity = THREE.Math.randFloat(8, 9);
-            this.lights.get('Desk_Screen_Light').setPower(THREE.Math.randFloat(90, 110));
+            this.materials.get('Screen').params.emissiveIntensity = Random.float(8, 9);
+            this.lights.get('Desk_Screen_Light').setPower(Random.float(90, 110));
         }
     }
 
