@@ -1,6 +1,6 @@
 import { Howl, Howler } from 'howler';
 
-class SoundEngine {
+class SoundManager {
     constructor(opt = {
         // datas
     }) {
@@ -34,4 +34,4 @@ class SoundEngine {
     }
 }
 
-export default new SoundEngine();
+export default new SoundManager();

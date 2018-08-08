@@ -4,6 +4,7 @@ import Log from '../utils/log';
 import UUID from '../utils/uuid';
 import Data from '../utils/data';
 
+// TODO: ECS based system : http://www.vasir.net/blog/game-development/how-to-build-entity-component-system-in-javascript
 export default class Entity {
     constructor(opt = {
         parent,

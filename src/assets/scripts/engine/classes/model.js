@@ -11,7 +11,7 @@ export default class Model extends Entity{
         this.modelUrl = undefined;
         this.animator = undefined;
 
-        this._materials = new Map();
+        this.materials = new Map();
 
         this.hasShadows = false;
 
@@ -23,9 +23,9 @@ export default class Model extends Entity{
         if (!material) return;
         if (!isIntancedMaterial) {
             const cloneMaterial = material.clone();
-            this._materials.set(cloneMaterial.name, cloneMaterial);
+            this.materials.set(cloneMaterial.name, cloneMaterial);
         } else {
-            this._materials.set(material.name, material);
+            this.materials.set(material.name, material);
         }
     }
 
@@ -121,7 +121,7 @@ export default class Model extends Entity{
                     child.receiveShadow = true;
                     if (this.isStatic)
                         child.matrixAutoUpdate = false;
-                    child = await updateMaterials(child, this._materials);
+                    child = await updateMaterials(child, this.materials);
                 } else {
                     child = await updateLights(child, this.lights);
                 }
@@ -153,7 +153,7 @@ export default class Model extends Entity{
             this.animator.update(time, delta);
 
         // update Env Map & Sway uniform
-        this._materials.forEach(material => {
+        this.materials.forEach(material => {
             if (this.scene.envMap) {
                 material.instance.envMap = this.scene.envMap;
             }
@@ -171,7 +171,7 @@ export default class Model extends Entity{
             this.animator.destroy();
         this.animator = null;
         this.modelUrl = null;
-        this._materials = null;
+        this.materials = null;
     }
 
 }

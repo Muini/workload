@@ -43,7 +43,10 @@ export default class PostProd {
                 rgbSplit: 1.0,
                 vignette: 1.0,
                 vignetteOffset: 1.0,
+                brightness: 0.0,
                 contrast: 1.0,
+                gamma: 1.0,
+                vibrance: 0.0,
                 lut: 1.0,
                 lutURL: '/static/img/lut.png',
             },
@@ -145,7 +148,10 @@ export default class PostProd {
             this.filmic.uniforms['vignetteStrength'].value = this.passes.filmic.vignette;
             this.filmic.uniforms['vignetteOffset'].value = this.passes.filmic.vignetteOffset;
 
+            this.filmic.uniforms['brightness'].value = this.passes.filmic.brightness;
             this.filmic.uniforms['contrast'].value = this.passes.filmic.contrast;
+            this.filmic.uniforms['gamma'].value = this.passes.filmic.gamma;
+            this.filmic.uniforms['vibrance'].value = this.passes.filmic.vibrance;
 
             let lutTexture = new THREE.TextureLoader().load(this.passes.filmic.lutURL);
             lutTexture.minFilter = THREE.NearestFilter;
@@ -162,14 +168,20 @@ export default class PostProd {
                     rgbSplitStrength: this.passes.filmic.rgbSplit,
                     vignetteStrength: this.passes.filmic.vignette,
                     vignetteOffset: this.passes.filmic.vignetteOffset,
+                    brightness: this.passes.filmic.brightness,
                     contrast: this.passes.filmic.contrast,
+                    gamma: this.passes.filmic.gamma,
+                    vibrance: this.passes.filmic.vibrance,
                     LUTstrength: this.passes.filmic.lut,
                 }
                 folder.add(uniforms, 'noiseStrength', 0.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'noiseStrength'));
                 folder.add(uniforms, 'rgbSplitStrength', -10.0, 10.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'rgbSplitStrength'));
                 folder.add(uniforms, 'vignetteStrength', 0.0, 100.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'vignetteStrength'));
                 folder.add(uniforms, 'vignetteOffset', 0.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'vignetteOffset'));
-                folder.add(uniforms, 'contrast', 0.0, 2.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'contrast'));
+                folder.add(uniforms, 'brightness', -0.5, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'brightness'));
+                folder.add(uniforms, 'contrast', 0.5, 2.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'contrast'));
+                folder.add(uniforms, 'gamma', 1.0, 3.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'gamma'));
+                folder.add(uniforms, 'vibrance', -1.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'vibrance'));
                 folder.add(uniforms, 'LUTstrength', 0.0, 1.0).onChange(value => this.guiChanger(value, this.filmic.uniforms, 'LUTstrength'));
             }
         }

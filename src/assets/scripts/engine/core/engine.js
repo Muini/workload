@@ -6,7 +6,7 @@ import Stats from 'stats.js';
 import RendererStats from 'three-webgl-stats';
 import PostProd from './postprod';
 import SceneManager from './sceneManager';
-import SoundEngine from './soundEngine';
+import SoundManager from './soundManager';
 
 import '../utils/watch-polyfill';
 import UUID from '../utils/uuid';
@@ -128,17 +128,20 @@ class Engine {
                         },
                         bloom: {
                             enabled: Quality.score >= 1000 ? true : false,
-                            options: [0.4, 1.0, 0.9]
+                            options: [0.4, 1.0, 0.95]
                         },
                         filmic: {
                             enabled: true,
-                            noise: 0.075,
+                            noise: 0.05,
                             useStaticNoise: true,
                             rgbSplit: Quality.score >= 1000 ? 5.0 : 0.0,
                             vignette: Quality.score >= 1000 ? 20.0 : 0.0,
                             vignetteOffset: 0.15,
-                            contrast: 1.25,
-                            lut: 1.00,
+                            brightness: 0.0,
+                            contrast: 1.3,
+                            gamma: 2.2,
+                            vibrance: 0.3,
+                            lut: 0.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },
                         bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
@@ -200,13 +203,13 @@ class Engine {
                 if (!isActive) {
                     isActive = true
                     this.play();
-                    SoundEngine.resume();
+                    SoundManager.resume();
                 }
             } else {
                 if (isActive) {
                     isActive = false
                     this.pause();
-                    SoundEngine.pause();
+                    SoundManager.pause();
                 }
             }
         })
@@ -214,14 +217,14 @@ class Engine {
             if (!isActive) {
                 isActive = true
                 this.play();
-                SoundEngine.resume();
+                SoundManager.resume();
             }
         }, false)
         window.addEventListener('blur', _ => {
             if (isActive) {
                 isActive = false
                 this.pause();
-                SoundEngine.pause();
+                SoundManager.pause();
             }
         }, false)
     }

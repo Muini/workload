@@ -2,7 +2,7 @@ import { Howl, Howler } from 'howler';
 
 import UUID from '../utils/uuid';
 import Log from '../utils/log';
-import SoundEngine from '../core/soundEngine';
+import SoundManager from '../core/soundManager';
 
 // TODO: Inherit Entity class when Entity class has been lighten
 export default class Sound {
@@ -41,7 +41,7 @@ export default class Sound {
             this.parent.sounds.set(this.name, this);
             this.scene.addSound(this);
         }
-        SoundEngine.register(this);
+        SoundManager.register(this);
     }
 
     load(callback) {
@@ -87,7 +87,7 @@ export default class Sound {
 
     destroy() {
         this.stop();
-        SoundEngine.unregister(this);
+        SoundManager.unregister(this);
         this.uuid = null;
         this.name = null;
         this._howl.unload();

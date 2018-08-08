@@ -32,7 +32,10 @@ THREE.FilmicShader = {
         "vignetteStrength": { value: 1.0 },
         "vignetteOffset": { value: 1.0 },
 
+        "brightness": { value: 1.0 },
         "contrast": { value: 1.0 },
+        "gamma": { value: 1.0 },
+        "vibrance": { value: 1.0 },
 
         "LUTtexture": { value: null },
         "LUTstrength": { value: 1.0 },

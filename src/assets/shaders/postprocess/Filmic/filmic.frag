@@ -19,10 +19,31 @@ uniform float rgbSplitStrength;
 uniform float vignetteStrength;
 uniform float vignetteOffset;
 
+uniform float brightness;
 uniform float contrast;
+uniform float gamma;
+uniform float vibrance;
 
 uniform sampler2D LUTtexture;
 uniform float LUTstrength;
+
+vec3 brightnessContrast(vec3 value, float brightness, float contrast)
+{
+    return (value - 0.5) * contrast + 0.5 + brightness;
+}
+vec3 Gamma(vec3 value, float param)
+{
+    return vec3(pow(abs(value.r), param),pow(abs(value.g), param),pow(abs(value.b), param));
+}
+vec3 Vibrance(vec3 value, float amount){
+    vec3 coeff = vec3(0.299,0.587,0.114);
+    float lum = dot(value, coeff);
+    vec3 mask = (value - vec3(lum));
+    mask = clamp(mask, 0.0, 1.0);
+    float lumMask = dot(coeff, mask);
+    lumMask = 1.0 - lumMask;
+    return mix(vec3(lum), value, 1.0 + amount * lumMask);
+}
 
 void main() {
 
@@ -45,13 +66,20 @@ void main() {
         gl_FragColor.rgb = mix(gl_FragColor.rgb, rgbSplitColor.rgb, 1.0);
     }
 
+    // Brightness & Contrast
+    gl_FragColor.rgb = brightnessContrast(gl_FragColor.rgb, brightness, contrast);
+    // Gamma
+    gl_FragColor.rgb = Gamma(gl_FragColor.rgb, gamma);
+    // Vibrance
+    gl_FragColor.rgb = Vibrance(gl_FragColor.rgb, vibrance);
+
     // Vignette
     if(vignetteStrength > 0.0){
 
         vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( vignetteOffset );
         gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3( 1.0 - vignetteStrength ), dot( uv, uv ) );
     }
-    
+
     // Noise
     if(noiseStrength > 0.0){
 
@@ -78,9 +106,6 @@ void main() {
             gl_FragColor.rgb = noiseColor;
         #endif
     }
-
-    // Contrast
-    gl_FragColor.rgb = ((gl_FragColor.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
 
     // LUT
     vec3 lut = lookup(gl_FragColor, LUTtexture).rgb;
