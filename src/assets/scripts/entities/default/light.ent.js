@@ -19,6 +19,7 @@ export class Light extends Entity{
             color: opt.color || 'ffffff',
             colorGround: opt.colorGround || '000000', //only for ambiant
             power: opt.power || 200,
+            fov: opt.fov || undefined,
             distance: opt.distance || 4.0,
             castShadow: opt.castShadow || false,
             shadowMapSize: opt.shadowMapSize || (this.type === 'point' ? 16 : 128),
@@ -34,8 +35,10 @@ export class Light extends Entity{
             case 'spot':
                 this.instance = new THREE.SpotLight('#' + this.params.color);
                 this.instance.decay = 2;
+                this.instance.penumbra = 0.5;
                 this.instance.power = this.params.power;
                 this.instance.castShadow = Quality.score >= 1500 ? this.params.castShadow : false;
+                if(this.params.fov !== undefined) this.instance.angle = this.params.fov;
                 break;
 
             case 'directional':

@@ -17,3 +17,8 @@ import './paper.mat';
 import './abs.mat';
 import './screen.mat';
 import './bonhomme.mat';
+import './suit.mat';
+import './boots.mat';
+import './cloth.mat';
+import './skin.mat';
+import './hair.mat';

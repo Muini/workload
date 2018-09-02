@@ -80,10 +80,6 @@ export default class Entity {
             //Name it properly
             this.model.name = this.name;
 
-            // TODO: Import model correctly to invert axis
-            if (!this.isCamera && !this.isLight && !this.isModelEntity)
-                this.rotation.x += Math.PI / 2; //hack inverted axis
-
             // Set original coord
             this.model.position.x += this.position.x;
             this.model.position.y += this.position.y;

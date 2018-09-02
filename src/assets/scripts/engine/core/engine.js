@@ -128,19 +128,24 @@ class Engine {
                         },
                         bloom: {
                             enabled: Quality.score >= 1000 ? true : false,
-                            options: [0.4, 1.0, 0.95]
+                            options: [0.5, 1.5, 0.95]
                         },
                         filmic: {
                             enabled: true,
-                            noise: 0.05,
+                            // noise: 0.05, 
+                            noise: 0.25, 
                             useStaticNoise: true,
-                            rgbSplit: Quality.score >= 1000 ? 5.0 : 0.0,
-                            vignette: Quality.score >= 1000 ? 20.0 : 0.0,
-                            vignetteOffset: 0.15,
+                            rgbSplit: 30.0,
+                            // vignette: Quality.score >= 1000 ? 20.0 : 0.0,
+                            vignette: 40.0,
+                            // vignetteOffset: 0.15,
+                            vignetteOffset: 0.09,
                             brightness: 0.0,
-                            contrast: 1.3,
+                            // contrast: 1.3,
+                            contrast: 1.6,
                             gamma: 2.2,
-                            vibrance: 0.3,
+                            // vibrance: 0.3,
+                            vibrance: 1.0,
                             lut: 0.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },
@@ -148,7 +153,8 @@ class Engine {
                         blur: {
                             enabled: true,
                             strength: 10.0,
-                            sharpen: Quality.isMobile ? 0.05 : 0.2,
+                            // sharpen: Quality.isMobile ? 0.05 : 0.2,
+                            sharpen: Quality.isMobile ? 0.5 : 0.7,
                             blurRgbSplit: 1.5,
                             gain: 1.3,
                         }
@@ -196,7 +202,7 @@ class Engine {
             this._performanceCycleNbr = 0;
             this.resize();
         }, false);
-        // if (Log.debug) return;
+        if (Log.debug) return;
         let isActive = true
         document.addEventListener('visibilitychange', _ => {
             if (document.visibilityState == 'visible') {

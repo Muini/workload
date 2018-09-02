@@ -105,9 +105,8 @@ class AssetsManager {
             switch (assetType) {
                 case 'model':
                     let cloneAsset = await this.cloneGltf(this.assets[assetName].asset);
-                    cloneAsset.scene.children[0].rotation.z = Math.PI * 2;
                     const returnAsset = {
-                        model: cloneAsset.scene.children[0],
+                        model: cloneAsset.scene,
                         animations: cloneAsset.animations
                     }
                     return returnAsset;

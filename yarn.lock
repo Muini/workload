@@ -2930,9 +2930,9 @@ hosted-git-info@^2.1.4:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.6.1.tgz#6e4cee78b01bb849dcf93527708c69fdbee410df"
 
-howler@^2.0.13:
-  version "2.0.13"
-  resolved "https://registry.yarnpkg.com/howler/-/howler-2.0.13.tgz#fa665bf9e328fe71823795e6e334e45e441c1eb9"
+howler@^2.0.15:
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/howler/-/howler-2.0.15.tgz#8f26d6548d29b257441fc190644b4392ce99ad32"
 
 hsl-regex@^1.0.0:
   version "1.0.0"
@@ -6315,9 +6315,9 @@ three-webgl-stats@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/three-webgl-stats/-/three-webgl-stats-1.0.5.tgz#9b4852b9fd9319e9b605d71e9e58cace9618d9b6"
 
-three@0.94.0:
-  version "0.94.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.94.0.tgz#4ce6db7f2bfbf79c2d73444aa6e3cfc08a32d762"
+three@0.96.0:
+  version "0.96.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.96.0.tgz#6f48bb9e321506906ae4708bda69b0ffa808ee7f"
 
 through2@^0.6.3:
   version "0.6.5"

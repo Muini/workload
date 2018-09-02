@@ -36,4 +36,15 @@ export default {
 
         }
     },
+    'worker-test': {
+        models: {
+            'bonhomme.model': '/static/models/bonhomme.glb',
+        },
+        textures: {
+
+        },
+        sounds: {
+
+        }
+    },
 }
