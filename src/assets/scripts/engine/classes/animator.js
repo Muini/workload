@@ -19,6 +19,10 @@ export default class Animator {
 
         this.isPlaying = false;
 
+        this.skeleton = new THREE.SkeletonHelper(this.model);
+        this.skeleton.visible = false;
+        scene.add(this.skeleton);
+
     }
 
     play(animationName, callback) {

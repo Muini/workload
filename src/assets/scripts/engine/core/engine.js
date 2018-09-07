@@ -202,7 +202,7 @@ class Engine {
             this._performanceCycleNbr = 0;
             this.resize();
         }, false);
-        if (Log.debug) return;
+        // if (Log.debug) return;
         let isActive = true
         document.addEventListener('visibilitychange', _ => {
             if (document.visibilityState == 'visible') {
@@ -437,12 +437,12 @@ class Engine {
 
         //Update & Render Post processing effects
         if (this.hasPostProd)
-            this.postprod.update(time, deltaScaled);
+            this.postprod.update(this.elapsedTime, deltaScaled);
 
         //Update all entities
         this._updateFunctions.forEach(fct => {
             try {
-                fct(time, deltaScaled);
+                fct(this.elapsedTime, deltaScaled);
             } catch (error) {
                 Log.push('error', this.constructor.name, `${error}`)
                 this.pause();

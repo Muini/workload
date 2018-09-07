@@ -37,6 +37,12 @@ export class Bonhomme extends Model {
 
             await this.generateRandomLook();
 
+            console.log(this.model)
+
+            let bone = await this.getChildModel('Body');
+            // bone = bone.filter(item => item.type === 'Bone')[0];
+            console.log(bone);
+
         })();
     }
 
@@ -73,8 +79,14 @@ export class Bonhomme extends Model {
                 props[index].visible = false;
             }
             
-            let hairs = await this.getChildModel(this.isFemale ? 'Prop_Hair_Woman' : 'Prop_Hair_Man');
-            this.setRandomItemFromListVisible(hairs, true);
+            let hairs = await this.getChildModel('Prop_Hair_Man');
+            if(this.isFemale)
+            {
+                let womenhairs = await this.getChildModel('Prop_Hair_Women');
+                hairs = hairs.concat(womenhairs)
+                hairs = hairs.filter(prop => prop.name.indexOf('Hat') === -1 && prop.name.indexOf('Short') === -1 && prop.name.indexOf('Special') === -1);
+            }
+            this.setRandomItemFromListVisible(hairs, this.isFemale ? false : true);
 
             if(!this.isFemale){
                 let facialhairs = await this.getChildModel('Prop_Hair_Facial');
@@ -82,10 +94,15 @@ export class Bonhomme extends Model {
             }
 
             let bodyitems = await this.getChildModel('Prop_Body');
+            if(!this.isFemale){
+                bodyitems = bodyitems.filter(prop => prop.name.indexOf('Women') === -1);
+            }
             this.setRandomItemFromListVisible(bodyitems, true);
 
-            let headitems = await this.getChildModel('Prop_Head');
-            this.setRandomItemFromListVisible(headitems, true);
+            if(Random.int(0, 1) === 0){
+                let headitems = await this.getChildModel('Prop_Head');
+                this.setRandomItemFromListVisible(headitems, true);
+            }
         })();
     }
 
