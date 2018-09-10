@@ -104,6 +104,7 @@ class AssetsManager {
 
             switch (assetType) {
                 case 'model':
+                console.log(this.assets[assetName])
                     let cloneAsset = await this.cloneGltf(this.assets[assetName].asset);
                     const returnAsset = {
                         model: cloneAsset.scene,

@@ -27,6 +27,7 @@ export default class Material {
             emissiveIntensity: opt.emissiveIntensity || 0.0,
             fog: opt.fog || true,
             sway: opt.sway || 0.0,
+            doublesided: opt.doublesided || false,
         }
 
         this.isSwayShader = this.params.sway > 0.0;
@@ -48,7 +49,8 @@ export default class Material {
             dithering: false,
             envMapIntensity: 6.,
             fog: this.params.fog,
-            wireframe: false
+            wireframe: false,
+            side: this.params.doublesided ? THREE.DoubleSide : THREE.FrontSide
         });
 
         // TODO: Remove ACES back to Uncharted2 tonemapping
@@ -146,11 +148,13 @@ export default class Material {
     watchChanges() {
         for (let param in this.params) {
             this.params.watch(param, (id, oldval, newval) => {
-                if (id === 'color' || id === 'emissive')
+                if (id === 'color' || id === 'emissive') {
                     this.instance[id].setHex('0x' + newval);
-                else if (id === 'opacity') {
+                } else if (id === 'opacity') {
                     this.instance['transparent'] = newval < 1.0 ? true : false;
                     this.instance[id] = newval;
+                } else if (id === 'doublesided') {
+                    this.instance['side'] = newval ? THREE.DoubleSide : THREE.FrontSide;
                 } else {
                     this.instance[id] = newval;
                 }

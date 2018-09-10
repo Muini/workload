@@ -24,86 +24,155 @@ export class Bonhomme extends Model {
 
         this.timeElapsed = 0;
 
-        this.isFemale = false;
+        this.isFemale = false; //La patriarchie vaincra !
 
-        this.skinColor = new THREE.Color();
-        this.hairColor = new THREE.Color();
-        this.clothColor = new THREE.Color();
+        this.look = {
+            skinColor: new THREE.Color(),
+            hairColor: new THREE.Color(),
+            clothColor: new THREE.Color(),
+            heightFactor: 1.0,
+            hair: -1,
+            facialhair: -1,
+            headObject: -1,
+            bodyObject: -1,
+        }
+        this.props = {
+            all: [],
+            hair: [],
+            womanhair: [],
+            facialhair: [],
+            headObjects: [],
+            bodyObjects: [],
+        }
+        this.fbody = undefined;
+        this.mbody = undefined;
+
     }
 
     created() {
         return (async () => {
             await super.created();
 
-            await this.generateRandomLook();
+            this.fbody = await this.getChildModel('Body_Female');
+            this.mbody = await this.getChildModel('Body_Male');
+            
+            await this.getProps();
 
-            console.log(this.model)
+            this.generateRandomLook();
 
-            let bone = await this.getChildModel('Body');
+            this.updateLook();
+
+            console.log(this.animator);
+
+            // let bone = await this.getChildModel('Body');
             // bone = bone.filter(item => item.type === 'Bone')[0];
-            console.log(bone);
+            // console.log(bone);
 
         })();
     }
 
-    generateRandomLook(){
+    getProps(){        
         return (async () => {
-            this.isFemale = Random.int(0, 1) ? true : false;
 
-            this.skinColor.setHSL(Random.float(0.075, 0.1), Random.float(0.175, 0.35), Random.float(0.1, 0.65));
-            if (Random.int(0, 6) === 0)
-                this.hairColor.setHSL(Random.float(0.0, 1.0), Random.float(0.1, 0.4), Random.float(0.1, 0.7));
-            else
-                this.hairColor.setHSL(Random.float(0.075, 0.125), Random.float(0.1, 0.4), Random.float(0.1, 0.7));
-            this.clothColor.setHSL(Random.float(0.0, 1.0), Random.float(0.2, 0.5), Random.float(0.1, 0.6));
-
-            let scalar = this.isFemale ? 0.05 : 0.0
-            this.model.scale.setScalar(Random.float(0.95 - scalar, 1.05 - scalar));
-
-            this.materials.get('Skin').params.color = this.skinColor.getHexString();
-            this.materials.get('Hair').params.color = this.hairColor.getHexString();
-            this.materials.get('Cloth').params.color = this.clothColor.getHexString();
-
-            let fbody = await this.getChildModel('Body_Female');
-            let mbody = await this.getChildModel('Body_Male');
-            if(this.isFemale){
-                fbody[0].visible = true;
-                mbody[0].visible = false;
-            }else{
-                fbody[0].visible = false;
-                mbody[0].visible = true;
-            }
-
-            let props = await this.getChildModel('Prop');
-            for (let index in props) {
-                props[index].visible = false;
-            }
+            this.props.all = await this.getChildModel('Prop');
             
-            let hairs = await this.getChildModel('Prop_Hair_Man');
-            if(this.isFemale)
-            {
-                let womenhairs = await this.getChildModel('Prop_Hair_Women');
-                hairs = hairs.concat(womenhairs)
-                hairs = hairs.filter(prop => prop.name.indexOf('Hat') === -1 && prop.name.indexOf('Short') === -1 && prop.name.indexOf('Special') === -1);
-            }
-            this.setRandomItemFromListVisible(hairs, this.isFemale ? false : true);
+            this.props.hair = await this.getChildModel('Prop_Hair_Man');
 
-            if(!this.isFemale){
-                let facialhairs = await this.getChildModel('Prop_Hair_Facial');
-                this.setRandomItemFromListVisible(facialhairs, true);
-            }
+            this.props.womanhair = await this.getChildModel('Prop_Hair_Women');
+            this.props.womanhair = this.props.hair.concat(this.props.womanhair);
+            this.props.womanhair = this.props.womanhair.filter(prop => prop.name.indexOf('Hat') === -1 && prop.name.indexOf('Short') === -1 && prop.name.indexOf('Special') === -1);
 
-            let bodyitems = await this.getChildModel('Prop_Body');
-            if(!this.isFemale){
-                bodyitems = bodyitems.filter(prop => prop.name.indexOf('Women') === -1);
-            }
-            this.setRandomItemFromListVisible(bodyitems, true);
+            this.props.facialhair = await this.getChildModel('Prop_Hair_Facial');
 
-            if(Random.int(0, 1) === 0){
-                let headitems = await this.getChildModel('Prop_Head');
-                this.setRandomItemFromListVisible(headitems, true);
-            }
+            this.props.bodyObjects = await this.getChildModel('Prop_Body');
+
+            this.props.headObjects = await this.getChildModel('Prop_Head');
         })();
+    }
+
+    generateRandomLook(){
+        // Sex
+        this.isFemale = Random.int(0, 1) ? true : false;
+
+        // Skin color
+        this.look.skinColor.setHSL(Random.float(0.075, 0.1), Random.float(0.175, 0.35), Random.float(0.1, 0.65));
+
+        // Hair color
+        if (Random.int(0, 6) === 0)
+            this.look.hairColor.setHSL(Random.float(0.0, 1.0), Random.float(0.1, 0.4), Random.float(0.1, 0.7));
+        else
+            this.look.hairColor.setHSL(Random.float(0.075, 0.125), Random.float(0.1, 0.4), Random.float(0.1, 0.7));
+
+        // Cloth color
+        this.look.clothColor.setHSL(Random.float(0.0, 1.0), Random.float(0.2, 0.5), Random.float(0.1, 0.6));
+
+        // Height factor, female are a bit shorter than male, sorry ladies.
+        let scalar = this.isFemale ? 0.05 : 0.0;
+        this.look.heightFactor = Random.float(0.95 - scalar, 1.05 - scalar);
+
+        // What kind of hair ?
+        this.look.hair = this.isFemale ? 
+                        Random.int(0, this.props.womanhair.length - 1) : 
+                        Random.int(-1, this.props.hair.length - 1);
+
+        // Facial hair
+        this.look.facialhair = this.isFemale ? -1 : Random.int(-1, this.props.facialhair.length - 1);
+
+        // Body props
+        this.look.bodyObject = Random.int(-1, this.props.bodyObjects.length - 1);
+
+        // Head props
+        this.look.headObject = Random.int(-1, this.props.headObjects.length - 1);
+    }
+
+    updateLook(){
+        // Hide everything
+        for (let index in this.props.all) {
+            this.props.all[index].visible = false;
+        }
+
+        this.model.scale.setScalar(this.look.heightFactor);
+
+        if (this.isFemale) {
+            this.fbody[0].visible = true;
+            this.mbody[0].visible = false;
+        } else {
+            this.fbody[0].visible = false;
+            this.mbody[0].visible = true;
+        }
+
+        this.materials.get('Skin').params.color = this.look.skinColor.getHexString();
+        this.materials.get('Hair').params.color = this.look.hairColor.getHexString();
+        this.materials.get('Cloth').params.color = this.look.clothColor.getHexString();
+
+        if(this.look.hair > -1){
+            if(this.isFemale){
+                this.props.womanhair[this.look.hair].visible = true;
+                // console.log(this.props.womanhair[this.look.hair].name)
+            } else{
+                this.props.hair[this.look.hair].visible = true;
+                // console.log(this.props.hair[this.look.hair].name)
+            }
+        }
+
+        if (this.look.facialhair > -1) {
+            this.props.facialhair[this.look.facialhair].visible = true;
+        }
+
+        if (this.look.bodyObject > -1) {
+            if(!this.isFemale){
+                if(this.props.bodyObjects[this.look.bodyObject].name.indexOf('Women') === -1){
+                    this.props.bodyObjects[this.look.bodyObject].visible = true;
+                }
+            }else{
+                this.props.bodyObjects[this.look.bodyObject].visible = true;
+            }
+        }
+
+        if (this.look.headObject > -1) {
+            this.props.headObjects[this.look.headObject].visible = true;
+        }
+
     }
 
     setRandomItemFromListVisible(list, canBeNothing) {
@@ -124,8 +193,11 @@ export class Bonhomme extends Model {
 
         this.timeElapsed += delta;
 
-        if(this.timeElapsed > 500){
+        this.model.rotation.y += 0.0005 * delta;
+
+        if(this.timeElapsed > 1000){
             this.generateRandomLook();
+            this.updateLook();
             this.timeElapsed = 0;
         }
     }

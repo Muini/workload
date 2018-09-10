@@ -136,5 +136,7 @@ export default new Scene({
     onStart: async function() {
         // await Engine.wait(1000)
 
+        // this.bonhomme.animator.play('Salute')
+
     }
 });
