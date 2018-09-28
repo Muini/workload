@@ -25,7 +25,8 @@ export default {
     },
     'workload': {
         models: {
-            'worker.model': '/static/models/worker.glb',
+            'bonhomme.model': '/static/models/bonhomme.glb',
+            'desk.model': '/static/models/desk.glb',
             'paper.model': '/static/models/paper.glb',
             'cash.model': '/static/models/cash.glb',
         },

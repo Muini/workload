@@ -5,6 +5,7 @@ import UUID from '../utils/uuid';
 import Data from '../utils/data';
 
 // TODO: ECS based system : http://www.vasir.net/blog/game-development/how-to-build-entity-component-system-in-javascript
+// http://aras-p.info/texts/files/2018Academy%20-%20ECS-DoD.pdf
 export default class Entity {
     constructor(opt = {
         parent,
@@ -144,10 +145,6 @@ export default class Entity {
     }
 
     update(time, delta) {}
-
-    onClicked() {
-        if (!this.isActive) return;
-    }
 
     destroy() {
         this.setActive(false);

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Interaction } from 'three.interaction';
 import Log from '../utils/log';
 import * as dat from 'dat.gui';
 import Quality from './quality';
@@ -46,6 +47,8 @@ class Engine {
         this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
+
+        this.interaction = undefined;
 
         this.timeScale = 1.0;
         this.lastTick = 0;
@@ -113,7 +116,6 @@ class Engine {
             this.pixelDensityDefault = this.pixelDensity;
             this.renderer.setPixelRatio(this.pixelDensity);
 
-
             if (this.hasPostProd) {
                 this.postprod = await new PostProd({
                     width: this.width,
@@ -133,16 +135,16 @@ class Engine {
                         filmic: {
                             enabled: true,
                             // noise: 0.05, 
-                            noise: 0.25, 
+                            noise: 0.15, 
                             useStaticNoise: true,
-                            rgbSplit: 30.0,
+                            rgbSplit: 10.0, //30
                             // vignette: Quality.score >= 1000 ? 20.0 : 0.0,
                             vignette: 40.0,
                             // vignetteOffset: 0.15,
                             vignetteOffset: 0.09,
                             brightness: 0.0,
                             // contrast: 1.3,
-                            contrast: 1.6,
+                            contrast: 1.5,
                             gamma: 2.2,
                             // vibrance: 0.3,
                             vibrance: 1.0,
@@ -202,7 +204,7 @@ class Engine {
             this._performanceCycleNbr = 0;
             this.resize();
         }, false);
-        // if (Log.debug) return;
+        if (Log.debug) return;
         let isActive = true
         document.addEventListener('visibilitychange', _ => {
             if (document.visibilityState == 'visible') {
@@ -415,6 +417,10 @@ class Engine {
 
     update(time) {
         if (!SceneManager.currentScene || !SceneManager.currentScene.mainCamera || !this.isPlaying) return;
+
+        if(!this.interaction){
+            this.interaction = new Interaction(this.renderer, SceneManager.currentScene.instance, SceneManager.currentScene.mainCamera);
+        }
         
         this._requestId = window.requestAnimationFrame(time => this.update(time))
 

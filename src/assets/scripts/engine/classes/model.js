@@ -16,6 +16,8 @@ export default class Model extends Entity{
         this.hasShadows = false;
 
         this.isModelEntity = true;
+
+        this.isHovering = false;
     }
 
     addMaterial(materialName, isIntancedMaterial = true) {
@@ -36,6 +38,10 @@ export default class Model extends Entity{
             //Get the model from the assets manager
             const asset = await AssetsManager.getAsset('model', this.modelName);
             this.model = asset.model;
+            /*for (let i = 0; i < asset.model.children.length; i++) {
+                console.log(asset.model.children[i])
+                this.model.add(asset.model.children[i]);
+            }*/
             //Create an animator if there is animations
             if (asset.animations.length) {
                 this.animator = new Animator({
@@ -58,33 +64,50 @@ export default class Model extends Entity{
         })()
     }
 
+    awake() {
+        return (async () => {
+            await super.awake();
+
+            this.bindEvents();
+        })();
+    }
+
+    bindEvents() {
+        this.model.on('click', this.onClick.bind(this));
+        this.model.cursor = "pointer";
+        this.model.on('mousemove', this.onHover.bind(this));
+        this.model.on('mouseout', this.onOutHover.bind(this));
+    }
+
+    onClick(e) {
+        if (!this.isActive) return;
+    }
+    onHover(e) {
+        if (!this.isActive) return;
+        if (this.isHovering) return;
+        this.isHovering = true;
+    }
+    onOutHover(e){
+        this.isHovering = false;
+    }
+
     overwriteModelParameters() {
         return (async () => {
 
             const updateLights = function (child, lights) {
-                if (!child.isSpotLight && !child.isPointLight && !child.isDirectionalLight) return child;
-
-                child.decay = 2;
-                child.penumbra = 0.8;
-                child.angle /= 2.;
-                /*
-                if (child.isPointLight) {
-                    child.distance = 5.0;
-                }*/
                 //Overwrite lights
                 lights.forEach(light => {
                     if (light.name == child.name) {
-                        child.color = light.instance.color;
-                        child.intensity = light.instance.intensity;
-                        child.power = light.instance.power;
-                        child.castShadow = light.instance.castShadow;
-                        child.visible = light.instance.visible;
-                        child.shadow = light.instance.shadow;
-                        if (child.isPointLight) {
-                            child.distance = light.instance.distance;
-                        }
-                        light.instance = child;
-                        child = light.instance;
+                        light.instance.position.set(child.position.x, child.position.y, child.position.z);
+                        light.instance.quaternion.set(child.quaternion.x, child.quaternion.y, child.quaternion.z, child.quaternion.w);
+                        light.instance.rotation.set(child.rotation.x, child.rotation.y, child.rotation.z);
+                        light.instance.decay = 2;
+                        light.instance.penumbra = 0.8;
+                        child.parent.add(light.instance);
+                        // child.parent.remove(child);
+                        // light.instance.angle /= 2.;
+                        // console.log(light.instance);
+                        return light.instance;
                     }
                 });
                 return child;

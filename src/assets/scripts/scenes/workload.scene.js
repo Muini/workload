@@ -23,13 +23,13 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(50, 45, 50),
+            position: new THREE.Vector3(0, 40, 60),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 50,
-            focus: 42.0, //42
+            focus: 38.0, //42
             aperture: 1.8,
         });
-        this.camera.model.rotation.y = (45 / 180) * 3.14;
+        // this.camera.model.rotation.y = (45 / 180) * 3.14;
         this.camera.instance.rotation.x = -(30 / 180) * 3.14;
 
         let cubemap = new Cubemap({
@@ -67,21 +67,21 @@ export default new Scene({
         // Test Worker
         this.worker = new Worker({ parent: this });
 
-        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0.0, -8.0) });
+        /*this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -8.0) });
         this.worker2.happiness = 0.4;
 
-        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(-16.0, 0.0, -16.0) });
-        this.worker3.happiness = 0.6;
+        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -16.0) });
+        this.worker3.happiness = 0.6;*/
 
-        this.testdom = new ExempleDom({ parent: this });
+        // this.testdom = new ExempleDom({ parent: this });
 
 
     },
     onStart: async function() {
         // await Engine.wait(1000)
 
-        let tween = new Tween({ x:50, y:45, z:50, aperture: 2.0 })
-            .to({ x:25, y:26, z:25, aperture: 3.5 }, 2000)
+        let tween = new Tween({ x:0, y:40, z:60, aperture: 1.8 })
+            .to({ x:0, y:20, z:30, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
             // .yoyo(true)
             .ease(Ease.Sine.Out)
@@ -92,12 +92,7 @@ export default new Scene({
                 this.camera.params.aperture = props.aperture;
             })
             .onComplete(async _ => {
-                this.testdom.setActive(true);
-                this.worker.addWork(10);
-                await Engine.wait(200);
-                this.worker2.addWork(10);
-                await Engine.wait(200);
-                this.worker3.addWork(10);
+                // this.testdom.setActive(true);
             })
             .start();
     }

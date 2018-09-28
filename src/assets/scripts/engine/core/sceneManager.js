@@ -93,6 +93,7 @@ class SceneManager {
         }
         this.set(this.scenesOrder[this.sceneCurrentIndex]).then(_ => {
             // When loaded, init the new scene
+            Engine.interaction = undefined;
             this.currentScene.start().then(_ => {
                 // Start the render
                 // Engine.play();

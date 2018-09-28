@@ -6315,6 +6315,10 @@ three-webgl-stats@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/three-webgl-stats/-/three-webgl-stats-1.0.5.tgz#9b4852b9fd9319e9b605d71e9e58cace9618d9b6"
 
+three.interaction@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/three.interaction/-/three.interaction-0.2.2.tgz#01ce80ba7cacd24ada09dc57f1d64e9dd5d7a0b0"
+
 three@0.96.0:
   version "0.96.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.96.0.tgz#6f48bb9e321506906ae4708bda69b0ffa808ee7f"

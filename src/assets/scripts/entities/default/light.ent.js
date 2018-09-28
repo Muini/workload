@@ -103,6 +103,11 @@ export class Light extends Entity{
         }
     }
 
+    setVisibility(visibility){
+        console.log('setting visibility to', visibility, this.name)
+        this.instance.visible = visibility;
+    }
+
     setColor(newColor){
         this.params.color = newColor;
         this.instance.color.setHex('0x' + this.params.color);

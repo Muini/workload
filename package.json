@@ -47,6 +47,7 @@
         "stats.js": "^0.17.0",
         "three": "0.96.0",
         "three-webgl-stats": "^1.0.5",
+        "three.interaction": "^0.2.2",
         "webfontloader": "^1.6.28"
     }
 }

@@ -13,6 +13,7 @@ import './snow.mat';
 
 import './money.mat';
 import './paper.mat';
+import './placeholder.mat';
 
 import './abs.mat';
 import './screen.mat';
