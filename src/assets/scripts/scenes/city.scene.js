@@ -59,21 +59,23 @@ export default new Scene({
             type: 'ambient',
             color: '222e56',
             colorGround: '323b2e',
-            power: 10.0, //Day
-            // power: 6.0, //Sunset
+            // power: 10.0, //Day
+            power: 1.0, //Sunset
         })
 
         this.sun = new Light({
             name: 'Sun',
             parent: this,
             type: 'directional',
-            color: 'FFF4E6',
-            power: 8.0,
+            // color: 'FFF4E6',
+            color: 'aa6644', //Day
+            // power: 8.0, //Day
+            power: 12.0,
             castShadow: true,
             shadowMapSize: 1024,
             shadowCameraSize: 50.0,
-            position: new THREE.Vector3(-30, 100, 30), //Day
-            // position: new THREE.Vector3(-80, 100, -600), //Sunset
+            // position: new THREE.Vector3(-30, 100, 30), //Day
+            position: new THREE.Vector3(-140, 150, -600), //Sunset
         })
         
         this.sunTarget = new THREE.Object3D();
@@ -81,24 +83,25 @@ export default new Scene({
         this.sunTarget.position.y = 20;
         this.sunTarget.position.z = -30;
         this.instance.add(this.sunTarget);
-        this.sun.setTarget(this.sunTarget)
 
         let sky = new Sky({
             parent: this,
             size: 1000,
             sunPosition: this.sun.position,
-            turbidity: 4.0,
+            turbidity: 0.5,
             rayleight: 3.0,
             mieCoefficient: 0.005,
             mieDirectionalG: 0.5
         })
 
-        this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002); //Day
-        // this.instance.fog = new THREE.FogExp2(0xbcb2a4, 0.025);
+        // this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002); //Day
+        this.instance.fog = new THREE.FogExp2(0x664411, 0.0025); //Sunset
 
         this.city = new City({
             parent: this
         });
+        this.city.rotation.y = 3.14;
+        this.sun.setTarget(this.city.model);
 
         this.citySound = new Sound({
             name: 'city-loop',

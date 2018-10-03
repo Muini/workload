@@ -8,8 +8,9 @@ import Random from '../engine/utils/random';
 import { Ease, Tween } from '../engine/classes/tween';
 
 import { Light } from './default/light.ent';
-import { PaperBlock } from './paperBlock.ent';
+// import { PaperBlock } from './paperBlock.ent';
 import { CashPile } from './cashPile.ent';
+import { Bonhomme } from './bonhomme.ent';
 
 export class Worker extends Model {
     constructor(opt) {
@@ -55,6 +56,7 @@ export class Worker extends Model {
             castShadow: true,
         })
 
+        this.bonhomme = new Bonhomme({ parent: this })
         this.placeholder = undefined;
 
         this.timeElapsed = 0;
@@ -159,8 +161,8 @@ export class Worker extends Model {
             this.lights.get('Desk_Spot').setPower(2 + (progress * 8));
         })
         .onComplete(_ => {
-            // The worker is created 
             // Bonhomme arrive at work
+            this.bonhomme.arriveAtDesk();
             this.turnLightOn();
         })
 
@@ -171,12 +173,14 @@ export class Worker extends Model {
         this.stopWorking();
         this.turnScreenOff();
         //Anim out
+        this.bonhomme.leaveFromDesk();
         this.turnLightOff();
     }
 
     arriveAtOffice(){
         this.turnLightOn();
         //Anim in
+        this.bonhomme.arriveAtDesk();
         this.turnScreenOn();
         this.startWorking();
     }

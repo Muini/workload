@@ -47,6 +47,8 @@ export class Bonhomme extends Model {
         this.fbody = undefined;
         this.mbody = undefined;
 
+        this.isOut = true;
+
     }
 
     created() {
@@ -62,7 +64,7 @@ export class Bonhomme extends Model {
 
             this.updateLook();
 
-            console.log(this.animator);
+            // console.log(this.animator)
 
             // let bone = await this.getChildModel('Body');
             // bone = bone.filter(item => item.type === 'Bone')[0];
@@ -185,21 +187,25 @@ export class Bonhomme extends Model {
         return (async () => {
             await super.awake();
             // Is fired when the scene is starting
+            if(this.isOut)
+                this.model.visible = false;
         })();
+    }
+
+    arriveAtDesk(){
+        this.model.visible = true;
+        this.isOut = false;
+        //TODO: Animation In (walk in & sit)
+    }
+
+    leaveFromDesk(){
+        //TODO: Animation Out (sit up & walk away)
+        this.model.visible = false;
+        this.isOut = true;
     }
 
     update(time, delta) {
         super.update(time, delta);
-
-        this.timeElapsed += delta;
-
-        this.model.rotation.y += 0.0005 * delta;
-
-        if(this.timeElapsed > 1000){
-            this.generateRandomLook();
-            this.updateLook();
-            this.timeElapsed = 0;
-        }
     }
 
 }

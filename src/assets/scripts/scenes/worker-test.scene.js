@@ -137,6 +137,17 @@ export default new Scene({
         // await Engine.wait(1000)
 
         // this.bonhomme.animator.play('Salute')
+        
+        // onUpdate
+        /*this.timeElapsed += delta;
+
+        this.model.rotation.y += 0.0005 * delta;
+
+        if(this.timeElapsed > 1000){
+            this.generateRandomLook();
+            this.updateLook();
+            this.timeElapsed = 0;
+        }*/
 
     }
 });
