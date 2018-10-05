@@ -36,6 +36,7 @@ class Engine {
         this.containerBoundingBox = undefined;
         this.renderer = new THREE.WebGLRenderer({
             antialias: false,
+            powerPreference: 'high-performance',
             alpha: false
         });
         // this.renderer = new THREE.WebGLDeferredRenderer();
@@ -54,7 +55,7 @@ class Engine {
         this.lastTick = 0;
         this.elapsedTime = 0;
 
-        this.hasAdapativeRenderer = true;
+        this.hasAdapativeRenderer = false;
         this.pixelDensity = 1.0;
         this.pixelDensityDefault = 1.0;
         this._fpsMedian = 0;
@@ -130,31 +131,32 @@ class Engine {
                         },
                         bloom: {
                             enabled: Quality.score >= 1000 ? true : false,
-                            options: [0.5, 1.5, 0.95]
+                            options: [0.5, 1.5, 0.9]
                         },
                         filmic: {
                             enabled: true,
                             // noise: 0.05, 
-                            noise: 0.15, 
+                            noise: 0.1, 
                             useStaticNoise: true,
                             rgbSplit: 10.0, //30
                             // vignette: Quality.score >= 1000 ? 20.0 : 0.0,
-                            vignette: 40.0,
+                            vignette: 30.0,
                             // vignetteOffset: 0.15,
                             vignetteOffset: 0.09,
-                            brightness: 0.0,
+                            brightness: 0.1,
                             // contrast: 1.3,
-                            contrast: 1.5,
+                            contrast: 1.3,
                             gamma: 2.2,
-                            // vibrance: 0.3,
-                            vibrance: 1.0,
+                            // gamma: 2.2,
+                            vibrance: 0.3,
+                            // vibrance: 0.0,
                             lut: 0.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },
                         bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
                         blur: {
                             enabled: true,
-                            strength: 10.0,
+                            strength: 2.0,
                             // sharpen: Quality.isMobile ? 0.05 : 0.2,
                             sharpen: Quality.isMobile ? 0.5 : 0.7,
                             blurRgbSplit: 1.5,
