@@ -68,7 +68,7 @@ export default class Material {
 
                 this.instance.uniforms = shader.uniforms;
 
-                // Log.push('info', this.constructor.name, `Compile shader ${this.name}`);
+                // Log.push('info', this, `Compile shader ${this.name}`);
             };
         }else{
             this.instance.onBeforeCompile = (shader) => {
@@ -82,7 +82,7 @@ export default class Material {
 
                 this.instance.uniforms = shader.uniforms;
 
-                // Log.push('info', this.constructor.name, `Compile shader ${this.name}`);
+                // Log.push('info', this, `Compile shader ${this.name}`);
             };
         }
         

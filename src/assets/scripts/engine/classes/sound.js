@@ -23,7 +23,7 @@ export default class Sound {
             volume: opt.volume ? opt.volume : 1.0,
         })
         this.parent = opt.parent ? opt.parent : null; //Parent mush be THREE object to get 3D position
-        if (!this.parent) return Log.push('error', this.constructor.name, `Sound parameter "parent" is mandatory and should be a Entity or Scene type`);
+        if (!this.parent) return Log.push('error', this, `Sound parameter "parent" is mandatory and should be a Entity or Scene type`);
         this.scene = this.parent.isScene ? this.parent : this.parent.scene;
         this._nominalVolume = opt.volume ? opt.volume : 1.0;
 

@@ -47,6 +47,7 @@ export class Light extends Entity{
                 this.instance.shadow.camera.right = this.params.shadowCameraSize; // default
                 this.instance.shadow.camera.top = this.params.shadowCameraSize; // default
                 this.instance.shadow.camera.bottom = -this.params.shadowCameraSize; // default
+                this.instance.shadow.camera.far = 1000;
                 this.instance.castShadow = Quality.score >= 500 ? this.params.castShadow : false;
                 break;
 
@@ -104,7 +105,7 @@ export class Light extends Entity{
     }
 
     setVisibility(visibility){
-        console.log('setting visibility to', visibility, this.name)
+        // console.log('setting visibility to', visibility, this.name)
         this.instance.visible = visibility;
     }
 

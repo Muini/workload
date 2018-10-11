@@ -14,7 +14,7 @@ export default class Entity {
         active,
     }) {
         this.uuid = UUID();
-        this.name = 'unnamed entity';
+        this.name = opt.name || 'unnamed entity';
 
         this.model = new THREE.Group();
 
@@ -29,8 +29,8 @@ export default class Entity {
         this.isEntity = true;
 
         this.parent = opt.parent || undefined;
-        if (!this.parent) return Log.push('error', this.constructor.name, `Entity parameter "parent" is mandatory and should be a Object or Scene type`);
-        this.scene = this.parent.isScene ? this.parent : this.parent.scene;
+        // if (!this.parent) Log.push('warn', this, `Entity parameter "parent" is mandatory and should be a Object or Scene type`);
+        this.scene = this.parent ? (this.parent.isScene ? this.parent : this.parent.scene) : null;
         this._children = [];
 
         this.position = opt.position || new THREE.Vector3(0, 0, 0);
@@ -39,8 +39,8 @@ export default class Entity {
         this._isUpdating = false;
 
         //Add object to the parent as children, and to the scene to register it
-        this.scene.addEntity(this);
-        this.parent.addChildren(this);
+        if(this.scene) this.scene.addEntity(this);
+        if(this.parent) this.parent.addChildren(this);
     }
 
     addChildren(child) {
@@ -93,10 +93,12 @@ export default class Entity {
                 this.model.matrixAutoUpdate = false;
 
             // Add mesh instance to scene or parent
-            if (this.parent.isScene) {
-                this.scene.instance.add(this.model);
-            } else {
-                this.parent.model.add(this.model);
+            if(this.parent){
+                if ( this.parent.isScene) {
+                    this.scene.instance.add(this.model);
+                } else {
+                    this.parent.model.add(this.model);
+                }
             }
 
             // Create children now

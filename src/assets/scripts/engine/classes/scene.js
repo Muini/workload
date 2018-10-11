@@ -16,7 +16,7 @@ export default class Scene {
         this.uuid = UUID();
         this.name = opt.name || 'unamed scene';
         if(this.name === 'global'){
-            Log.push('warn', this.constructor.name, `Scene name 'global' is reserved, changed to 'global2'`)
+            Log.push('warn', this, `Scene name 'global' is reserved, changed to 'global2'`)
             this.name = 'global2'
         }
         this.data = opt.data || {};
@@ -74,7 +74,7 @@ export default class Scene {
     createEntities() {
         return (async() => {
             await Promise.all(this._children.map(async entity => { await entity.created() }))
-            Log.push('info', this.constructor.name, `Scene created c:salmon{${this._children.length}} entity(ies)`);
+            Log.push('info', this, `Scene created c:salmon{${this._children.length}} entity(ies)`);
             return;
         })();
     }
@@ -82,7 +82,7 @@ export default class Scene {
     awakeEntities() {
         return (async() => {
             await Promise.all(this._children.map(async entity => { await entity.awake() }))
-            Log.push('info', this.constructor.name, `Scene awaked c:salmon{${this._children.length}} entity(ies)`);
+            Log.push('info', this, `Scene awaked c:salmon{${this._children.length}} entity(ies)`);
             return;
         })();
     }
@@ -102,7 +102,7 @@ export default class Scene {
     resize() {
         if (!this.mainCamera) return;
         if (!this.mainCamera.isOrthographicCamera) {
-            // Log.push('info', this.constructor.name, `Resize camera c:salmon{${Engine.width} & ${Engine.height}}`);
+            // Log.push('info', this, `Resize camera c:salmon{${Engine.width} & ${Engine.height}}`);
             this.mainCamera.aspect = Engine.width / Engine.height;
         } else {
             this.mainCamera.left = Engine.width / -this.mainCamera.distance;
@@ -123,7 +123,7 @@ export default class Scene {
             this.sounds.forEach(sound => sound.load());
 
             await AssetsManager.loadAssetsFromScene(this.name, async _ => {
-                Log.push('success', this.constructor.name, `Scene c:LightGreen{${this.name}} loaded`);
+                Log.push('success', this, `Scene c:LightGreen{${this.name}} loaded`);
                 await this.createEntities();
                 await Engine.renderer.compile(this.instance, this.camera.instance);
                 this.isLoading = false;
@@ -139,7 +139,7 @@ export default class Scene {
             Engine.addToResize(this.uuid, this.resize.bind(this));
             this.resize();
             await this.awakeEntities();
-            if (!this.camera || !this.camera.instance) return Log.push('error', this.constructor.name, `No camera has been specified in the scene ${this.name}`);
+            if (!this.camera || !this.camera.instance) return Log.push('error', this, `No camera has been specified in the scene ${this.name}`);
             this.setCamera(this.camera.instance);
             this.isPlaying = true;
             Engine.waitNextTick().then(_ => {
@@ -163,7 +163,7 @@ export default class Scene {
     }
 
     unload() {
-        Log.push('info', this.constructor.name, `Clear scene ${this.name}`);
+        Log.push('info', this, `Clear scene ${this.name}`);
 
         this.sounds.forEach(elem => elem.destroy());
         let i = this._entities.length;

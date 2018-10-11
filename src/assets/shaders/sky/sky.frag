@@ -48,7 +48,11 @@ vec3 ACESToneMapping( vec3 color )
     float c = 2.43;
     float d = 0.59;
     float e = 0.14;
-	color *= toneMappingExposure;
+	color *= 0.1;
+	vec3 grayXfer = vec3(0.3, 0.9, 0.11);
+	vec3 gray = vec3(dot(grayXfer, color));
+	color = vec3(mix(color, gray, 0.5));
+	// color = vec3(color.r, color.r, color.r);
     return saturate((color*(a*color+b))/(color*(c*color+d)+e));
 }
 

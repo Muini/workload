@@ -31,8 +31,8 @@ export class Worker extends Model {
             name: 'Desk_Light',
             type: 'point',
             parent: this,
-            color: 'ff9356',
-            power: 200,
+            color: 'fc7223',
+            power: 250,
             castShadow: false,
         })
 
@@ -145,6 +145,7 @@ export class Worker extends Model {
         .onComplete(_ => {
             // Remove placeholder
             this.placeholder.visible = false;
+            this.lights.get('Desk_Spot').setVisibility(true);
             deskAnimIn.start();
         })
 
@@ -159,6 +160,7 @@ export class Worker extends Model {
         .onUpdate((props, progress) => {
             this.model.position.y = props.y;
             this.lights.get('Desk_Spot').setPower(2 + (progress * 8));
+            // console.log(this.lights.get('Desk_Spot').params.power);
         })
         .onComplete(_ => {
             // Bonhomme arrive at work

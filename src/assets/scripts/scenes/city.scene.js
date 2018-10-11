@@ -46,19 +46,25 @@ export default new Scene({
             parent: this,
             near: 1,
             far: 500,
-            resolution: 128,
-            position: new THREE.Vector3(0, 30, 10),
+            resolution: 256,
+            // position: new THREE.Vector3(0, 30, 10),
+            position: new THREE.Vector3(0, 30, -150),
             shouldUpdate: false,
             tickRate: 2,
+            debug:false,
         });
+        cubemap.rotation.z += -3.14 / 2;
+        cubemap.rotation.x += 3.14 / 2;
 
         // Ambient Light
         let ambiantLight = new Light({
             name: 'Ambient Light',
             parent: this,
             type: 'ambient',
-            color: '222e56',
-            colorGround: '323b2e',
+            // color: '222e56', //Day
+            color: 'f9c5ac',
+            // colorGround: '323b2e', //Day
+            colorGround: '3d3463',
             // power: 10.0, //Day
             power: 1.0, //Sunset
         })
@@ -68,14 +74,14 @@ export default new Scene({
             parent: this,
             type: 'directional',
             // color: 'FFF4E6',
-            color: 'aa6644', //Day
+            color: 'fa4f1d', //Day
             // power: 8.0, //Day
-            power: 12.0,
+            power: 16.0,
             castShadow: true,
-            shadowMapSize: 1024,
+            shadowMapSize: 512,
             shadowCameraSize: 50.0,
             // position: new THREE.Vector3(-30, 100, 30), //Day
-            position: new THREE.Vector3(-140, 150, -600), //Sunset
+            position: new THREE.Vector3(150, 50, -250), //Sunset
         })
         
         this.sunTarget = new THREE.Object3D();
@@ -88,14 +94,15 @@ export default new Scene({
             parent: this,
             size: 1000,
             sunPosition: this.sun.position,
-            turbidity: 0.5,
-            rayleight: 3.0,
-            mieCoefficient: 0.005,
-            mieDirectionalG: 0.5
+            turbidity: 2.0,
+            rayleigh: 3.0,
+            mieCoefficient: 0.0008,
+            mieDirectionalG: 0.8
         })
 
         // this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002); //Day
-        this.instance.fog = new THREE.FogExp2(0x664411, 0.0025); //Sunset
+        // this.instance.fog = new THREE.FogExp2(0x959fa5, 0.002); //Day
+        this.instance.fog = new THREE.FogExp2(0x604f40, 0.002); //Sunset
 
         this.city = new City({
             parent: this
@@ -130,7 +137,7 @@ export default new Scene({
     },
     onStart: async function () {
 
-        this.citySound.play(1000);
+        // this.citySound.play(1000);
 
         let tween = new Tween({
                 y: 45,

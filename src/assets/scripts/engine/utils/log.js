@@ -25,11 +25,11 @@ class Log {
         this._STAYTIME = 10000; //ms
     }
 
-    push(type, className, message){
+    push(type, caller, message){
         const log = {
             uuid: UUID(),
             type: type,
-            class: className,
+            class: caller.constructor.name,
             message: message,
         }
 
@@ -38,11 +38,11 @@ class Log {
 
         // Write it in the console
         if (log.type === 'error')
-            console.error(logMessage, styles, "color:black")
+            console.error(logMessage, styles, "color:black", caller)
         else if(log.type === 'warn')
             console.warn(logMessage, styles, "color:black")
         else
-            console.log(logMessage, styles, "color:black")
+            console.info(logMessage, styles, "color:black")
 
         if (this.debug) {
             this.createDomLog(log);

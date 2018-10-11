@@ -5,6 +5,7 @@ import Engine from '../engine/core/engine';
 import MaterialManager from '../engine/core/materialManager';
 import Scene from '../engine/classes/scene';
 import { Ease, Tween } from '../engine/classes/tween';
+import DomEntity from '../engine/classes/domEntity';
 
 // Objects
 import { Camera } from '../entities/default/camera.ent';
@@ -80,7 +81,14 @@ export default new Scene({
         this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -16.0) });
         this.worker3.happiness = 0.6;*/
 
-        // this.testdom = new ExempleDom({ parent: this });
+        this.testdom = new DomEntity({
+            parent: this.worker,
+            selector: '.hud-add-worker',
+            name: 'Add Worker',
+            debug: false,
+            follow: true,
+            position: new THREE.Vector3(0, 10, 0)
+        });
 
 
     },
@@ -99,7 +107,7 @@ export default new Scene({
                 this.camera.params.aperture = props.aperture;
             })
             .onComplete(async _ => {
-                // this.testdom.setActive(true);
+                this.testdom.setActive(true);
             })
             .start();
     }

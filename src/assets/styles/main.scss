@@ -47,9 +47,8 @@ body {
 .hud {
     position: absolute;
     z-index: 2;
-    visibility: hidden;
+    display: none;
     background-color: rgba(0, 50, 100, 0.2);
-    pointer-events: none;
     &.title {
         @include fluid-type( $mq-min-width, $mq-xxlarge-min, 30px, 60px);
         // width: 100%;
