@@ -74,7 +74,6 @@ export default class Model extends Entity{
 
     bindEvents() {
         this.model.on('click', this.onClick.bind(this));
-        this.model.cursor = "pointer";
         this.model.on('mousemove', this.onHover.bind(this));
         this.model.on('mouseout', this.onOutHover.bind(this));
     }

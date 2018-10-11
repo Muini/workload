@@ -47,7 +47,7 @@ class SceneManager {
     set(sceneName) {
         return new Promise((resolve, reject) => {
             //TODO: reject setScene
-            if (this.scenes.get(sceneName) === undefined) return Log.push('error', this.constructor.name, `Scene ${sceneName} is not registered`);
+            if (this.scenes.get(sceneName) === undefined) return Log.push('error', this, `Scene ${sceneName} is not registered`);
             this.currentScene = this.scenes.get(sceneName);
             if (Log.debug)
                 window.scene = this.currentScene.instance;
@@ -77,7 +77,7 @@ class SceneManager {
     }
 
     next() {
-        Log.push('info', this.constructor.name, `Next Scene`);
+        Log.push('info', this, `Next Scene`);
         // Pause render
         // Engine.pause();
         // Clear renderer
@@ -88,7 +88,7 @@ class SceneManager {
         this.sceneCurrentIndex++;
         // Check if the next scene exist
         if (!this.scenesOrder[this.sceneCurrentIndex]) {
-            Log.push('warn', this.constructor.name, `No more scenes to play.`);
+            Log.push('warn', this, `No more scenes to play.`);
             return this.stop();
         }
         this.set(this.scenesOrder[this.sceneCurrentIndex]).then(_ => {

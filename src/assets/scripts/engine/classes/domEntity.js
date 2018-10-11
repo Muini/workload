@@ -1,36 +1,25 @@
+import * as THREE from 'three';
 import Engine from '../core/engine';
-import UUID from '../utils/uuid';
-import Log from '../utils/log';
+import Entity from './entity';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
 // TODO: Make the dom inherit the Entity class
-export default class DomEntity {
-    constructor(opt = {
-        selector,
-        parent,
-        active,
-    }) {
-        this.uuid = UUID();
-        this.name = 'unnamed dom entity';
+export default class DomEntity extends Entity {
+    constructor(opt) {
+        super(opt);
+
+        this.name = opt.name || 'unnamed dom entity';
 
         this.selector = opt.selector || undefined;
+        this.follow = opt.follow || false;
         this.dom = undefined;
-        // TODO: Datas for every Entity & OnDataChanged function
-        this.data = {};
-
-        this.isActive = opt.active || false;
-        this.isVisible = false;
+        
         this.isDomEntity = true;
+        this.debug = opt.debug || false;
 
-        this.parent = opt.parent || null;
-        if (!this.parent) {
-            if (this.constructor.name != 'Loader')
-                Log.push('warn', this.constructor.name, `DomEntity parameter "parent" is mandatory and should be a Entity or Scene type`);
-        } else {
-            this.scene = this.parent.isScene ? this.parent : this.parent.scene;
-            this.scene.addEntity(this);
-            this.parent.addChildren(this);
+        if(this.debug){
+            this.model.add(new THREE.AxesHelper(1));
         }
 
         this._vars = {};
@@ -56,41 +45,27 @@ export default class DomEntity {
     }
 
     setVisibility(bool) {
+        super.setVisibility(bool);
         if (this.dom){
-            if(bool === true){
+            if(bool){
                 if (!this.isLoader) {
                     Engine.waitNextTick().then(_ => {
-                        this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+                        this.dom.style['display'] = bool ? 'block' : 'none';
                     });
                 } else {
                     requestAnimationFrame(_ => {
-                        this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+                        this.dom.style['display'] = bool ? 'block' : 'none';
                     });
                 }
                 
             }else{
-                this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+                this.dom.style['display'] = bool ? 'block' : 'none';
             }
         }
-        this.isVisible = bool;
     }
 
     setActive(bool) {
-        this.isActive = bool;
-        if (this.isActive) {
-            if (!this._isUpdating) {
-                if (!this.isLoader)
-                    Engine.addToUpdate(this.uuid, this.update.bind(this));
-                this._isUpdating = true;
-            }
-        } else {
-            if (this._isUpdating) {
-                if (!this.isLoader)
-                    Engine.removeFromUpdate(this.uuid);
-                this._isUpdating = false;
-            }
-        }
-        this.setVisibility(bool);
+        super.setActive(bool);
     }
 
     created() {
@@ -116,16 +91,14 @@ export default class DomEntity {
                 });
             }
 
-            if (this.scene && this.scene.isPlaying) {
-                await this.awake();
-            }
+            await super.created();
         })();
     }
 
     // Awake happen when the scene is loaded into the engine & started to be used
     awake() {
         return (async() => {
-            this.setActive(this.isActive);
+            await super.awake();
         })();
     }
 
@@ -177,7 +150,15 @@ export default class DomEntity {
         })();
     }
 
-    update(time, delta) {}
+    update(time, delta) {
+        if(this.follow){
+            const pos = this.model.position.project(this.scene.mainCamera);
+            const x = (pos.x * (Engine.width / 2)) + (Engine.width / 2);
+            const y = -(pos.y * (Engine.height / 2)) + (Engine.height / 2);
+            this.dom.style['transform'] = `translateZ(0) translateX(-50%) translateY(-50%) translateX(${x}px) translateY(${y}px)`;
+            this.dom.style['webkitTransform'] = `translateZ(0) translateX(-50%) translateY(-50%) translateX(${x}px) translateY(${y}px)`;
+        }
+    }
 
     destroy() {
         this.setActive(false);

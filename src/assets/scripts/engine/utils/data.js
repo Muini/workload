@@ -22,7 +22,7 @@ export default class Data {
     }
 
     compute(data, fct){
-        if(!this.data[data]) return Log.push('error', this.constructor.name, `Data ${data} is not existing`);
+        if(!this.data[data]) return Log.push('error', this, `Data ${data} is not existing`);
         this.dataFunctions[data] = fct;
     }
 

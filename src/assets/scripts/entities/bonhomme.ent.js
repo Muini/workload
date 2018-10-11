@@ -188,19 +188,19 @@ export class Bonhomme extends Model {
             await super.awake();
             // Is fired when the scene is starting
             if(this.isOut)
-                this.model.visible = false;
+                this.setVisibility(false);
         })();
     }
 
-    arriveAtDesk(){
-        this.model.visible = true;
+    arriveAtDesk() {
+        this.setVisibility(true);
         this.isOut = false;
         //TODO: Animation In (walk in & sit)
     }
 
     leaveFromDesk(){
         //TODO: Animation Out (sit up & walk away)
-        this.model.visible = false;
+        this.setVisibility(false);
         this.isOut = true;
     }
 

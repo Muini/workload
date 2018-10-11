@@ -92,7 +92,7 @@ class AssetsManager {
     updateLoader() {
         this.assetsLoaded++;
         Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
-        Log.push('info', this.constructor.name, `c:LightGreen{${this.assetsLoaded}/${this.assetsToLoad}} assets loaded`);
+        Log.push('info', this, `c:LightGreen{${this.assetsLoaded}/${this.assetsToLoad}} assets loaded`);
         if (this.assetsLoaded >= this.assetsToLoad) {
             this.onSceneLoaded();
         }
@@ -100,7 +100,7 @@ class AssetsManager {
 
     getAsset(assetType, assetName) {
         return (async() => {
-            if (!this.assets[assetName] || !this.assets[assetName].isLoaded) return Log.push('error', this.constructor.name, `Asset ${assetName} has not been loaded ! Make sure it is in assets.js with the correct name.`);
+            if (!this.assets[assetName] || !this.assets[assetName].isLoaded) return Log.push('error', this, `Asset ${assetName} has not been loaded ! Make sure it is in assets.js with the correct name.`);
 
             switch (assetType) {
                 case 'model':

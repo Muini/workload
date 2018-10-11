@@ -57,7 +57,7 @@ export default new Scene({
             type: 'ambient',
             color: '2f364f',
             colorGround: '323b2e',
-            power: 10.0,
+            power: 5.0,
         })
 
         this.spotLight = new Light({
@@ -77,7 +77,7 @@ export default new Scene({
             parent: this,
             type: 'spot',
             color: '0033ff',
-            power: 10.0,
+            power: 14.0,
             fov: Math.PI / 10,
             castShadow: true,
             shadowMapSize: 128,
@@ -114,7 +114,7 @@ export default new Scene({
         this.camera.setTargetMAP(this.bonhomme.model);
 
         // Music : Le Perv - Carpender Brut
-
+        this.timeElapsed = 0;
         this.update = (time, delta) => {
             this.camera.instance.rotation.z = Math.sin(time * 0.0011) * 0.1;
             this.camera.instance.position.z = Math.sin(time * 0.001) * 0.75;
@@ -126,28 +126,29 @@ export default new Scene({
             this.rimLight.setColor(this.rimLightColor.getHexString())
 
             if(this.textMaterial)
-                this.textMaterial.emissiveIntensity = 45.0 + ((Math.sin(time * 0.005) * 5.0));
-        }
-        this.update(0, 0);
+                this.textMaterial.emissiveIntensity = 50.0 + ((Math.sin(time * 0.005) * 5.0));
 
-        Engine.addToUpdate(this.uuid, this.update.bind(this));
+            this.timeElapsed += delta;
+
+            this.bonhomme.model.rotation.y += 0.0005 * delta;
+
+            if (this.timeElapsed > 1000) {
+                this.bonhomme.generateRandomLook();
+                this.bonhomme.updateLook();
+                this.timeElapsed = 0;
+            }
+        }
+        // this.update(0, 0);
+
+        // Engine.addToUpdate(this.uuid, this.update.bind(this));
 
     },
     onStart: async function() {
         // await Engine.wait(1000)
 
+        this.bonhomme.setVisibility(true);
         // this.bonhomme.animator.play('Salute')
         
-        // onUpdate
-        /*this.timeElapsed += delta;
-
-        this.model.rotation.y += 0.0005 * delta;
-
-        if(this.timeElapsed > 1000){
-            this.generateRandomLook();
-            this.updateLook();
-            this.timeElapsed = 0;
-        }*/
 
     }
 });

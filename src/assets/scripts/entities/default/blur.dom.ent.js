@@ -50,7 +50,7 @@ export class BlurDom extends DomEntity {
         else if (Engine.postprod)
             Engine.postprod.addBlurPosition(this);
         else
-            Log.push('warn', this.constructor.name, `Blur DomEntity require postprocessing effects on`);
+            Log.push('warn', this, `Blur DomEntity require postprocessing effects on`);
     }
 
     update(time, delta) {

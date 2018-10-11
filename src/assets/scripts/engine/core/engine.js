@@ -188,7 +188,7 @@ class Engine {
 
             Log.push(
                 'success',
-                this.constructor.name,
+                this,
                 `Init\nSize: c:lightgreen{${this.width}x${this.height}px}\nQuality score: c:salmon{${Quality.score}}\nPixelDensity: c:orange{${this.pixelDensity}}\nThree.js: c:lightgreen{r${THREE.REVISION}}\nGPU: c:orange{${Quality.gpu}}\n`
             );
         })();
@@ -316,15 +316,15 @@ class Engine {
             await SceneManager.set(SceneManager.scenesOrder[SceneManager.sceneCurrentIndex]).then(async _ => {
                 if (SceneManager.currentScene == undefined) return Log.push(
                     'error',
-                    this.constructor.name,
+                    this,
                     'No scene has been loaded or specified, please use SceneManager.setOrder(...) function'
                 );
 
-                Log.push('info', this.constructor.name, '⏺️ Start');
+                Log.push('info', this, '⏺️ Start');
 
                 await SceneManager.currentScene.start();
 
-                // if (SceneManager.currentScene.mainCamera == undefined) return Log.push('error', this.constructor.name, 'No camera has been added or specified, please use scene.setCamera(...) function');
+                // if (SceneManager.currentScene.mainCamera == undefined) return Log.push('error', this, 'No camera has been added or specified, please use scene.setCamera(...) function');
 
                 this.hasStarted = true;
 
@@ -339,7 +339,7 @@ class Engine {
         this.lastTick = 0;
         this._requestId = window.requestAnimationFrame(time => this.update(time));
         this.isPlaying = true;
-        // Log.push('info', this.constructor.name, '▶️ Play');
+        // Log.push('info', this, '▶️ Play');
     }
 
     pause() {
@@ -347,11 +347,11 @@ class Engine {
         window.cancelAnimationFrame(this._requestId);
         this._requestId = undefined;
         this.isPlaying = false;
-        // Log.push('info', this.constructor.name, '⏸️ Pause');
+        // Log.push('info', this, '⏸️ Pause');
     }
 
     stop() {
-        Log.push('info', this.constructor.name, '⏹️ Stop');
+        Log.push('info', this, '⏹️ Stop');
         this.pause();
         this.elapsedTime = 0;
         this.hasStarted = false;
@@ -404,7 +404,7 @@ class Engine {
                     hasBeenResized = true;
                     this._adaptiveRendererDelay = 1000;
                     this._lastAdaptiveRendererTime = time;
-                    Log.push('info', this.constructor.name, `Adapting renderer to c:salmon{${newPixelDensity}} pixelRatio because ${this._fpsMedian}fps`);
+                    Log.push('info', this, `Adapting renderer to c:salmon{${newPixelDensity}} pixelRatio because ${this._fpsMedian}fps`);
                 }
 
             }
@@ -452,7 +452,7 @@ class Engine {
             try {
                 fct(this.elapsedTime, deltaScaled);
             } catch (error) {
-                Log.push('error', this.constructor.name, `${error}`)
+                Log.push('error', this, `${error}`)
                 this.pause();
             }
         });

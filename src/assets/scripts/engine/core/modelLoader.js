@@ -19,7 +19,7 @@ class ModelLoader {
                     onUpdate(xhr.loaded, xhr.total);
                 },
                 (error) => {
-                    Log.push('error', this.constructor.name, `GLTF Loader error : ${error}`);
+                    Log.push('error', this, `GLTF Loader error : ${error}`);
                     console.log(error)
                 },
             );

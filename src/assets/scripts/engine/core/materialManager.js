@@ -11,7 +11,7 @@ class MaterialManager {
 
     get(materialName) {
         const material = this.materials.get(materialName);
-        if (!material) Log.push('error', this.constructor.name, `Material ${materialName} does not exist or is not registered`);
+        if (!material) Log.push('error', this, `Material ${materialName} does not exist or is not registered`);
         return material;
     }
 }

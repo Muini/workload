@@ -105,7 +105,7 @@ export class Light extends Entity{
     }
 
     setVisibility(visibility){
-        console.log('setting visibility to', visibility, this.name)
+        // console.log('setting visibility to', visibility, this.name)
         this.instance.visible = visibility;
     }
 

@@ -12,6 +12,8 @@ export class ExempleDom extends BlurDom {
 
         //Init variables
         this.name = 'test';
+        this.debug = false;
+        this.follow = false;
         // Define & init here custom variables
 
         this.data = {
