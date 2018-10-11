@@ -29,6 +29,7 @@ export default {
             'desk.model': '/static/models/desk.glb',
             'paper.model': '/static/models/paper.glb',
             'cash.model': '/static/models/cash.glb',
+            'clock.model': '/static/models/clock.glb',
         },
         textures: {
 

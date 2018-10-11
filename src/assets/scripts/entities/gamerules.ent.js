@@ -1,11 +1,8 @@
-import * as THREE from 'three';
-
-import Engine from '../../engine/core/engine';
 
 import Entity from '../engine/classes/entity';
 import Data from '../engine/utils/data';
 
-export class Exemple extends Entity {
+export class Gamerules extends Entity {
     constructor(opt = {}) {
         super(opt);
 
@@ -24,9 +21,10 @@ export class Exemple extends Entity {
             timeOfTheDay: 0, //from 0 to 23
             lengthOfADay: 900, //in ms
         });
+        console.log("CONNARD", this.data);
 
-        this.data.compute('gameTimeElapsed', _ => {
-            this.data.timeOfTheDay = Math.floor(this.data.gameTimeElapsed / this.data.lengthOfADay * 24);
+        this.data.compute('timeOfTheDay', (newval) => {
+            return Math.floor(this.data.gameTimeElapsed / this.data.lengthOfADay * 24);
         });
     }
 
@@ -45,15 +43,17 @@ export class Exemple extends Entity {
         return (async () => {
             await super.awake();
             // Is fired when the scene is starting
+            this.data.timeIsGoingOn = true;
         })();
     }
 
     update(time, delta) {
         super.update(time, delta);
 
-        if(this.data.timeIsGoingOn){
-            this.gameTimeElapsed += delta;
-        }
+        // if(this.data.timeIsGoingOn){
+            // this.data.gameTimeElapsed += delta;
+        // }
+        // console.log(this.data.gameTimeElapsed, this.data.timeOfTheDay)
     }
 
 }

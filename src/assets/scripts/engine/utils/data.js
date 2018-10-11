@@ -1,29 +1,35 @@
 import Log from './log';
 
 export default class Data {
-    constructor(opt) {
+    constructor(data = {}) {
         // TODO: Data class that handles datas through the engine. Can be used in object / scenes & global app
-        this.data = opt;
-        this.dataFunctions = {};
+        
+        this._updateFct = {};
 
-        this.onDataUpdate = this.onDataUpdate.bind(this);
-        for(data in this.data){
-            this.data.watch(data, this.onDataUpdate)
-            this.dataFunctions[data] = function(){};
+        // this.onDataUpdate = this.onDataUpdate.bind(this);
+        for(let dataName in data){
+            console.log(dataName, data[dataName]);
+            this[dataName] = data[dataName];
+            this.watch(dataName, this.onDataUpdate)
+            // this.data.updateFct[data] = function (){};
         }
+
+        console.log(this);
     }
 
     onDataUpdate(data, oldval, newval){
-        if (typeof this.dataFunctions[data] === 'function') {
-            this.dataFunctions[data]();
+        console.log('data update', data, oldval, newval);
+        if (typeof this._updateFct[data] === 'function') {
+            data = this._updateFct[data](newval);
+        }else{
+            data = newval;
         }
-        this.data[data] = newval;
-        return;
     }
 
     compute(data, fct){
-        if(!this.data[data]) return Log.push('error', this.constructor.name, `Data ${data} is not existing`);
-        this.dataFunctions[data] = fct;
+        console.log('compute', data, fct);
+        // if (!this.data[data]) return Log.push('error', this.constructor.name, `Data ${data} is not existing`);
+        this._updateFct[data] = fct;
     }
 
 }

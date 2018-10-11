@@ -11,6 +11,8 @@ import { Camera } from '../entities/default/camera.ent';
 import { Light } from '../entities/default/light.ent';
 import { Cubemap } from '../entities/default/cubemap.ent';
 import { Worker } from '../entities/worker.ent';
+import { Clock } from '../entities/clock.ent';
+import { Gamerules } from '../entities/gamerules.ent';
 
 // Dom Objects
 import { ExempleDom } from '../entities/default/exemple.dom.ent';
@@ -20,16 +22,19 @@ export default new Scene({
     name: 'workload',
     data: {},
     setup: function() {
+
+        this.gamerules = new Gamerules({ parent: this });
+
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(0, 40, 60),
+            position: new THREE.Vector3(0, 40, -60),
             rotation: new THREE.Vector3(0, 0, 0),
             focalLength: 50,
             focus: 38.0, //42
             aperture: 1.8,
         });
-        // this.camera.model.rotation.y = (45 / 180) * 3.14;
+        this.camera.model.rotation.y = 3.14;
         this.camera.instance.rotation.x = -(30 / 180) * 3.14;
 
         let cubemap = new Cubemap({
@@ -48,7 +53,7 @@ export default new Scene({
         let plane = new THREE.Mesh(floorGeometry, floorMaterial);
         plane.name = "Floor";
         plane.rotation.x = -3.14 / 2;
-        plane.castShadow = true;
+        // plane.castShadow = true;
         plane.receiveShadow = true;
         this.instance.add(plane);
 
@@ -67,6 +72,8 @@ export default new Scene({
         // Test Worker
         this.worker = new Worker({ parent: this });
 
+        this.clock = new Clock({ parent: this });
+
         /*this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -8.0) });
         this.worker2.happiness = 0.4;
 
@@ -80,8 +87,8 @@ export default new Scene({
     onStart: async function() {
         // await Engine.wait(1000)
 
-        let tween = new Tween({ x:0, y:40, z:60, aperture: 1.8 })
-            .to({ x:0, y:20, z:30, aperture: 3.5 }, 2000)
+        let tween = new Tween({ x:0, y:40, z:-60, aperture: 1.8 })
+            .to({ x:0, y:20, z:-30, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
             // .yoyo(true)
             .ease(Ease.Sine.Out)

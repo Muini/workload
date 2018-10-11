@@ -23,3 +23,5 @@ import './boots.mat';
 import './cloth.mat';
 import './skin.mat';
 import './hair.mat';
+
+import './clock.mat';
