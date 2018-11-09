@@ -156,7 +156,7 @@ class Engine {
                         bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
                         blur: {
                             enabled: true,
-                            strength: 2.0,
+                            strength: 10.0,
                             // sharpen: Quality.isMobile ? 0.05 : 0.2,
                             sharpen: Quality.isMobile ? 0.5 : 0.7,
                             blurRgbSplit: 1.5,
@@ -182,14 +182,12 @@ class Engine {
 
             await SceneManager.initScenes();
 
-            this.waitNextTick().then(_ => {
-                this.containerBoundingBox = this.container.getBoundingClientRect();
-            });
+            this.containerBoundingBox = this.container.getBoundingClientRect();
 
             Log.push(
                 'success',
                 this,
-                `Init\nSize: c:lightgreen{${this.width}x${this.height}px}\nQuality score: c:salmon{${Quality.score}}\nPixelDensity: c:orange{${this.pixelDensity}}\nThree.js: c:lightgreen{r${THREE.REVISION}}\nGPU: c:orange{${Quality.gpu}}\n`
+                `Init\nSize: c:lightgreen{${this.width | 0}x${this.height | 0}px}\nQuality score: c:salmon{${Quality.score}}\nPixelDensity: c:orange{${this.pixelDensity}}\nThree.js: c:lightgreen{r${THREE.REVISION}}\nGPU: c:orange{${Quality.gpu}}\n`
             );
         })();
     }

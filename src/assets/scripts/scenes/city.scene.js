@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import 'three/examples/js/objects/Lensflare';
 
 // Engine
 import Engine from '../engine/core/engine';
@@ -66,7 +67,7 @@ export default new Scene({
             // colorGround: '323b2e', //Day
             colorGround: '3d3463',
             // power: 10.0, //Day
-            power: 1.0, //Sunset
+            power: 1.4, //Sunset
         })
 
         this.sun = new Light({
@@ -76,7 +77,7 @@ export default new Scene({
             // color: 'FFF4E6',
             color: 'fa4f1d', //Day
             // power: 8.0, //Day
-            power: 16.0,
+            power: 12.0,
             castShadow: true,
             shadowMapSize: 512,
             shadowCameraSize: 50.0,
@@ -89,6 +90,27 @@ export default new Scene({
         this.sunTarget.position.y = 20;
         this.sunTarget.position.z = -30;
         this.instance.add(this.sunTarget);
+
+        let textureLoader = new THREE.TextureLoader();
+        let flare01 = textureLoader.load('/static/img/lensflare/flare01.png');
+        let flare02 = textureLoader.load('/static/img/lensflare/flare02.png');
+        let flare03 = textureLoader.load('/static/img/lensflare/flare03.png');
+        let flare04 = textureLoader.load('/static/img/lensflare/flare04.png');
+
+        let flareColor = new THREE.Color(0xffffff);
+        flareColor.setHSL(.15, .9, .2);
+
+        let lensFlare = new THREE.Lensflare();
+        lensFlare.addElement(new THREE.LensflareElement(flare01, 1.2 * Engine.width, 0.0, new THREE.Color(0x331111), THREE.AdditiveBlending));
+        lensFlare.addElement(new THREE.LensflareElement(flare03, 6 * Engine.width, 0.0, new THREE.Color(0x223355), THREE.AdditiveBlending));
+        lensFlare.addElement(new THREE.LensflareElement(flare02, 0.06 * Engine.width, 0.65, new THREE.Color(0x331111), THREE.AdditiveBlending));
+        lensFlare.addElement(new THREE.LensflareElement(flare04, 0.08 * Engine.width, 0.8, flareColor, THREE.AdditiveBlending));
+        lensFlare.addElement(new THREE.LensflareElement(flare04, 0.11 * Engine.width, 0.9, new THREE.Color(0x223355), THREE.AdditiveBlending));
+        lensFlare.addElement(new THREE.LensflareElement(flare02, 0.4 * Engine.width, 1.0, new THREE.Color(0x333333), THREE.AdditiveBlending));
+        lensFlare.addElement(new THREE.LensflareElement(flare02, 0.06 * Engine.width, 1.1, flareColor, THREE.AdditiveBlending));
+
+        this.sun.instance.add(lensFlare);
+
 
         let sky = new Sky({
             parent: this,
@@ -118,21 +140,21 @@ export default new Scene({
             volume: 0.4,
         });
 
-        this.startButton = new BlurDom({
-            selector: '.btn-start',
-            parent: this,
-            active: false,
-        })
-        this.title = new BlurDom({
-            selector: '.title',
-            parent: this,
-            active: false
-        });
-        this.subtitle = new BlurDom({
-            selector: '.subtitle',
-            parent: this,
-            active: false
-        });
+        // this.startButton = new BlurDom({
+        //     selector: '.btn-start',
+        //     parent: this,
+        //     active: false,
+        // })
+        // this.title = new BlurDom({
+        //     selector: '.title',
+        //     parent: this,
+        //     active: false
+        // });
+        // this.subtitle = new BlurDom({
+        //     selector: '.subtitle',
+        //     parent: this,
+        //     active: false
+        // });
 
     },
     onStart: async function () {
@@ -177,23 +199,23 @@ export default new Scene({
                 SceneManager.next();
             });
 
-        this.startButton.onClick = async e => {
-            this.startButton.setActive(false);
-            tween2.start();
-            await Engine.wait(1000);
-            this.subtitle.setVisibility(false);
-            await Engine.wait(300);
-            this.title.setVisibility(false);
-        }
+        // this.startButton.onClick = async e => {
+        //     this.startButton.setActive(false);
+        //     tween2.start();
+        //     await Engine.wait(1000);
+        //     this.subtitle.setVisibility(false);
+        //     await Engine.wait(300);
+        //     this.title.setVisibility(false);
+        // }
 
         await Engine.wait(1000);
         tween.start();
         await Engine.wait(1000);
-        this.title.setActive(true);
-        await Engine.wait(2000);
-        this.subtitle.setActive(true);
-        await Engine.wait(2000);
-        this.startButton.setActive(true);
+        // this.title.setActive(true);
+        // await Engine.wait(2000);
+        // this.subtitle.setActive(true);
+        // await Engine.wait(2000);
+        // this.startButton.setActive(true);
 
     }
 })

@@ -20,13 +20,13 @@ import './scenes/worker-test.scene';
 
         await Engine.init(
             document.getElementById('film'), //Container
-            // (2 / 1) //Film Ratio
+            (2.35 / 1) //Film Ratio
         );
 
         // Set Scene will start the loading process of scenes
         SceneManager.setOrder([
-            // 'city',
-            'workload',
+            'city',
+            // 'workload',
             // 'worker-test', //This is the name of the scene, not of the file
         ]);
 

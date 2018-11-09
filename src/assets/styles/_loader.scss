@@ -8,7 +8,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    z-index: 1;
+    z-index: 10;
     background: rgba(5, 15, 30, .6);
     visibility: hidden;
     opacity: 1;
@@ -16,6 +16,7 @@
     transition-duration: 900ms;
     transition-timing-function: $easeInSineOutExpo;
     @include fluid-type( $mq-min-width, $mq-xxlarge-min, 12px, 20px);
+
     .percent {
         font-size: .75em;
         font-weight: bolder;

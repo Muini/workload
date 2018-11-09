@@ -47,53 +47,53 @@ body {
 .hud {
     position: absolute;
     z-index: 2;
-    display: none;
-    background-color: rgba(0, 50, 100, 0.2);
+    // background-color: rgba(255, 255, 255, 0.1);
+    user-select: none;
     &.title {
         @include fluid-type( $mq-min-width, $mq-xxlarge-min, 30px, 60px);
         // width: 100%;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) translateY(-0.5em);
+        bottom: 0%;
+        left: 3%;
+        transform: translate(0, -50%) translateY(-2.0em);
         text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
         color: white;
         font-family: 'Quattrocento', serif;
-        padding: .25em 1em;
+        padding: .25em 2vw;
         padding-bottom: .1em;
-        text-align: center;
+        text-align: left;
     }
     &.subtitle {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 16px, 22px);
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 14px, 18px);
         // width: 100%;
-        left: 50%;
-        bottom: 50%;
-        transform: translate(-50%, -50%) translateY(4em);
+        left: 3%;
+        bottom: 0%;
+        transform: translate(0, -50%) translateY(-4.5em);
         text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
         color: white;
         font-family: 'Open Sans', sans-serif;
         font-weight: 100;
         letter-spacing: 0.1em;
-        padding: .25em 1em;
+        padding: .25em 2vw;
         line-height: 1.4em;
-        text-align: center;
+        text-align: left;
         span {
-            color: greenyellow
+            color: orange
         }
     }
     &.btn-start{
-        left: 50%;
-        bottom: 50%;
-        transform: translate(-50%, -50%) translateY(10em);
+        left: 3%;
+        bottom: 0%;
+        transform: translate(0, -50%) translateY(-1em);
         a{
             @include fluid-type( $mq-min-width, $mq-xxlarge-min, 14px, 20px); // width: 100%;
             text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
             color: white;
             font-family: 'Open Sans', sans-serif;
             font-weight: 100;
-            padding: .5em 1.5em;
+            padding: .5em 2vw;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            text-align: center;
+            text-align: left;
             display: block;
             transition: background-color 325ms $easeOutSwift;
             background-color: rgba(200, 225, 255, 0);
