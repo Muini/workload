@@ -140,6 +140,7 @@ export default new Scene({
         }
         // this.update(0, 0);
 
+        // TODO: Fix fatal error, addToUpdate add the function to the main loop which is execute whether the scene is or isn't loaded or awaked.
         // Engine.addToUpdate(this.uuid, this.update.bind(this));
 
     },

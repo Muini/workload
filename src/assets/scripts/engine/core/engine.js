@@ -131,7 +131,7 @@ class Engine {
                         },
                         bloom: {
                             enabled: Quality.score >= 1000 ? true : false,
-                            options: [0.5, 1.5, 0.9]
+                            options: [0.5, 1.5, 0.8]
                         },
                         filmic: {
                             enabled: true,
@@ -158,7 +158,7 @@ class Engine {
                             enabled: true,
                             strength: 10.0,
                             // sharpen: Quality.isMobile ? 0.05 : 0.2,
-                            sharpen: Quality.isMobile ? 0.5 : 0.7,
+                            sharpen: Quality.isMobile ? 0.3 : 0.5,
                             blurRgbSplit: 1.5,
                             gain: 1.3,
                         }
