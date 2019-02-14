@@ -138,18 +138,22 @@ export default new Scene({
                 this.timeElapsed = 0;
             }
         }
+        this.update = this.update.bind(this);
         // this.update(0, 0);
 
-        // TODO: Fix fatal error, addToUpdate add the function to the main loop which is execute whether the scene is or isn't loaded or awaked.
-        // Engine.addToUpdate(this.uuid, this.update.bind(this));
-
     },
-    onStart: async function() {
+    onStart: async function () {
+        // TODO: Fix fatal error, addToUpdate add the function to the main loop which is execute whether the scene is or isn't loaded or awaked.
+        Engine.addToUpdate(this.uuid, this.update);
         // await Engine.wait(1000)
 
         this.bonhomme.setVisibility(true);
         // this.bonhomme.animator.play('Salute')
         
 
-    }
+    },
+    // TODO: create a onDestroy function to remove added update function to the main loop
+    // onDestroy: async function(){
+    //     Engine.removeFromUpdate(this.uuid, this.update);
+    // }
 });

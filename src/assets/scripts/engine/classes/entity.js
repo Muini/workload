@@ -23,7 +23,7 @@ export default class Entity {
         // this.data = new Data();
 
         this.isStatic = false;
-        this.isActive = opt.active || true;
+        this.isActive = opt.active === undefined ? true : opt.active;
         this.isVisible = false;
 
         this.isEntity = true;

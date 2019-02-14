@@ -89,7 +89,7 @@ class SceneManager {
         // Check if the next scene exist
         if (!this.scenesOrder[this.sceneCurrentIndex]) {
             Log.push('warn', this, `No more scenes to play.`);
-            return this.stop();
+            return Engine.stop();
         }
         this.set(this.scenesOrder[this.sceneCurrentIndex]).then(_ => {
             // When loaded, init the new scene

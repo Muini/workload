@@ -25,7 +25,7 @@ export default class Material {
             opacity: opt.opacity || 1.0,
             emissive: opt.emissive || 'ffffff',
             emissiveIntensity: opt.emissiveIntensity || 0.0,
-            fog: opt.fog || true,
+            fog: opt.fog === undefined ? true : opt.fog,
             sway: opt.sway || 0.0,
             doublesided: opt.doublesided || false,
         }
@@ -64,7 +64,7 @@ export default class Material {
 
                 shader = this.modifyFogShader(shader);
                 
-                shader = this.modifyShadowShader(shader);
+                // shader = this.modifyShadowShader(shader);
 
                 this.instance.uniforms = shader.uniforms;
 
@@ -77,7 +77,7 @@ export default class Material {
 
                 shader = this.modifyFogShader(shader);
 
-                shader = this.modifyShadowShader(shader);
+                // shader = this.modifyShadowShader(shader);
 
 
                 this.instance.uniforms = shader.uniforms;

@@ -27,8 +27,8 @@ uniform sampler2D noiseTexture;
 
 // #define ITERATIONS 64
 
-#define DISTORTION_ANAMORPHIC	0.0;
-#define DISTORTION_BARREL       0.5;
+#define DISTORTION_ANAMORPHIC	0.8;
+#define DISTORTION_BARREL       0.75;
 
 // Helpers-----------------------------------------------------------------------------------
 vec2 rotate(vec2 vector, float angle)
@@ -136,7 +136,7 @@ void main() {
 
         float fDepth = ((focus - near) / far) * 2.0;
 
-        float blur = clamp(((abs(depth - fDepth) / pow(aperture, 2.0) * CoC ) * pow(focalLength, 1.75)) / (focus / 100.0), -maxblur * 2.0, maxblur * 2.0);
+        float blur = clamp(((abs(depth - fDepth) / pow(aperture, 2.0) * CoC ) * pow(focalLength, 1.75)) / (focus / 100.0), -maxblur * 3.0, maxblur * 3.0);
         /*
         float layerSeparatorSharpness = 1.0;
         float focusDepth = (1.0 - getFocus(blur, depth, layerSeparatorSharpness));
@@ -149,13 +149,13 @@ void main() {
         
         // vec4 backgroudColor = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
         // vec4 foregroudColor = vec4(Bokeh(tDiffuse, vUv, blur, highlightBokehAmount, depth), 1.0);
-        if(blur < 0.02){
+        if(blur < 0.05){
                 gl_FragColor = texture2D(tDiffuse, vUv);
         }else{
-                float highlightBokehAmount = 40.0;
+                float highlightBokehAmount = 50.0;
                 vec4 noise = texture2D(noiseTexture, mod(vUv, 0.1) / 0.1);
-                float randomOffset = ((noise.r + noise.g + noise.b) / 3.0);
-                vec4 bokehDOF = vec4(Bokeh(tDiffuse, vUv + (randomOffset * blur * 0.0015), blur, highlightBokehAmount, depth), 1.0);
+                float randomOffset = ((noise.r + noise.g + noise.b) / 3.0) / float(ITERATIONS);
+                vec4 bokehDOF = vec4(Bokeh(tDiffuse, vUv + (randomOffset * blur * 0.0025), blur, highlightBokehAmount, depth), 1.0);
                 // bokehDOF.rgb = debugFocus(bokehDOF.rgb, blur, depth);
                 gl_FragColor = bokehDOF;
         }

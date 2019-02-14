@@ -27,8 +27,8 @@ export default new Scene({
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
-            position: new THREE.Vector3(0, 75, 62),
-            rotation: new THREE.Vector3(0, 0, 0),
+            position: new THREE.Vector3(0, 125, 62),
+            rotation: new THREE.Vector3(-0.1, 0, 0),
             focalLength: 18, //25
             aperture: 2.8,
             focus: 50.0,
@@ -110,15 +110,15 @@ export default new Scene({
         lensFlare.addElement(new THREE.LensflareElement(flare02, 0.4 * Engine.width, 1.0, new THREE.Color(0x333333), THREE.AdditiveBlending));
         lensFlare.addElement(new THREE.LensflareElement(flare02, 0.06 * Engine.width, 1.1, flareColor, THREE.AdditiveBlending));
 
-
         this.sun.instance.add(lensFlare);
 
 
         const sunpos = this.sun.position.clone();
-        sunpos.y -= 20;
+        // sunpos.y -= 30;
+        // sunpos.x -= 25;
         let sky = new Sky({
             parent: this,
-            size: 1000,
+            size: 10000,
             sunPosition: sunpos,
             luminance: 1.12,
             turbidity: 2.0,
@@ -130,7 +130,7 @@ export default new Scene({
         // this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002); //Day
         // this.instance.fog = new THREE.FogExp2(0x959fa5, 0.002); //Day
         // this.instance.fog = new THREE.FogExp2(0x604f40, 0.002); //Sunset old
-        this.instance.fog = new THREE.FogExp2(0x355768, 0.00175); //Sunset
+        this.instance.fog = new THREE.FogExp2(0x355768, 0.002); //Sunset
 
         this.city = new City({
             parent: this
@@ -146,21 +146,21 @@ export default new Scene({
             volume: 0.4,
         });
 
-        // this.startButton = new BlurDom({
-        //     selector: '.btn-start',
-        //     parent: this,
-        //     active: false,
-        // })
-        // this.title = new BlurDom({
-        //     selector: '.title',
-        //     parent: this,
-        //     active: false
-        // });
-        // this.subtitle = new BlurDom({
-        //     selector: '.subtitle',
-        //     parent: this,
-        //     active: false
-        // });
+        this.startButton = new BlurDom({
+            selector: '.btn-start',
+            parent: this,
+            active: false,
+        })
+        this.title = new BlurDom({
+            selector: '.title',
+            parent: this,
+            active: false
+        });
+        this.subtitle = new BlurDom({
+            selector: '.subtitle',
+            parent: this,
+            active: false
+        });
 
     },
     onStart: async function () {
@@ -168,10 +168,10 @@ export default new Scene({
         // this.citySound.play(1000);
 
         let tween = new Tween({
-                y: 75,
+                y: 125,
             })
             .to({
-                y: 18,
+                y: 24,
             }, 6000)
             // .repeat(Infinity)
             // .yoyo(true)
@@ -205,23 +205,23 @@ export default new Scene({
                 SceneManager.next();
             });
 
-        // this.startButton.onClick = async e => {
-        //     this.startButton.setActive(false);
-        //     tween2.start();
-        //     await Engine.wait(1000);
-        //     this.subtitle.setVisibility(false);
-        //     await Engine.wait(300);
-        //     this.title.setVisibility(false);
-        // }
+        this.startButton.onClick = async e => {
+            this.startButton.setActive(false);
+            tween2.start();
+            await Engine.wait(1000);
+            this.subtitle.setVisibility(false);
+            await Engine.wait(300);
+            this.title.setVisibility(false);
+        }
 
         await Engine.wait(1000);
         tween.start();
         await Engine.wait(1000);
-        // this.title.setActive(true);
-        // await Engine.wait(2000);
-        // this.subtitle.setActive(true);
-        // await Engine.wait(2000);
-        // this.startButton.setActive(true);
+        this.title.setActive(true);
+        await Engine.wait(2000);
+        this.subtitle.setActive(true);
+        await Engine.wait(2000);
+        this.startButton.setActive(true);
 
     }
 })

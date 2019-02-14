@@ -155,7 +155,7 @@ class Engine {
                         },
                         bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
                         blur: {
-                            enabled: true,
+                            enabled: false,
                             strength: 10.0,
                             // sharpen: Quality.isMobile ? 0.05 : 0.2,
                             sharpen: Quality.isMobile ? 0.3 : 0.5,

@@ -285,6 +285,7 @@ export default class PostProd {
     }
 
     removeBlurPosition(domblur) {
+        if (!this.passes.blur.enabled) return;
         for (let i = 0; i < this.blurDomElems.length; i++) {
             if (this.blurDomElems[i].uuid === domblur.uuid) {
                 this.blurDomElems.splice(i, 1);

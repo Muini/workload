@@ -50,16 +50,16 @@ export default class DomEntity extends Entity {
             if(bool){
                 if (!this.isLoader) {
                     Engine.waitNextTick().then(_ => {
-                        this.dom.style['display'] = bool ? '' : 'none';
+                        this.dom.style['display'] = bool ? 'flex' : 'none';
                     });
                 } else {
                     requestAnimationFrame(_ => {
-                        this.dom.style['display'] = bool ? '' : 'none';
+                        this.dom.style['display'] = bool ? 'flex' : 'none';
                     });
                 }
                 
             }else{
-                this.dom.style['display'] = bool ? '' : 'none';
+                this.dom.style['display'] = bool ? 'flex' : 'none';
             }
         }
     }

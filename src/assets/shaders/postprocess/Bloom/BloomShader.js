@@ -324,5 +324,5 @@ THREE.UnrealBloomPass.prototype = Object.assign(Object.create(THREE.Pass.prototy
 
 });
 
-THREE.UnrealBloomPass.BlurDirectionX = new THREE.Vector2(1.0, 0.0);
-THREE.UnrealBloomPass.BlurDirectionY = new THREE.Vector2(0.0, 1.0);
+THREE.UnrealBloomPass.BlurDirectionX = new THREE.Vector2(3.0, 0.0);
+THREE.UnrealBloomPass.BlurDirectionY = new THREE.Vector2(0.0, 0.5);
