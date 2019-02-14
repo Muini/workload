@@ -47,7 +47,7 @@ export default class Material {
             emissive: new THREE.Color().setHex('0x' + this.params.emissive),
             emissiveIntensity: this.params.emissiveIntensity,
             dithering: false,
-            envMapIntensity: 4.,
+            envMapIntensity: 6.,
             fog: this.params.fog,
             wireframe: false,
             side: this.params.doublesided ? THREE.DoubleSide : THREE.FrontSide

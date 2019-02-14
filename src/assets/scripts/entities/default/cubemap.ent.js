@@ -23,16 +23,17 @@ export class Cubemap extends Entity {
 
         this.cubeCamera1 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
         this.cubeCamera1.name = 'Cubemap CubeCamera1';
+        this.cubeCamera1.renderTarget.texture.generateMipmaps = true;
         this.cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
-        this.cubeCamera1.rotation.x = -3.14 / 2;
+        // this.cubeCamera1.rotation.x = -3.14 / 2;
         this.model.add(this.cubeCamera1);
 
         this.cubeCamera2 = new THREE.CubeCamera(opt.near || 1, opt.far || 100000, resolution);
-        this.cubeCamera2.name = 'Cubemap CubeCamera1';
+        this.cubeCamera2.name = 'Cubemap CubeCamera2';
+        this.cubeCamera2.renderTarget.texture.generateMipmaps = true;
         this.cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
-        this.cubeCamera2.rotation.x = -3.14 / 2;
+        // this.cubeCamera2.rotation.x = -3.14 / 2;
         this.model.add(this.cubeCamera2);
-
 
         this.texture = this.cubeCamera1.renderTarget.texture;
 
@@ -43,13 +44,13 @@ export class Cubemap extends Entity {
         this.hasBeenRendered = false;
 
         if(this.debug){
-            let geometry = new THREE.SphereBufferGeometry(1, 16, 16);
+            let geometry = new THREE.SphereBufferGeometry(10, 16, 16);
             this.debugMaterial = new THREE.MeshStandardMaterial({
                 color: new THREE.Color(0xffffff),
-                roughness: 0.2,
+                roughness: 0.0,
                 metalness: 1.0,
                 envMap: this.texture,
-                envMapIntensity: 10.0,
+                envMapIntensity: 6.0,
             });
             let debugSphere = new THREE.Mesh(geometry, this.debugMaterial);
             this.model.add(debugSphere);
@@ -83,6 +84,7 @@ export class Cubemap extends Entity {
         }
         if(this.debug)
             this.debugMaterial.envMap = this.texture;
+
         this.scene.setEnvMap(this.texture);
 
         this.tick++;

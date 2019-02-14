@@ -47,15 +47,16 @@ export default new Scene({
             parent: this,
             near: 1,
             far: 500,
-            resolution: 256,
+            resolution: 8,
             // position: new THREE.Vector3(0, 30, 10),
-            position: new THREE.Vector3(0, 30, -150),
+            position: new THREE.Vector3(0, 30, -100),
             shouldUpdate: false,
             tickRate: 2,
             debug:false,
         });
-        cubemap.rotation.z += -3.14 / 2;
-        cubemap.rotation.x += 3.14 / 2;
+        // cubemap.rotation.z += -3.14 / 2;
+        // cubemap.rotation.x += 3.14 / 2;
+        cubemap.rotation.y += 3.14 / 4;
 
         // Ambient Light
         let ambiantLight = new Light({

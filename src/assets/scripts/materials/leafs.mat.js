@@ -5,8 +5,8 @@ export default new Material('Leafs', {
     color: '557436',
     emissive: 'ABCC45',
     // emissive: 'ccb545',
-    emissiveIntensity: 0.1,
+    emissiveIntensity: 0.2,
     roughness: .9,
     metalness: 0.0,
-    sway: 0.005,
+    sway: 0.01,
 })

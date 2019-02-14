@@ -42,7 +42,7 @@ export default new Scene({
             parent: this,
             near: 1,
             far: 500,
-            resolution: 128,
+            resolution: 16,
             position: new THREE.Vector3(0, 4, 0),
             shouldUpdate: false,
             tickRate: 2,

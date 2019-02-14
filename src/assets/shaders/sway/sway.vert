@@ -2,13 +2,13 @@
 
 vec3 displacedVertex = vec3(0.0);
 
-float fBF = transformed.z * swayBlend * length(transformed);
+float fBF =  transformed.y * swayBlend * length(transformed);
 fBF += 1.0;
 fBF *= fBF;
 fBF = fBF * fBF - fBF;
 
 displacedVertex.x = (windForce.x / 10.0) * cos( time * 0.00005 * length(windForce) + transformed.x ) * fBF;
-displacedVertex.z = (windForce.y / 10.0) * sin( time * 0.00005 * length(windForce) + transformed.y ) * fBF;
+displacedVertex.y = (windForce.y / 10.0) * sin( time * 0.00005 * length(windForce) + transformed.y ) * fBF;
 
 transformed -= displacedVertex;
 

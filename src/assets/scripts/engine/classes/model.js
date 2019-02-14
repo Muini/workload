@@ -177,6 +177,7 @@ export default class Model extends Entity{
         // update Env Map & Sway uniform
         this.materials.forEach(material => {
             if (this.scene.envMap) {
+                // console.log('update envMap')
                 material.instance.envMap = this.scene.envMap;
             }
             if (material.isSwayShader) {
