@@ -48,10 +48,10 @@ export default new Scene({
             parent: this,
             near: 1,
             far: 500,
-            resolution: 16,
+            resolution: 32,
             position: new THREE.Vector3(0, 4, 0),
             shouldUpdate: false,
-            tickRate: 2,
+            tickRate: 2
         });
 
         // Floor
@@ -79,15 +79,16 @@ export default new Scene({
         this.clock = new Clock({ parent: this });
 
         // Test Worker
-        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0) });
-        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 0.0) });
-        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -6.0) });
-        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 6.0) });
-        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 0.0) });
-        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, -6.0) });
-        this.worker7 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0, 6.0) });
-        this.worker8 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0, 0.0) });
-        this.worker9 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0, -6.0) });
+        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 0.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0.0, 6.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 6.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0.0, 0.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 0.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+
+
+        this.boss = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -8.0) })
+        this.boss.recruit();
 
 
     },

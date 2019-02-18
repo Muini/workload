@@ -18,7 +18,8 @@ export class Light extends Entity{
         this.params = {
             color: opt.color || 'ffffff',
             colorGround: opt.colorGround || '000000', //only for ambiant
-            power: opt.power || 200,
+            power: opt.power ? opt.power : 200,
+            initialPower: opt.power ? opt.power : 200,
             fov: opt.fov || undefined,
             distance: opt.distance || 4.0,
             castShadow: opt.castShadow || false,
@@ -28,6 +29,7 @@ export class Light extends Entity{
 
         if (Engine.renderer.physicallyCorrectLights){
             this.params.power *= 3.0;
+            this.params.initialPower *= 3.0;
             this.params.distance *= 3.0;
         }
 
@@ -90,6 +92,11 @@ export class Light extends Entity{
 
     setPower(newPower){
         this.params.power = newPower;
+        this.params.initialPower = newPower;
+        this.onChangeLightPower();
+    }
+
+    onChangeLightPower(){
         switch (this.type) {
             case 'directional':
             case 'ambient':
@@ -105,8 +112,9 @@ export class Light extends Entity{
     }
 
     setVisibility(visibility){
-        // console.log('setting visibility to', visibility, this.name)
-        this.instance.visible = visibility;
+        // this.instance.visible = visibility;
+        this.params.power = visibility === true ? this.params.initialPower : 0.0;
+        this.onChangeLightPower();
     }
 
     setColor(newColor){

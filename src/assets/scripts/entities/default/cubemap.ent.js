@@ -44,7 +44,7 @@ export class Cubemap extends Entity {
         this.hasBeenRendered = false;
 
         if(this.debug){
-            let geometry = new THREE.SphereBufferGeometry(10, 16, 16);
+            let geometry = new THREE.SphereBufferGeometry(2, 16, 16);
             this.debugMaterial = new THREE.MeshStandardMaterial({
                 color: new THREE.Color(0xffffff),
                 roughness: 0.0,

@@ -58,6 +58,10 @@ export default class Model extends Entity{
         })();
     }
 
+    setVisibility(bool) {
+        super.setVisibility(bool);
+    }
+
     created(){
         return (async() => {
             await this.getModel();

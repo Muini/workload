@@ -35,6 +35,7 @@ export class Worker extends Model {
             color: 'fc7223',
             power: 250,
             castShadow: false,
+            active: false,
         })
 
         new Light({
@@ -90,6 +91,7 @@ export class Worker extends Model {
             volume: 0.5,
         });
 
+
         this.addWorker = new DomEntity({
             parent: this,
             selector: '.hud-add-worker',
@@ -115,7 +117,6 @@ export class Worker extends Model {
 
             this.addWorker.onClick = _ => {
                 this.recruit();
-                this.addWorker.setActive(false);
             }
             this.addWorker.onHover = _ => {
                 this.isHoveringPlaceholder = true;
@@ -151,6 +152,7 @@ export class Worker extends Model {
 
     recruit() {
         console.log('Recruit');
+        this.addWorker.setActive(false);
         this.isPlaceholder = false;
         // Anim out placeholder
         this.materials.get('Placeholder').params.emissiveIntensity = 6.0;

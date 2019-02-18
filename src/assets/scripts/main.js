@@ -25,9 +25,9 @@ import './scenes/worker-test.scene';
 
         // Set Scene will start the loading process of scenes
         SceneManager.setOrder([
-            'city',
+            // 'city',
             'workload',
-            // 'worker-test', //This is the name of the scene, not of the file
+            'worker-test', //This is the name of the scene, not of the file
         ]);
 
         await Loader.show();

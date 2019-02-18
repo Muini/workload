@@ -23,6 +23,7 @@ export default class Material {
             bumpMap: opt.bumpMap || null,
             bumpScale: opt.bumpScale || 1.0,
             opacity: opt.opacity || 1.0,
+            initialOpacity: opt.opacity || 1.0,
             emissive: opt.emissive || 'ffffff',
             emissiveIntensity: opt.emissiveIntensity || 0.0,
             fog: opt.fog === undefined ? true : opt.fog,
@@ -79,7 +80,6 @@ export default class Material {
 
                 // shader = this.modifyShadowShader(shader);
 
-
                 this.instance.uniforms = shader.uniforms;
 
                 Log.push('info', this, `Compile shader ${this.name}`);
@@ -87,6 +87,8 @@ export default class Material {
         }
         
         this.watchChanges();
+
+        this.instance.needsUpdate = false;
 
         if (!isCloning)
             MaterialManager.register(this);
