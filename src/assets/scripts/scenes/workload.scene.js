@@ -81,7 +81,7 @@ export default new Scene({
         this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -16.0) });
         this.worker3.happiness = 0.6;*/
 
-        this.testdom = new DomEntity({
+        this.addWorker = new DomEntity({
             parent: this.worker,
             selector: '.hud-add-worker',
             name: 'Add Worker',
@@ -95,6 +95,10 @@ export default new Scene({
     onStart: async function() {
         // await Engine.wait(1000)
 
+        this.addWorker.onClick = _ => {
+            this.worker.recruit();
+        }
+
         let tween = new Tween({ x:0, y:40, z:-60, aperture: 1.8 })
             .to({ x:0, y:20, z:-30, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
@@ -107,7 +111,7 @@ export default new Scene({
                 this.camera.params.aperture = props.aperture;
             })
             .onComplete(async _ => {
-                this.testdom.setActive(true);
+                this.addWorker.setActive(true);
             })
             .start();
     }

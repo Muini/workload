@@ -21,7 +21,8 @@ export default class Animator {
 
         this.skeleton = new THREE.SkeletonHelper(this.model);
         this.skeleton.visible = false;
-        scene.add(this.skeleton);
+
+        this.model.add(this.skeleton);
 
     }
 

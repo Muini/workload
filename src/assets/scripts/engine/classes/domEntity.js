@@ -29,6 +29,8 @@ export default class DomEntity extends Entity {
 
         this.onDataChanged = function() {};
         this.onClick = function() {};
+        this.onHover = function () {};
+        this.onOutHover = function () {};
 
         if (this.selector) {
             this.dom = document.querySelector(this.selector);
@@ -38,10 +40,9 @@ export default class DomEntity extends Entity {
     }
 
     bindEvents(){
-        this.dom.addEventListener('click', e => {
-            e.preventDefault();
-            this.onClick(e);
-        }, false);
+        this.dom.addEventListener('click', e => { this.onClick(e) }, false);
+        this.dom.addEventListener('mousemove', e => { this.onHover(e) }, false);
+        this.dom.addEventListener('mouseout', e => { this.onOutHover(e) }, false);
     }
 
     setVisibility(bool) {

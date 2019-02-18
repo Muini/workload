@@ -15,7 +15,7 @@ export class Cubemap extends Entity {
         let shouldUpdate = opt.shouldUpdate;
         let tickRate = opt.tickRate || 2;
 
-        resolution /= Quality.settings.cubemaps.resolutionDivider;
+        // resolution /= Quality.settings.cubemaps.resolutionDivider;
         tickRate *= Quality.settings.cubemaps.resolutionDivider;
         shouldUpdate = Quality.settings.cubemaps.canBeRealtime ? shouldUpdate : false;
 

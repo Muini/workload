@@ -50,63 +50,12 @@ body {
     z-index: 2;
     // background-color: rgba(255, 255, 255, 0.1);
     user-select: none;
-    &.title {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 30px, 60px);
-        // width: 100%;
-        bottom: 0%;
-        left: 3%;
-        transform: translate(0, -50%) translateY(-2.0em);
-        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
-        color: white;
-        font-family: 'Quattrocento', serif;
-        padding: .25em 2vw;
-        padding-bottom: .1em;
-        text-align: left;
-    }
-    &.subtitle {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 14px, 18px);
-        // width: 100%;
-        left: 3%;
-        bottom: 0%;
-        transform: translate(0, -50%) translateY(-4.5em);
-        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
-        color: white;
-        font-family: 'Open Sans', sans-serif;
-        font-weight: 100;
-        letter-spacing: 0.1em;
-        padding: .25em 2vw;
-        line-height: 1.4em;
-        text-align: left;
-        span {
-            color: orange
-        }
-    }
-    &.btn-start{
-        left: 3%;
-        bottom: 0%;
-        transform: translate(0, -50%) translateY(-1em);
-        a{
-            @include fluid-type( $mq-min-width, $mq-xxlarge-min, 14px, 20px); // width: 100%;
-            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
-            color: white;
-            font-family: 'Open Sans', sans-serif;
-            font-weight: 100;
-            padding: .5em 2vw;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-align: left;
-            display: block;
-            transition: background-color 325ms $easeOutSwift;
-            background-color: rgba(200, 225, 255, 0);
-            &:hover{
-                transition-duration: 75ms;
-                background-color: rgba(200, 225, 255, 0.3);
-            }
+    &-add-worker{
+        &:hover{
+            cursor: pointer;
         }
     }
 }
-
-
 
 .hud-test {
     position: absolute;
@@ -130,3 +79,5 @@ body {
 }
 
 @import 'loader';
+
+@import 'scenes/city';

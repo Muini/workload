@@ -4,6 +4,7 @@ import 'three/examples/js/objects/Lensflare';
 // Engine
 import Engine from '../engine/core/engine';
 import SceneManager from '../engine/core/sceneManager';
+import Log from '../engine/utils/log';
 
 import Scene from '../engine/classes/scene';
 import Sound from '../engine/classes/sound';
@@ -15,6 +16,7 @@ import { Light } from '../entities/default/light.ent';
 import { Cubemap } from '../entities/default/cubemap.ent';
 import { Sky } from '../entities/default/sky.ent';
 import { City } from '../entities/city.ent';
+import { SimpleCameraMovement } from '../entities/simpleCameraMovement.ent';
 
 // Dom Entities
 import { BlurDom } from '../entities/default/blur.dom.ent';
@@ -115,13 +117,13 @@ export default new Scene({
 
 
         const sunpos = this.sun.position.clone();
-        // sunpos.y -= 30;
-        // sunpos.x -= 25;
+        sunpos.y -= 45;
+        sunpos.x -= 25;
         let sky = new Sky({
             parent: this,
             size: 10000,
             sunPosition: sunpos,
-            luminance: 1.12,
+            luminance: 1.1,
             turbidity: 2.0,
             rayleigh: 3.0,
             mieCoefficient: 0.0008,
@@ -131,7 +133,8 @@ export default new Scene({
         // this.instance.fog = new THREE.FogExp2(0xd2dbe0, 0.002); //Day
         // this.instance.fog = new THREE.FogExp2(0x959fa5, 0.002); //Day
         // this.instance.fog = new THREE.FogExp2(0x604f40, 0.002); //Sunset old
-        this.instance.fog = new THREE.FogExp2(0x355768, 0.002); //Sunset
+        // TODO: Postprocessing fog or better fog
+        this.instance.fog = new THREE.FogExp2(0x355768, 0.0015); //Sunset
 
         this.city = new City({
             parent: this
@@ -163,8 +166,19 @@ export default new Scene({
             active: false
         });
 
+        this.simpleCameraMovement = new SimpleCameraMovement({
+            parent: this,
+            camera: this.camera,
+            easeFactor: 0.05,
+            amplitude: 30.0,
+            target: new THREE.Vector3(0, 20, -100),
+            active: true
+        })
+
     },
     onStart: async function () {
+
+        this.simpleCameraMovement.disableControls();
 
         // this.citySound.play(1000);
 
@@ -207,6 +221,9 @@ export default new Scene({
             });
 
         this.startButton.onClick = async e => {
+            if(!Log.debug)
+                document.documentElement.requestFullscreen();
+            this.simpleCameraMovement.disableControls();
             this.startButton.setActive(false);
             tween2.start();
             await Engine.wait(1000);
@@ -223,6 +240,8 @@ export default new Scene({
         this.subtitle.setActive(true);
         await Engine.wait(2000);
         this.startButton.setActive(true);
+
+        this.simpleCameraMovement.enableControls();
 
     }
 })

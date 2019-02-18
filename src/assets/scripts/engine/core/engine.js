@@ -138,7 +138,7 @@ class Engine {
                             // noise: 0.05, 
                             noise: 0.1, 
                             useStaticNoise: true,
-                            rgbSplit: 10.0, //30
+                            rgbSplit: Quality.score > 400 ? 6.0 : 0.0, //30
                             // vignette: Quality.score >= 1000 ? 20.0 : 0.0,
                             vignette: 30.0,
                             // vignetteOffset: 0.15,
@@ -153,7 +153,8 @@ class Engine {
                             lut: 0.00,
                             lutURL: '/static/img/lut-gamma.png',
                         },
-                        bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
+                        // bokehdof: { enabled: Quality.score >= 1500 ? true : false, },
+                        bokehdof: { enabled: false, },
                         blur: {
                             enabled: false,
                             strength: 10.0,
