@@ -12,11 +12,11 @@ export default class DomEntity extends Entity {
         this.name = opt.name || 'unnamed dom entity';
 
         this.selector = opt.selector || undefined;
-        this.follow = opt.follow || false;
+        this.follow = opt.follow !== undefined ? opt.follow : false;
         this.dom = undefined;
         
         this.isDomEntity = true;
-        this.debug = opt.debug || false;
+        this.debug = opt.debug !== undefined ? opt.debug : false;
 
         if(this.debug){
             this.model.add(new THREE.AxesHelper(1));
@@ -33,7 +33,9 @@ export default class DomEntity extends Entity {
         this.onOutHover = function () {};
 
         if (this.selector) {
-            this.dom = document.querySelector(this.selector);
+            this.initialDom = document.querySelector(this.selector);
+            if (!this.initialDom) return log.push('error', this, `Initial dom element for domEntity ${this.name} with selector ${this.selector} was not found in template`);
+            this.dom = this.isLoader ? this.initialDom : this.initialDom.cloneNode(true);
         }
 
         this.bindEvents();
@@ -47,21 +49,20 @@ export default class DomEntity extends Entity {
 
     setVisibility(bool) {
         super.setVisibility(bool);
-        if (this.dom){
-            if(bool){
-                if (!this.isLoader) {
-                    Engine.waitNextTick().then(_ => {
-                        this.dom.style['display'] = bool ? 'flex' : 'none';
-                    });
-                } else {
-                    requestAnimationFrame(_ => {
-                        this.dom.style['display'] = bool ? 'flex' : 'none';
-                    });
-                }
-                
-            }else{
-                this.dom.style['display'] = bool ? 'flex' : 'none';
+        if (!this.dom) return;
+        if (bool) {
+            if (!this.isLoader) {
+                Engine.waitNextTick().then(_ => {
+                    this.dom.style['display'] = bool ? 'flex' : 'none';
+                });
+            } else {
+                requestAnimationFrame(_ => {
+                    this.dom.style['display'] = bool ? 'flex' : 'none';
+                });
             }
+
+        } else {
+            this.dom.style['display'] = bool ? 'flex' : 'none';
         }
     }
 
@@ -92,6 +93,9 @@ export default class DomEntity extends Entity {
                 });
             }
 
+            if (!this.isLoader && Engine.container.contains(this.initialDom))
+                Engine.container.removeChild(this.initialDom);
+
             await super.created();
         })();
     }
@@ -100,6 +104,8 @@ export default class DomEntity extends Entity {
     awake() {
         return (async() => {
             await super.awake();
+            if(!this.isLoader)
+                Engine.container.appendChild(this.dom);
         })();
     }
 
@@ -152,8 +158,9 @@ export default class DomEntity extends Entity {
     }
 
     update(time, delta) {
-        if(this.follow){
-            const pos = this.model.position.project(this.scene.mainCamera);
+        if(this.follow && this.parent.model){
+            const newPos = new THREE.Vector3().addVectors(this.parent.model.position, this.position);
+            const pos = newPos.project(this.scene.mainCamera);
             const x = (pos.x * (Engine.width / 2)) + (Engine.width / 2);
             const y = -(pos.y * (Engine.height / 2)) + (Engine.height / 2);
             this.dom.style['transform'] = `translateZ(0) translateX(-50%) translateY(-50%) translateX(${x}px) translateY(${y}px)`;
@@ -162,7 +169,9 @@ export default class DomEntity extends Entity {
     }
 
     destroy() {
-        this.setActive(false);
+        super.destroy();
+        if (this.dom && !this.isLoader)
+            Engine.container.removeChild(this.dom);
         this.dom = null;
         this.selector = null;
     }

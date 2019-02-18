@@ -1,4 +1,6 @@
 
+import Engine from './engine';
+
 class Input {
     constructor() {
 
@@ -9,6 +11,10 @@ class Input {
             relY: 0.0,
             velocity: 0.0,
             isInScreen: true,
+            onClick: false,
+            isDown: false,
+            isTouch: false,
+            wheelDelta: 0.0
         }
 
         this.bindEvents();
@@ -18,21 +24,62 @@ class Input {
     bindEvents(){
         window.addEventListener('mouseenter', e => {
             this.onMouseMove(e);
-            this.isInScreen = true;
+            this.mouse.isInScreen = true;
         });
         window.addEventListener('mousemove', e => {
             this.onMouseMove(e);
-            this.isInScreen = true;
+            this.mouse.isInScreen = true;
+        });
+        window.addEventListener('touchmove', e => {
+            this.onMouseMove(e);
+            this.mouse.isInScreen = true;
+            this.mouse.isTouch = true;
         });
         window.addEventListener('mouseleave', e => {
             this.onMouseMove(e);
-            this.isInScreen = false;
+            this.mouse.isInScreen = false;
+            this.mouse.isDown = false;
         });
+        window.addEventListener('mousedown', e => {
+            this.mouse.isDown = true;
+        });
+        window.addEventListener('touchstart', e => {
+            this.onMouseMove(e);
+            this.mouse.isDown = true;
+            this.mouse.isInScreen = true;
+            this.mouse.isTouch = true;
+        });
+        window.addEventListener('mouseup', e => {
+            this.mouse.isDown = false;
+        });
+        window.addEventListener('touchend', e => {
+            this.mouse.isDown = false;
+            this.mouse.isInScreen = false;
+            this.mouse.isTouch = false;
+        });
+        window.addEventListener('touchcancel', _ => {
+            this.mouse.isDown = false;
+            this.mouse.isInScreen = false;
+            this.mouse.isTouch = false;
+        })
+        window.addEventListener('click', e => {
+            // this.onClick(e);
+            this.mouse.onClick = true;
+            Engine.waitNextTick().then(_ => {
+                this.mouse.onClick = false;
+            })
+        })
+        window.addEventListener('mousewheel', e => {
+            this.mouse.wheelDelta = e.wheelDelta;
+            Engine.waitNextTick().then(_ => {
+                this.mouse.wheelDelta = 0.0;
+            })
+        })
     }
 
     onMouseMove(e){
-        this.mouse.x = e.clientX;
-        this.mouse.y = e.clientY;
+        this.mouse.x = e.clientX || e.touches[0].clientX;
+        this.mouse.y = e.clientY || e.touches[0].clientY;
         this.mouse.relX = (this.mouse.x / window.innerWidth) * 2 - 1;
         this.mouse.relY = (this.mouse.y / window.innerHeight) * 2 - 1;
     }

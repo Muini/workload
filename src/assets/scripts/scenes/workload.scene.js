@@ -14,9 +14,7 @@ import { Cubemap } from '../entities/default/cubemap.ent';
 import { Worker } from '../entities/worker.ent';
 import { Clock } from '../entities/clock.ent';
 import { Gamerules } from '../entities/gamerules.ent';
-
-// Dom Objects
-import { ExempleDom } from '../entities/default/exemple.dom.ent';
+import { RTSCameraMovement } from '../entities/rtsCameraMovement.ent';
 
 // Create scene
 export default new Scene({
@@ -37,6 +35,14 @@ export default new Scene({
         });
         this.camera.model.rotation.y = 3.14;
         this.camera.instance.rotation.x = -(30 / 180) * 3.14;
+
+        this.RTSCameraMovement = new RTSCameraMovement({
+            parent: this,
+            camera: this.camera,
+            easeFactor: 0.1,
+            sensitivity: 0.5,
+            active: false
+        })
 
         let cubemap = new Cubemap({
             parent: this,
@@ -70,34 +76,23 @@ export default new Scene({
 
         this.instance.fog = new THREE.FogExp2(0x30364c, 0.001);
 
-        // Test Worker
-        this.worker = new Worker({ parent: this });
-
         this.clock = new Clock({ parent: this });
 
-        /*this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -8.0) });
-        this.worker2.happiness = 0.4;
-
-        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -16.0) });
-        this.worker3.happiness = 0.6;*/
-
-        this.addWorker = new DomEntity({
-            parent: this.worker,
-            selector: '.hud-add-worker',
-            name: 'Add Worker',
-            debug: false,
-            follow: true,
-            position: new THREE.Vector3(0, 10, 0)
-        });
+        // Test Worker
+        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0) });
+        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 0.0) });
+        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -6.0) });
+        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 6.0) });
+        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 0.0) });
+        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, -6.0) });
+        this.worker7 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0, 6.0) });
+        this.worker8 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0, 0.0) });
+        this.worker9 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0, -6.0) });
 
 
     },
     onStart: async function() {
         // await Engine.wait(1000)
-
-        this.addWorker.onClick = _ => {
-            this.worker.recruit();
-        }
 
         let tween = new Tween({ x:0, y:40, z:-60, aperture: 1.8 })
             .to({ x:0, y:20, z:-30, aperture: 3.5 }, 2000)
@@ -111,7 +106,13 @@ export default new Scene({
                 this.camera.params.aperture = props.aperture;
             })
             .onComplete(async _ => {
-                this.addWorker.setActive(true);
+                // this.addWorker.setActive(true);
+                this.RTSCameraMovement.setActive(true);
+                this.RTSCameraMovement.moveTo(new THREE.Vector3(0, 20, -30));
+                // await Engine.wait(3000)
+                // this.RTSCameraMovement.disableControls();
+                // this.RTSCameraMovement.moveTo(new THREE.Vector3(0, 20, -30));
+                // this.RTSCameraMovement.setFovTo(30);
             })
             .start();
     }

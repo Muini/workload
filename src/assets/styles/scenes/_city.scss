@@ -34,16 +34,7 @@
             @include fluid-type($mq-min-width, $mq-xxlarge-min, 14px, 22px); // width: 100%;
             color: white;
             font-family: 'Quattrocento', serif;
-            padding: .25em 1.25em;
             text-align: left;
-            display: block;
-            transition: background-color 325ms $easeOutSwift;
-            background-color: hsla(263, 20, 17, 255);
-
-            &:hover {
-                transition-duration: 75ms;
-                background-color: hsla(263, 20, 47, 255);
-            }
         }
     }
 }

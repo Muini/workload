@@ -4,5 +4,5 @@ export default new Material('Clock_color', {
     color: '555555',
     roughness: 0.1,
     emissive: 'C8E7CC',
-    emissiveIntensity: 2.0,
+    emissiveIntensity: 3.0,
 })

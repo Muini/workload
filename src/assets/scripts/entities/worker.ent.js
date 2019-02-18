@@ -6,6 +6,7 @@ import Sound from '../engine/classes/sound';
 import Model from '../engine/classes/model';
 import Random from '../engine/utils/random';
 import { Ease, Tween } from '../engine/classes/tween';
+import DomEntity from '../engine/classes/domEntity';
 
 import { Light } from './default/light.ent';
 // import { PaperBlock } from './paperBlock.ent';
@@ -53,11 +54,12 @@ export class Worker extends Model {
             color: 'DFEEFF',
             power: 2,
             fov: .6,
-            castShadow: true,
+            castShadow: false,
         })
 
         this.bonhomme = new Bonhomme({ parent: this })
         this.placeholder = undefined;
+        this.isHoveringPlaceholder = false;
 
         this.timeElapsed = 0;
 
@@ -87,6 +89,16 @@ export class Worker extends Model {
             loop: true,
             volume: 0.5,
         });
+
+        this.addWorker = new DomEntity({
+            parent: this,
+            selector: '.hud-add-worker',
+            name: 'Add Worker',
+            debug: false,
+            follow: true,
+            position: new THREE.Vector3(0, 4, 0),
+            active: true,
+        });
     }
 
     created() {
@@ -100,6 +112,17 @@ export class Worker extends Model {
 
             this.model.position.y -= 3;
             this.placeholder.position.y += 3;
+
+            this.addWorker.onClick = _ => {
+                this.recruit();
+                this.addWorker.setActive(false);
+            }
+            this.addWorker.onHover = _ => {
+                this.isHoveringPlaceholder = true;
+            }
+            this.addWorker.onOutHover = _ => {
+                this.isHoveringPlaceholder = false;
+            }
 
         })();
     }
@@ -116,7 +139,7 @@ export class Worker extends Model {
         })();
     }
 
-    onClick(e) {
+    /*onClick(e) {
         if(this.isPlaceholder){
             this.recruit();
             return;
@@ -124,7 +147,7 @@ export class Worker extends Model {
             this.turnLightOff();
             this.turnScreenOff();
         }
-    }
+    }*/
 
     recruit() {
         console.log('Recruit');
@@ -241,7 +264,7 @@ export class Worker extends Model {
         super.update(time, delta);
 
         if (this.isPlaceholder) {
-            this.materials.get('Placeholder').params.emissiveIntensity = (this.isHovering ? 1.0 : 0.0) + (Math.sin(time * 0.001) * 0.1);
+            this.materials.get('Placeholder').params.emissiveIntensity = (this.isHoveringPlaceholder ? 1.0 : 0.0) + (Math.sin(time * 0.001) * 0.1);
             return;
         }
 

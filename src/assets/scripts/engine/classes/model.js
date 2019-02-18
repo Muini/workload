@@ -1,3 +1,5 @@
+import Engine from '../core/engine';
+
 import Entity from './entity';
 import MaterialManager from '../core/materialManager';
 import AssetsManager from '../core/assetsManager';

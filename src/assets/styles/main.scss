@@ -8,6 +8,10 @@
 @import './utils/normalize';
 @import './utils/fonts';
 @import './utils/scrollbar';
+
+// Components
+@import './components/button';
+
 html {
     &.wf-loading {
         .ft {
@@ -25,7 +29,6 @@ body {
     width: 100%;
     min-height: 100%;
     background: black;
-    color: #aa7700;
 }
 
 #main {
@@ -48,13 +51,10 @@ body {
     display: none;
     position: absolute;
     z-index: 2;
+    top: 0;
+    left: 0;
     // background-color: rgba(255, 255, 255, 0.1);
     user-select: none;
-    &-add-worker{
-        &:hover{
-            cursor: pointer;
-        }
-    }
 }
 
 .hud-test {
@@ -66,7 +66,6 @@ body {
     color: rgba(255, 255, 255, .8);
     @include fluid-type( $mq-min-width, $mq-xxlarge-min, 12px, 22px);
     font-weight: 300;
-    letter-spacing: .05em;
     padding: .5em 1em;
     // border-right: 2px solid rgba(255, 255, 255, .8);
     // background: rgba(10, 30, 50, .4);
@@ -81,3 +80,4 @@ body {
 @import 'loader';
 
 @import 'scenes/city';
+@import 'scenes/workload';
