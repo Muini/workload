@@ -1,0 +1,13 @@
+.c-btn{
+    display: block;
+    padding: .25em 1.25em;
+    transition: background-color 325ms $easeOutSwift;
+    background-color: hsla(263, 20, 17, 255);
+    cursor: pointer;
+    border-radius: .2em;
+
+    &:hover {
+        transition-duration: 50ms;
+        background-color: hsla(263, 20, 47, 255);
+    }
+}
