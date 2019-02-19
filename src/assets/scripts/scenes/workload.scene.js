@@ -88,12 +88,12 @@ export default new Scene({
 
 
         this.boss = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -8.0) })
-        this.boss.recruit();
 
 
     },
     onStart: async function() {
         // await Engine.wait(1000)
+        this.boss.recruit();
 
         let tween = new Tween({ x:0, y:40, z:-60, aperture: 1.8 })
             .to({ x:0, y:20, z:-30, aperture: 3.5 }, 2000)

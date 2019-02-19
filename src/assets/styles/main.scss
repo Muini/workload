@@ -12,17 +12,6 @@
 // Components
 @import './components/button';
 
-html {
-    &.wf-loading {
-        .ft {
-            font-family: sans-serif;
-        }
-        .ft_serif {
-            font-family: serif;
-        }
-    }
-}
-
 body {
     position: relative;
     // display: flex;

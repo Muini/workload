@@ -221,8 +221,18 @@ export default new Scene({
             });
 
         this.startButton.onClick = async e => {
-            if(!Log.debug)
-                document.documentElement.requestFullscreen();
+            var i = document.documentElement;
+            if(!Log.debug){
+                if (i.requestFullscreen) {
+                    i.requestFullscreen();
+                } else if (i.webkitRequestFullscreen) {
+                    i.webkitRequestFullscreen();
+                } else if (i.mozRequestFullScreen) {
+                    i.mozRequestFullScreen();
+                } else if (i.msRequestFullscreen) {
+                    i.msRequestFullscreen();
+                }
+            }
             this.simpleCameraMovement.disableControls();
             this.startButton.setActive(false);
             tween2.start();
