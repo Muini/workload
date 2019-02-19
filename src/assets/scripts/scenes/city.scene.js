@@ -221,8 +221,8 @@ export default new Scene({
             });
 
         this.startButton.onClick = async e => {
-            var i = document.documentElement;
             if(!Log.debug){
+                const i = document.documentElement;
                 if (i.requestFullscreen) {
                     i.requestFullscreen();
                 } else if (i.webkitRequestFullscreen) {

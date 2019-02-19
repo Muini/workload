@@ -50,43 +50,49 @@ class AssetsManager {
         }
     }
 
-    loadAssetsFromScene(sceneName, callback) {
-        if (!Assets[sceneName]) return callback();
+    loadAssetsFromScene(sceneName) {
+        return new Promise((resolve, reject) => {
 
-        this.onSceneLoaded = callback;
-        this.assetsToLoad = 0;
-        this.assetsLoaded = 0;
+            if (!Assets[sceneName]) return reject();
 
-        // TODO: Async everything
-        for (let modelName in Assets[sceneName].models) {
-            if (!this.assets[modelName].isLoaded) {
-                this.assetsToLoad++;
-                this.assetPercent = 0;
-                ModelLoader.load(
-                    this.assets[modelName].url,
-                    (modelLoaded) => {
-                        this.assets[modelName].asset = modelLoaded;
-                        this.assets[modelName].isLoaded = true;
-                        this.updateLoader();
-                    },
-                    (loaded, total) => {
-                        this.assetPercent = loaded / total * 100;
-                        Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
-                    }
-                );
+            this.onSceneLoaded = resolve;
+            this.assetsToLoad = 0;
+            this.assetsLoaded = 0;
+
+            for (let modelName in Assets[sceneName].models) {
+                if (!this.assets[modelName].isLoaded) {
+                    this.assetsToLoad++;
+                    this.assetPercent = 0;
+                    ModelLoader.load(
+                        this.assets[modelName].url,
+                        (modelLoaded) => {
+                            this.assets[modelName].asset = modelLoaded;
+                            this.assets[modelName].isLoaded = true;
+                            this.updateLoader();
+                        },
+                        (loaded, total) => {
+                            this.assetPercent = loaded / total * 100;
+                            Loader.updateLoader(this.assetsLoaded, this.assetsToLoad, this.assetPercent);
+                        }
+                    );
+                }
             }
-        }
-        // TODO: sound loading
-        for (let textureName in Assets[sceneName].textures) {
-            if (!this.assets[textureName].isLoaded) {
-                this.assetsToLoad++;
+            // TODO: sound loading
+            for (let textureName in Assets[sceneName].textures) {
+                if (!this.assets[textureName].isLoaded) {
+                    this.assetsToLoad++;
+                }
             }
-        }
-        for (let soundName in Assets[sceneName].sounds) {
-            if (!this.assets[soundName].isLoaded) {
-                this.assetsToLoad++;
+            for (let soundName in Assets[sceneName].sounds) {
+                if (!this.assets[soundName].isLoaded) {
+                    this.assetsToLoad++;
+                }
             }
-        }
+
+            if(this.assetsToLoad === 0)
+                resolve();
+
+        });
     }
 
     updateLoader() {
@@ -99,17 +105,16 @@ class AssetsManager {
     }
 
     getAsset(assetType, assetName) {
-        return (async() => {
+        return (async _ => {
             if (!this.assets[assetName] || !this.assets[assetName].isLoaded) return Log.push('error', this, `Asset ${assetName} has not been loaded ! Make sure it is in assets.js with the correct name.`);
 
             switch (assetType) {
                 case 'model':
                     let cloneAsset = await this.cloneGltf(this.assets[assetName].asset);
-                    const returnAsset = {
+                    return {
                         model: cloneAsset.scene,
                         animations: cloneAsset.animations
-                    }
-                    return returnAsset;
+                    };
                     break;
                 case 'texture':
 
@@ -122,7 +127,7 @@ class AssetsManager {
     }
 
     cloneGltf(gltf) {
-        return (async() => {
+        return (async _ => {
             const clone = {
                 animations: gltf.animations,
                 scene: gltf.scene.clone(true)

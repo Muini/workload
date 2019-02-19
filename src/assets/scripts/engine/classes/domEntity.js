@@ -4,7 +4,6 @@ import Entity from './entity';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
-// TODO: Make the dom inherit the Entity class
 export default class DomEntity extends Entity {
     constructor(opt) {
         super(opt);
@@ -35,7 +34,7 @@ export default class DomEntity extends Entity {
         if (this.selector) {
             this.initialDom = document.querySelector(this.selector);
             if (!this.initialDom) return log.push('error', this, `Initial dom element for domEntity ${this.name} with selector ${this.selector} was not found in template`);
-            this.dom = this.isLoader ? this.initialDom : this.initialDom.cloneNode(true);
+            this.dom = this.initialDom.cloneNode(true);
         }
 
         this.bindEvents();

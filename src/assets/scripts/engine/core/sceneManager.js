@@ -8,6 +8,8 @@ class SceneManager {
         this.scenesOrder = [];
         this.sceneCurrentIndex = 0;
 
+        this.isPreloading = false;
+
         this.currentScene = undefined;
     }
 
@@ -17,9 +19,9 @@ class SceneManager {
 
     initScenes(){
         return (async() => {
-            this.scenes.forEach(async scene => {
-                await scene.initScene();
-            });
+            for(const scene of this.scenes){
+                await scene[1].initScene();
+            }
         })();
     }
 
@@ -32,7 +34,7 @@ class SceneManager {
             if (!nextSceneName) return false;
             if (!this.scenes.get(nextSceneName).hasLoaded) {
                 this.isPreloading = true;
-                await Engine.wait(1000);
+                await Engine.wait(3000);
                 await this.scenes.get(nextSceneName).preload(_ => {
                     this.isPreloading = false;
                 });
@@ -44,10 +46,27 @@ class SceneManager {
         checkIfSceneShouldPreload();
     }
 
+    preloadAllScenes(){
+        return (async _ => {
+            this.isPreloading = true;
+            Loader.show();
+            for(let scene of this.scenes){
+                await Log.push('info', this, `Scene ${scene[1].name} is preloading now`)
+                if (!scene[1].hasLoaded) {
+                    await scene[1].preload(async _ => {});
+                }
+            }
+            Loader.hide();
+            this.isPreloading = false;
+        })()
+    }
+
     set(sceneName) {
         return new Promise((resolve, reject) => {
-            //TODO: reject setScene
-            if (this.scenes.get(sceneName) === undefined) return Log.push('error', this, `Scene ${sceneName} is not registered`);
+            if (this.scenes.get(sceneName) === undefined) {
+                Log.push('error', this, `Scene ${sceneName} is not registered`);
+                return reject();
+            }
             this.currentScene = this.scenes.get(sceneName);
             if (Log.debug)
                 window.scene = this.currentScene.instance;
@@ -65,6 +84,7 @@ class SceneManager {
                     this.isPreloading = true;
                     this.currentScene.preload(_ => {
                         this.isPreloading = false;
+                        Loader.hide();
                         resolve();
                     });
                 }

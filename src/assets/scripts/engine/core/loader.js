@@ -16,10 +16,9 @@ class Loader extends DomEntity {
             chunkPercentage: 0,
         }
 
-        this.created();
-    }
+        this.dom = this.initialDom;
 
-    init() {
+        this.created();
     }
 
     created() {
@@ -39,19 +38,15 @@ class Loader extends DomEntity {
     }
 
     show() {
-        this.setActive(true);
-        this.dom.style['visibility'] = 'visible';
+        this.setVisibility(true);
         this.dom.classList.remove('hide');
         this.data.percentage = 0;
         this.updateGraphLoader();
     }
 
     hide() {
-        requestAnimationFrame(_ => {
-            this.setActive(false);
-            this.dom.style['visibility'] = 'visible';
-            this.dom.classList.add('hide');
-        });    
+        this.setVisibility(false);
+        this.dom.classList.add('hide');
     }
 
     updateGraphLoader() {
@@ -69,7 +64,6 @@ class Loader extends DomEntity {
         this.data.chunkPercentage = assetPercent;
         if (this.data.chunkLoaded >= this.data.chunkToLoad) {
             this.data.percentage = 100;
-            this.hide();
         } else {
             this.data.percentage = assetsToLoad > 1 ? parseInt(assetsLoaded / assetsToLoad * 100) + parseInt(assetPercent / assetsToLoad) : parseInt(assetPercent / assetsToLoad);
         }

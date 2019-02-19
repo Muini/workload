@@ -122,15 +122,19 @@ export default class Scene {
 
             this.sounds.forEach(sound => sound.load());
 
-            await AssetsManager.loadAssetsFromScene(this.name, async _ => {
-                Log.push('success', this, `Scene c:LightGreen{${this.name}} loaded`);
-                await this.createEntities();
-                await Engine.renderer.compile(this.instance, this.camera.instance);
-                this.isLoading = false;
-                this.hasLoaded = true;
-                return this.onPreloaded();
-            });
+            await AssetsManager.loadAssetsFromScene(this.name);
 
+            Log.push('success', this, `Scene c:LightGreen{${this.name}} loaded`);
+
+            await this.createEntities();
+
+            await Engine.renderer.compile(this.instance, this.camera.instance);
+
+            this.isLoading = false;
+            this.hasLoaded = true;
+
+            if(typeof this.onPreloaded === 'function')
+                return this.onPreloaded();
         })();
     }
 

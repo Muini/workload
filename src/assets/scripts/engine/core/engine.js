@@ -3,7 +3,6 @@ import { Interaction } from 'three.interaction';
 import Log from '../utils/log';
 import * as dat from 'dat.gui';
 import Quality from './quality';
-import Stats from 'stats.js';
 import RendererStats from 'three-webgl-stats';
 import PostProd from './postprod';
 import SceneManager from './sceneManager';
@@ -18,9 +17,6 @@ class Engine {
         // TODO: event based engine to avoid import in every files. With naming convention for event
 
         if (Log.debug) {
-            // TODO: remove stats.js, use chrome fps instead and add renderer info gui
-            this.stats = new Stats();
-            this.stats.showPanel(0);
             this.rendererStats = new RendererStats();
         }
 
@@ -66,7 +62,7 @@ class Engine {
         this._maxPerformanceCycle = 5; //3 Cycles
         this._performanceCycleLength = 30; //Every 8 frames
 
-        this.hasBackgroundPreload = true;
+        this.hasBackgroundPreload = false;
 
         this._requestId = undefined;
         this.hasStarted = false;
@@ -170,7 +166,6 @@ class Engine {
             this.container = container;
             await this.container.appendChild(this.renderer.domElement);
             if (Log.debug){
-                this.container.appendChild(this.stats.dom);
                 this.rendererStats.domElement.style.position = 'absolute'
                 this.rendererStats.domElement.style.left = '0px'
                 this.rendererStats.domElement.style.bottom = '0px'
@@ -264,9 +259,9 @@ class Engine {
     wait(timeToWait) {
         return new Promise((resolve, reject) => {
             const uuid = UUID();
-            const startTime = this.lastTick;
+            const startTime = this.elapsedTime;
             this.addToUpdate(uuid, _ => {
-                const elapsed = this.lastTick - startTime;
+                const elapsed = this.elapsedTime - startTime;
                 if (elapsed >= timeToWait) {
                     this.removeFromUpdate(uuid);
                     resolve();
@@ -310,7 +305,7 @@ class Engine {
     }
 
     start() {
-        return (async() => {
+        return (async _ => {
             // Set the scene when the engine is starting
             await SceneManager.set(SceneManager.scenesOrder[SceneManager.sceneCurrentIndex]).then(async _ => {
                 if (SceneManager.currentScene == undefined) return Log.push(
@@ -425,9 +420,6 @@ class Engine {
         
         this._requestId = window.requestAnimationFrame(time => this.update(time))
 
-        if (Log.debug)
-            this.stats.begin();
-
         // Calculate delta
         const delta = time - (this.lastTick || time);
 
@@ -466,7 +458,6 @@ class Engine {
         this.lastTick = time;
 
         if (Log.debug){
-            this.stats.end();
             this.rendererStats.update(this.renderer);
         }
 

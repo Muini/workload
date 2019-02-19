@@ -30,7 +30,7 @@ import './scenes/worker-test.scene';
             'worker-test', //This is the name of the scene, not of the file
         ]);
 
-        await Loader.show();
+        await SceneManager.preloadAllScenes();
 
         // Start the engine ; It will start the preloading and launch the first scene
         await Engine.start();
