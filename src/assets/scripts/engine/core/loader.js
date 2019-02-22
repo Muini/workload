@@ -33,7 +33,7 @@ class Loader extends DomEntity {
 
     awake() {
         return (async() => {
-            super.awake();
+            await super.awake();
         })();
     }
 
@@ -58,6 +58,7 @@ class Loader extends DomEntity {
     }
 
     updateLoader(assetsLoaded, assetsToLoad, assetPercent) {
+        // TODO: progress when preloading ALL scenes
         this.data.chunkLoaded = assetsLoaded;
         this.data.chunkToLoad = assetsToLoad;
         if (this.data.assetsToLoad <= 0) return;

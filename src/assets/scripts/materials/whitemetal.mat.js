@@ -1,7 +1,7 @@
 import Material from '../engine/classes/material';
 
 export default new Material('White Metal', {
-    color: 'D1D1D1',
+    color: 'D9D9D9',
     roughness: .8,
-    metalness: 1.0,
+    metalness: 0.6,
 })

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-import '../utils/GLTFLoader';
+// import '../utils/GLTFLoader';
+import 'three/examples/js/loaders/GLTFLoader';
 import Log from '../utils/log';
 
 class ModelLoader {

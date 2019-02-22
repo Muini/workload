@@ -40,7 +40,7 @@ class Engine {
         this.renderer.autoClear = false;
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
         this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
-        this.renderer.physicallyCorrectLights = false;
+        this.renderer.physicallyCorrectLights = true;
         this.renderer.gammaFactor = 2.2;
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
@@ -439,6 +439,7 @@ class Engine {
             this.postprod.update(this.elapsedTime, deltaScaled);
 
         //Update all entities
+        // TODO: replace forEach by a more performant loop function
         this._updateFunctions.forEach(fct => {
             try {
                 fct(this.elapsedTime, deltaScaled);

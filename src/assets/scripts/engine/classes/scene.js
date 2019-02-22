@@ -72,18 +72,20 @@ export default class Scene {
     }
 
     createEntities() {
-        return (async() => {
+        return (async _ => {
             await Promise.all(this._children.map(async entity => { await entity.created() }))
+            // for (const entity of this._children) { await entity.created(); }
             Log.push('info', this, `Scene created c:salmon{${this._children.length}} entity(ies)`);
-            return;
+            // return;
         })();
     }
 
     awakeEntities() {
-        return (async() => {
+        return (async _ => {
             await Promise.all(this._children.map(async entity => { await entity.awake() }))
+            // for (const entity of this._children) { await entity.awake(); }
             Log.push('info', this, `Scene awaked c:salmon{${this._children.length}} entity(ies)`);
-            return;
+            // return;
         })();
     }
 
@@ -114,7 +116,7 @@ export default class Scene {
     }
 
     preload(callback) {
-        return (async() => {
+        return (async _ => {
             this.isLoading = true;
             // Get all entites, load their assets (sounds, models, textures)
 
@@ -139,16 +141,21 @@ export default class Scene {
     }
 
     start() {
-        return (async() => {
+        return (async _ => {
             Engine.addToResize(this.uuid, this.resize.bind(this));
-            this.resize();
+            // this.resize();
+
             await this.awakeEntities();
+
             if (!this.camera || !this.camera.instance) return Log.push('error', this, `No camera has been specified in the scene ${this.name}`);
+
             this.setCamera(this.camera.instance);
+
             this.isPlaying = true;
-            Engine.waitNextTick().then(_ => {
-                this.onStart();
-            });
+
+            // Engine.waitNextTick().then(_ => {
+            this.onStart();
+            // });
         })();
     }
 

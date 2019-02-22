@@ -71,29 +71,30 @@ export default new Scene({
             type: 'ambient',
             color: '2f364f',
             colorGround: '323b2e',
-            power: 10.0,
+            power: 12.0,
         })
 
         this.instance.fog = new THREE.FogExp2(0x30364c, 0.001);
 
-        this.clock = new Clock({ parent: this });
+        this.clock = new Clock({ parent: this, position: new THREE.Vector3(0, 0.0, 3.0) });
 
-        // Test Worker
-        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
-        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 0.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
-        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0.0, 6.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
-        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 6.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
-        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(8.0, 0.0, 0.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
-        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-8.0, 0, 0.0), rotation: new THREE.Vector3(0, Math.PI, 0.0) });
+        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0) });
+        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 0.0) });
+        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(6.0, 0.0, 6.0) });
+        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-6.0, 0, 6.0) });
+        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(6.0, 0.0, 0.0) });
+        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-6.0, 0, 0.0) });
 
-
-        this.boss = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, -8.0) })
-
+        this.boss = new Worker({
+            parent: this,
+            position: new THREE.Vector3(0, 0.0, 12.0),
+            rotation: new THREE.Vector3(0, Math.PI, 0.0), 
+            isTheBoss: true
+        })
 
     },
     onStart: async function() {
         // await Engine.wait(1000)
-        this.boss.recruit();
 
         let tween = new Tween({ x:0, y:40, z:-60, aperture: 1.8 })
             .to({ x:0, y:20, z:-30, aperture: 3.5 }, 2000)
@@ -114,6 +115,10 @@ export default new Scene({
                 // this.RTSCameraMovement.disableControls();
                 // this.RTSCameraMovement.moveTo(new THREE.Vector3(0, 20, -30));
                 // this.RTSCameraMovement.setFovTo(30);
+
+                await Engine.wait(1000)
+
+                this.boss.arriveAtOffice();
             })
             .start();
     }

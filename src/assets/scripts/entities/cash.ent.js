@@ -1,6 +1,7 @@
 
 import Model from '../engine/classes/model';
 import { Ease, Tween } from '../engine/classes/tween';
+import Random from '../engine/utils/random';
 
 export class Cash extends Model {
     constructor(opt = {}) {
@@ -13,18 +14,19 @@ export class Cash extends Model {
         // Init materials
         this.addMaterial('Paper', false);
         this.addMaterial('Money', false);
+       
     }
     
     created() {
-        return (async() => {
+        return (async _ => {
             await super.created();
-            this.materials.get('Paper').params.opacity = 0;
-            this.materials.get('Money').params.opacity = 0;
+            this.materials.get('Paper').params.opacity = 0.0;
+            this.materials.get('Money').params.opacity = 0.0; 
         })();
     }
 
     awake() {
-        return (async() => {
+        return (async _ => {
             await super.awake();
         })();
     }
@@ -64,8 +66,8 @@ export class Cash extends Model {
                     opacity: 0
                 }, 400)
                 .onUpdate((props, progress) => {
-                    this.materials.get('Paper').params.opacity = props.opacity;
-                    this.materials.get('Money').params.opacity = props.opacity;
+                    // this.materials.get('Paper').params.opacity = props.opacity;
+                    // this.materials.get('Money').params.opacity = props.opacity;
                     this.model.position.z = initialPosZ + ((1 - props.opacity) * 1.);
                 })
                 .onComplete(_ => {

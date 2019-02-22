@@ -28,8 +28,8 @@ export class Light extends Entity{
         }
 
         if (Engine.renderer.physicallyCorrectLights){
-            this.params.power *= 3.0;
-            this.params.initialPower *= 3.0;
+            this.params.power *= this.type === 'spot' ? 300.0 : 3.0;
+            this.params.initialPower *= this.type === 'spot' ? 300.0 : 3.0;
             this.params.distance *= 3.0;
         }
 
@@ -91,8 +91,8 @@ export class Light extends Entity{
     }
 
     setPower(newPower){
-        this.params.power = newPower;
-        this.params.initialPower = newPower;
+        this.params.power = Engine.renderer.physicallyCorrectLights ? newPower * (this.type === 'spot' ? 300.0 : 3.0) : newPower;
+        this.params.initialPower = Engine.renderer.physicallyCorrectLights ? newPower * (this.type === 'spot' ? 300.0 : 3.0) : newPower;
         this.onChangeLightPower();
     }
 

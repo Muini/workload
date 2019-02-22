@@ -8,17 +8,17 @@ export default class Data {
 
         // this.onDataUpdate = this.onDataUpdate.bind(this);
         for(let dataName in data){
-            console.log(dataName, data[dataName]);
+            // console.log(dataName, data[dataName]);
             this[dataName] = data[dataName];
             this.watch(dataName, this.onDataUpdate)
             // this.data.updateFct[data] = function (){};
         }
 
-        console.log(this);
+        // console.log(this);
     }
 
     onDataUpdate(data, oldval, newval){
-        console.log('data update', data, oldval, newval);
+        // console.log('data update', data, oldval, newval);
         if (typeof this._updateFct[data] === 'function') {
             data = this._updateFct[data](newval);
         }else{
@@ -27,7 +27,7 @@ export default class Data {
     }
 
     compute(data, fct){
-        console.log('compute', data, fct);
+        // console.log('compute', data, fct);
         // if (!this.data[data]) return Log.push('error', this.constructor.name, `Data ${data} is not existing`);
         this._updateFct[data] = fct;
     }

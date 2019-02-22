@@ -23,20 +23,19 @@ class Input {
 
     bindEvents(){
         window.addEventListener('mouseenter', e => {
-            this.onMouseMove(e);
+            this.onMouseMove(e, false);
             this.mouse.isInScreen = true;
         });
         window.addEventListener('mousemove', e => {
-            this.onMouseMove(e);
+            this.onMouseMove(e, false);
             this.mouse.isInScreen = true;
         });
         window.addEventListener('touchmove', e => {
-            this.onMouseMove(e);
+            this.onMouseMove(e, true);
             this.mouse.isInScreen = true;
             this.mouse.isTouch = true;
         });
         window.addEventListener('mouseleave', e => {
-            this.onMouseMove(e);
             this.mouse.isInScreen = false;
             this.mouse.isDown = false;
         });
@@ -44,7 +43,7 @@ class Input {
             this.mouse.isDown = true;
         });
         window.addEventListener('touchstart', e => {
-            this.onMouseMove(e);
+            this.onMouseMove(e, true);
             this.mouse.isDown = true;
             this.mouse.isInScreen = true;
             this.mouse.isTouch = true;
@@ -77,9 +76,10 @@ class Input {
         })
     }
 
-    onMouseMove(e){
-        this.mouse.x = e.clientX || e.touches[0].clientX;
-        this.mouse.y = e.clientY || e.touches[0].clientY;
+    onMouseMove(e, isTouch){
+        if(!e.clientX && !e.touches) return;
+        this.mouse.x = !isTouch ? e.clientX : e.touches[0].clientX;
+        this.mouse.y = !isTouch ? e.clientY : e.touches[0].clientY;
         this.mouse.relX = (this.mouse.x / window.innerWidth) * 2 - 1;
         this.mouse.relY = (this.mouse.y / window.innerHeight) * 2 - 1;
     }

@@ -13,7 +13,7 @@ export class CashPile extends Entity {
         this.name = 'cash_pile';
         
         this.cashs = [];
-        this.cashsMax = 40;
+        this.cashsMax = 20;
         this.cashsNbr = 0;
         
         this.cashHeight = .1;

@@ -65,7 +65,7 @@ export default new Scene({
             parent: this,
             type: 'spot',
             color: 'ffffff',
-            power: 16.0,
+            power: 40.0,
             fov: Math.PI / 10,
             castShadow: true,
             shadowMapSize: 512,
@@ -77,7 +77,7 @@ export default new Scene({
             parent: this,
             type: 'spot',
             color: '0033ff',
-            power: 14.0,
+            power: 20.0,
             fov: Math.PI / 10,
             castShadow: true,
             shadowMapSize: 128,
@@ -86,7 +86,7 @@ export default new Scene({
 
         let loader = new THREE.FontLoader();
         loader.load('/static/fonts/quattrocento.json', (font) => {
-            let textGeometry = new THREE.TextGeometry('Character Creation', {
+            let textGeometry = new THREE.TextGeometry('Workload workers', {
                 font: font,
                 size: 40,
                 height: 20,

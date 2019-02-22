@@ -24,12 +24,14 @@ export default class Material {
             bumpScale: opt.bumpScale || 1.0,
             opacity: opt.opacity || 1.0,
             initialOpacity: opt.opacity || 1.0,
-            emissive: opt.emissive || 'ffffff',
+            emissive: opt.emissive !== undefined ? opt.emissive : '000000',
             emissiveIntensity: opt.emissiveIntensity || 0.0,
-            fog: opt.fog === undefined ? true : opt.fog,
+            fog: opt.fog !== undefined ? opt.fog : true,
             sway: opt.sway || 0.0,
-            doublesided: opt.doublesided || false,
+            doublesided: opt.doublesided !== undefined ? opt.doublesided : false,
         }
+
+        this.isInstanced = !isCloning;
 
         this.isSwayShader = this.params.sway > 0.0;
 
@@ -61,7 +63,7 @@ export default class Material {
 
                 shader = this.addSwayShader(shader);
 
-                shader = this.modifyToneMapping(shader);
+                // shader = this.modifyToneMapping(shader);
 
                 shader = this.modifyFogShader(shader);
                 
@@ -74,7 +76,7 @@ export default class Material {
         }else{
             this.instance.onBeforeCompile = (shader) => {
 
-                shader = this.modifyToneMapping(shader);
+                // shader = this.modifyToneMapping(shader);
 
                 shader = this.modifyFogShader(shader);
 
@@ -90,7 +92,7 @@ export default class Material {
 
         this.instance.needsUpdate = false;
 
-        if (!isCloning)
+        if (this.isInstanced)
             MaterialManager.register(this);
     }
 
@@ -150,16 +152,17 @@ export default class Material {
     watchChanges() {
         for (let param in this.params) {
             this.params.watch(param, (id, oldval, newval) => {
-                if (id === 'color' || id === 'emissive') {
-                    this.instance[id].setHex('0x' + newval);
-                } else if (id === 'opacity') {
-                    this.instance['transparent'] = newval < 1.0 ? true : false;
-                    this.instance[id] = newval;
-                } else if (id === 'doublesided') {
+                if (param === 'color' || param === 'emissive') {
+                    this.instance[param].setHex('0x' + newval);
+                } else if (param === 'opacity') {
+                    this.instance['transparent'] = newval < 1.0;
+                    this.instance[param] = newval;
+                } else if (param === 'doublesided') {
                     this.instance['side'] = newval ? THREE.DoubleSide : THREE.FrontSide;
                 } else {
-                    this.instance[id] = newval;
+                    this.instance[param] = newval;
                 }
+                // this.params[id] = newval;
             })
         }
     }

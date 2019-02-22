@@ -20,7 +20,7 @@ export default class Animator {
         this.isPlaying = false;
 
         this.skeleton = new THREE.SkeletonHelper(this.model);
-        this.skeleton.visible = false;
+        this.skeleton.visible = true;
 
         this.model.add(this.skeleton);
 

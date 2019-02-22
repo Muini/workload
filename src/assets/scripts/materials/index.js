@@ -1,3 +1,5 @@
+import './notfound.mat';
+
 import './grass.mat';
 import './floor.mat';
 import './concrete.mat';

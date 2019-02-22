@@ -1,53 +1,72 @@
-/*
- * object.watch polyfill
+/**
+ * Object.prototype.watch polyfill
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/watch
  *
- * 2012-04-03
+ * Known limitations:
+ * - `delete object[property]` will remove the watchpoint
  *
- * By Eli Grey, http://eligrey.com
- * Public Domain.
+ * Based on Eli Grey gist https://gist.github.com/eligrey/384583
+ * Impovements based on Xose Lluis gist https://gist.github.com/XoseLluis/4750176
+ * This version is optimized for minification
+ *
+ * WTFPL.
  * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
  */
 
-// object.watch
-if (!Object.prototype.watch) {
-    Object.defineProperty(Object.prototype, "watch", {
-        enumerable: false,
-        configurable: true,
-        writable: false,
-        value: function(prop, handler) {
-            var
-                oldval = this[prop],
-                newval = oldval,
-                getter = function() {
-                    return newval;
+(function (Object, descriptor) {
+    let prototype = Object.prototype,
+        defineProperty = Object.defineProperty,
+        getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
+        enumerable = 'enumerable';
+    // object.watch
+    if (!prototype.watch) {
+        descriptor.value = function (property, handler) {
+            let
+                descriptor = getOwnPropertyDescriptor(this, property),
+                _value = descriptor.value,
+                getter = descriptor.get || function () {
+                    return _value;
                 },
-                setter = function(val) {
-                    oldval = newval;
-                    return newval = handler.call(this, prop, oldval, val);
+                setter = function (value) {
+                    _value = handler.call(this, property, _value, value);
+                    if (setter._set) {
+                        setter._set.call(this, _value);
+                    }
+                    return _value;
                 };
-
-            if (delete this[prop]) { // can't watch constants
-                Object.defineProperty(this, prop, {
+            setter._set = descriptor.set; // backup old setter
+            if (descriptor.configurable && // can't watch constants
+                descriptor.writable !== false) { // don't watch readonly
+                defineProperty(this, property, {
                     get: getter,
                     set: setter,
-                    enumerable: true,
+                    enumerable: descriptor[enumerable],
                     configurable: true
                 });
             }
-        }
-    });
-}
-
-// object.unwatch
-if (!Object.prototype.unwatch) {
-    Object.defineProperty(Object.prototype, "unwatch", {
-        enumerable: false,
-        configurable: true,
-        writable: false,
-        value: function(prop) {
-            var val = this[prop];
-            delete this[prop]; // remove accessors
-            this[prop] = val;
-        }
-    });
-}
+        };
+        defineProperty(prototype, 'watch', descriptor);
+        // object.unwatch
+        descriptor.value = function (property) {
+            let descriptor = getOwnPropertyDescriptor(this, property);
+            if (descriptor.set && descriptor.set.hasOwnProperty('_set')) {
+                defineProperty(this, property, descriptor.set._set ? {
+                    get: descriptor.get,
+                    set: descriptor.set._set,
+                    enumerable: descriptor[enumerable],
+                    configurable: true
+                } : {
+                    value: this[property],
+                    enumerable: descriptor[enumerable],
+                    configurable: true,
+                    writable: true
+                });
+            }
+        };
+        defineProperty(prototype, 'unwatch', descriptor);
+    }
+})(Object, {
+    enumerable: false,
+    configurable: true,
+    writable: false
+});

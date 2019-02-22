@@ -31,7 +31,7 @@ export default new Scene({
             parent: this,
             position: new THREE.Vector3(0, 125, 62),
             rotation: new THREE.Vector3(-0.1, 0, 0),
-            focalLength: 18, //25
+            focalLength: 16, //25
             aperture: 2.8,
             focus: 50.0,
             far: 900,
@@ -71,7 +71,7 @@ export default new Scene({
             // colorGround: '323b2e', //Day
             colorGround: '3d3463',
             // power: 10.0, //Day
-            power: 1.5, //Sunset
+            power: 1.6, //Sunset
         })
 
         this.sun = new Light({
@@ -83,17 +83,18 @@ export default new Scene({
             // power: 8.0, //Day
             power: 12.0,
             castShadow: true,
-            shadowMapSize: 512,
-            shadowCameraSize: 50.0,
+            shadowMapSize: 1024,
+            shadowCameraSize: 80.0,
             // position: new THREE.Vector3(-30, 100, 30), //Day
-            position: new THREE.Vector3(150, 110, -250), //Sunset
+            position: new THREE.Vector3(470, 240, -750), //Sunset
         })
         
         this.sunTarget = new THREE.Object3D();
-        this.sunTarget.position.x = 12.0;
-        this.sunTarget.position.y = 20;
-        this.sunTarget.position.z = -30;
-        this.instance.add(this.sunTarget);
+        this.sunTarget.position.x = 0;
+        this.sunTarget.position.y = 0;
+        this.sunTarget.position.z = -100;
+        // this.instance.add(this.sunTarget);
+        this.sun.setTarget(this.sunTarget);
 
         let textureLoader = new THREE.TextureLoader();
         let flare01 = textureLoader.load('/static/img/lensflare/flare01.png');
@@ -134,13 +135,11 @@ export default new Scene({
         // this.instance.fog = new THREE.FogExp2(0x959fa5, 0.002); //Day
         // this.instance.fog = new THREE.FogExp2(0x604f40, 0.002); //Sunset old
         // TODO: Postprocessing fog or better fog
-        this.instance.fog = new THREE.FogExp2(0x355768, 0.0015); //Sunset
+        this.instance.fog = new THREE.FogExp2(0x355768, 0.002); //Sunset
 
         this.city = new City({
             parent: this
         });
-        this.city.rotation.y = 3.14;
-        this.sun.setTarget(this.city.model);
 
         this.citySound = new Sound({
             name: 'city-loop',
@@ -171,7 +170,7 @@ export default new Scene({
             camera: this.camera,
             easeFactor: 0.05,
             amplitude: 30.0,
-            target: new THREE.Vector3(0, 20, -100),
+            target: new THREE.Vector3(0, 10, -100),
             active: true
         })
 
@@ -186,7 +185,7 @@ export default new Scene({
                 y: 125,
             })
             .to({
-                y: 24,
+                y: 30,
             }, 6000)
             // .repeat(Infinity)
             // .yoyo(true)
@@ -205,7 +204,7 @@ export default new Scene({
             })
             .to({
                 // y: 18,
-                z: 10
+                z: 8
             }, 3000)
             // .repeat(Infinity)
             // .yoyo(true)

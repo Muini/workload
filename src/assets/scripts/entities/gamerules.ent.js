@@ -21,7 +21,7 @@ export class Gamerules extends Entity {
             timeOfTheDay: 0, //from 0 to 23
             lengthOfADay: 900, //in ms
         });
-        console.log("CONNARD", this.data);
+        // console.log("CONNARD", this.data);
 
         this.data.compute('timeOfTheDay', (newval) => {
             return Math.floor(this.data.gameTimeElapsed / this.data.lengthOfADay * 24);

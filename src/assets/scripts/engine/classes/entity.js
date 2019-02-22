@@ -77,7 +77,7 @@ export default class Entity {
     }
 
     created() {
-        return (async () => {
+        return (async _ => {
             //Name it properly
             this.model.name = this.name;
 
@@ -103,9 +103,10 @@ export default class Entity {
 
             // Create children now
             if (this._children.length > 0){
-                await Promise.all(this._children.map(async child => {
-                    await child.created()
-                }))
+                await Promise.all(this._children.map(async child => { await child.created() }))
+                /*for (const child of this._children) {
+                    await child.created();
+                }*/
             }
 
             // Awake
@@ -117,13 +118,14 @@ export default class Entity {
 
     // Awake happen when the scene is loaded into the engine & started to be used
     awake() {
-        return (async() => {
+        return (async _ => {
             this.setActive(this.isActive);
             // Awake children now
             if (this._children.length > 0){
-                await Promise.all(this._children.map(async child => {
-                    await child.awake()
-                }))
+                await Promise.all(this._children.map(async child => { await child.awake() }))
+                /*for (const child of this._children) {
+                    await child.awake();
+                }*/
             }
         })();
     }

@@ -33,7 +33,7 @@ export class Worker extends Model {
             type: 'point',
             parent: this,
             color: 'fc7223',
-            power: 250,
+            power: 200,
             castShadow: false,
             active: false,
         })
@@ -43,7 +43,7 @@ export class Worker extends Model {
             type: 'point',
             parent: this,
             color: 'B1C0E7',
-            power: 100,
+            power: 50,
             distance: 5.0,
             castShadow: false,
         })
@@ -62,18 +62,23 @@ export class Worker extends Model {
         this.placeholder = undefined;
         this.isHoveringPlaceholder = false;
 
+        this.isTheBoss = opt.isTheBoss ? opt.isTheBoss : false;
+
         this.timeElapsed = 0;
 
-        this.isPlaceholder = true;
+        this.isPlaceholder = this.isTheBoss ? false : true;
         this.isWorking = false;
-        this.isOff = true;
+        this.isOff = this.isTheBoss ? false : true;
         this.isDead = false;
 
         this.numberOfWorkingHours = 8.0; // 8 hours per day. Up to 24 !
         this.workingSpeed = 1.0; // Will depend on happiness
         this.happiness = 0.5;
 
-        this.cashPile = new CashPile({ parent: this }); // CASH !! €€€
+        this.cashPile = new CashPile({
+            parent: this,
+            position: new THREE.Vector3(Random.float(-0.25, -0.75), 0, Random.float(-0.1, 0.1))
+        });
 
         new Sound({
             name: 'paperSound',
@@ -99,12 +104,12 @@ export class Worker extends Model {
             debug: false,
             follow: true,
             position: new THREE.Vector3(0, 4, 0),
-            active: true,
+            active: this.isTheBoss ? false : true,
         });
     }
 
     created() {
-        return (async() => {
+        return (async _ => {
             await super.created();
 
             this.placeholder = await this.getChildModel('Placeholder');
@@ -112,9 +117,11 @@ export class Worker extends Model {
 
             this.lights.get('Desk_Spot').setTarget(this.model);
 
+            if (this.isTheBoss) return this.placeholder.visible = false;
+
             this.model.position.y -= 3;
             this.placeholder.position.y += 3;
-
+            
             this.addWorker.onClick = _ => {
                 this.recruit();
             }
@@ -133,25 +140,24 @@ export class Worker extends Model {
             await super.awake();
 
             this.turnScreenOff();
-            this.turnLightOff();
+            this.turnLightsOff();
 
-            this.lights.get('Desk_Spot').setPower(2);
+            if (this.isTheBoss){
+                this.lights.get('Desk_Spot').setPower(8);
+                return;
+            }
+
+            this.lights.get('Desk_Spot').setPower(1);
             this.lights.get('Desk_Spot').setVisibility(true);
         })();
     }
 
-    /*onClick(e) {
-        if(this.isPlaceholder){
-            this.recruit();
-            return;
-        }else{
-            this.turnLightOff();
-            this.turnScreenOff();
-        }
-    }*/
+    onClick(e) {
+        if(this.isPlaceholder || this.isDead || this.isTheBoss) return;
+        this.die();
+    }
 
     recruit() {
-        console.log('Recruit');
         this.addWorker.setActive(false);
         this.isPlaceholder = false;
         // Anim out placeholder
@@ -184,13 +190,12 @@ export class Worker extends Model {
         .ease(Ease.Expo.Out)
         .onUpdate((props, progress) => {
             this.model.position.y = props.y;
-            this.lights.get('Desk_Spot').setPower(2 + (progress * 8));
+            this.lights.get('Desk_Spot').setPower(2 + (progress * 6));
             // console.log(this.lights.get('Desk_Spot').params.power);
         })
         .onComplete(_ => {
             // Bonhomme arrive at work
-            this.bonhomme.arriveAtDesk();
-            this.turnLightOn();
+            this.arriveAtOffice();
         })
 
         placeholderAnimOut.start();
@@ -201,15 +206,18 @@ export class Worker extends Model {
         this.turnScreenOff();
         //Anim out
         this.bonhomme.leaveFromDesk();
-        this.turnLightOff();
+        this.turnLightsOff();
+        this.isOff = true;
     }
 
     arriveAtOffice(){
-        this.turnLightOn();
+        this.turnLightsOn();
         //Anim in
         this.bonhomme.arriveAtDesk();
         this.turnScreenOn();
-        this.startWorking();
+        if(!this.isTheBoss)
+            this.startWorking();
+        this.isOff = false;
     }
 
     turnScreenOn(){
@@ -222,12 +230,12 @@ export class Worker extends Model {
         this.lights.get('Desk_Screen_Light').setVisibility(false);
     }
 
-    turnLightOff(){
+    turnLightsOff(){
         this.lights.get('Desk_Spot').setVisibility(false);
         this.lights.get('Desk_Light').setVisibility(false);
     }
 
-    turnLightOn(){
+    turnLightsOn(){
         this.lights.get('Desk_Spot').setVisibility(true);
         this.lights.get('Desk_Light').setVisibility(true);
     }
@@ -237,7 +245,7 @@ export class Worker extends Model {
         this.isWorking = true;
         this.sounds.get('working').setRate(1.0 + (this.happiness / 10.));
         this.sounds.get('working').play();
-        // this.animator.play('Work');
+        // this.bonhomme.animator.play('Salute');
     }
 
     stopWorking() {
@@ -247,19 +255,17 @@ export class Worker extends Model {
         this.isWorking = false;
     }
 
-    working(){
+    working(delta) {
         this.timeElapsed += delta;
         // this.animator.setSpeed(this.workingSpeed * this.happiness * 3.0)
         if (this.timeElapsed > (1000 / (this.workingSpeed * this.happiness))) {
             this.timeElapsed = 0;
-            this.papersCount--;
+            // this.papersCount--;
             this.sounds.get('paperSound').play();
-            this.paperBlock.removePaper().then(_ => {
+            // this.paperBlock.removePaper().then(_ => {
                 this.cashPile.addCash();
-            });
+            // });
         }
-        this.materials.get('Screen').params.emissiveIntensity = Random.float(8, 9);
-        this.lights.get('Desk_Screen_Light').setPower(Random.float(90, 110));
     }
 
     update(time, delta) {
@@ -271,27 +277,31 @@ export class Worker extends Model {
         }
 
         if (this.isDead) {
-            this.materials.get('Screen').params.emissiveIntensity = Random.float(9, 10);
-            this.lights.get('Desk_Screen_Light').setPower(Random.float(90, 110));
+            this.lights.get('Desk_Screen_Light').setPower(Random.float(40, 60));
             return;
         }
 
         // I'm off ! Yeay !
         if(this.isOff) return;
 
+        this.materials.get('Screen').params.emissiveIntensity = Random.float(8, 9);
+        this.lights.get('Desk_Screen_Light').setPower(Random.float(80, 100));
+
         if(!this.isWorking) return;
         // Is working !
-        this.working();
+        this.working(delta);
     }
 
     die() {
         if (this.isWorking)
             this.stopWorking();
-        // this.animator.stop();
+        // this.bonhomme.animator.stop();
         this.materials.get('Screen').params.emissive = 'ff0000';
-        this.materials.get('Screen').params.emissiveIntensity = 6.0;
+        this.materials.get('Screen').params.emissiveIntensity = 4.0;
         this.lights.get('Desk_Screen_Light').setColor('fa0200');
-        this.lights.get('Desk_Light').setPower(0);
+        this.lights.get('Desk_Screen_Light').setVisibility(true);
+        this.lights.get('Desk_Light').setVisibility(false);
+        this.lights.get('Desk_Spot').setPower(2);
         this.isDead = true;
     }
 }

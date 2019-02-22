@@ -4,6 +4,7 @@ import Entity from './entity';
 import MaterialManager from '../core/materialManager';
 import AssetsManager from '../core/assetsManager';
 import Animator from './animator';
+import Log from '../utils/log';
 
 export default class Model extends Entity{
     constructor(opt){
@@ -34,7 +35,7 @@ export default class Model extends Entity{
     }
 
     getModel() {
-        return (async () => {
+        return (async _ => {
             //Is there a model ?
             if (!this.modelName) return;
             //Get the model from the assets manager
@@ -54,8 +55,7 @@ export default class Model extends Entity{
             //Update local parameters
             await this.overwriteModelParameters();
 
-            return;
-        })();
+        })();   
     }
 
     setVisibility(bool) {
@@ -63,15 +63,15 @@ export default class Model extends Entity{
     }
 
     created(){
-        return (async() => {
+        return (async _ => {
             await this.getModel();
 
-            super.created();
+            await super.created();
         })()
     }
 
     awake() {
-        return (async () => {
+        return (async _ => {
             await super.awake();
 
             this.bindEvents();
@@ -97,72 +97,74 @@ export default class Model extends Entity{
     }
 
     overwriteModelParameters() {
-        return (async () => {
-
-            const updateLights = function (child, lights) {
-                //Overwrite lights
-                lights.forEach(light => {
-                    if (light.name == child.name) {
-                        light.instance.position.set(child.position.x, child.position.y, child.position.z);
-                        light.instance.quaternion.set(child.quaternion.x, child.quaternion.y, child.quaternion.z, child.quaternion.w);
-                        light.instance.rotation.set(child.rotation.x, child.rotation.y, child.rotation.z);
-                        light.instance.decay = 2;
-                        light.instance.penumbra = 0.8;
-                        child.parent.add(light.instance);
-                        // child.parent.remove(child);
-                        // light.instance.angle /= 2.;
-                        // console.log(light.instance);
-                        return light.instance;
-                    }
-                });
-                return child;
-            }
-
-            const updateMaterials = function (child, materials) {
-                // Overwrite materials
-                // Add skinning if this is on a skinned mesh
-                materials.forEach(material => {
-                    if (child.material.length) {
-                        let m = child.material.length;
-                        while (m--) {
-                            if (material.name == child.material[m].name) {
-                                if (child.isSkinnedMesh)
-                                    material.instance.skinning = true;
-                                child.material[m] = material.instance;
-                            }
-                        }
-                    } else {
-                        if (material.name == child.material.name) {
-                            if (child.isSkinnedMesh)
-                                material.instance.skinning = true;
-                            child.material = material.instance;
-                        }
-                    }
-                });
-
-                return child;
-            }
-
-            await this.model.traverse(async (child) => {
-                if (child.isMesh || child.isSkinnedMesh) {
-                    child.castShadow = this.hasShadows;
-                    child.receiveShadow = true;
-                    if (this.isStatic)
-                        child.matrixAutoUpdate = false;
-                    child = await updateMaterials(child, this.materials);
-                } else {
-                    child = await updateLights(child, this.lights);
+        const updateLights = (child) => {
+            //Overwrite lights
+            for(let key of this.lights){
+                let light = key[1];
+                if (light.name == child.name) {
+                    light.instance.position.set(child.position.x, child.position.y, child.position.z);
+                    light.instance.quaternion.set(child.quaternion.x, child.quaternion.y, child.quaternion.z, child.quaternion.w);
+                    light.instance.rotation.set(child.rotation.x, child.rotation.y, child.rotation.z);
+                    light.instance.decay = 2;
+                    light.instance.penumbra = 0.8;
+                    // light.instance.angle /= 2.;
+                    child.parent.add(light.instance);
+                    // child.parent.remove(child);
+                    // console.log(light.instance);
+                    return light.instance;
                 }
-            });
+            }
+            return child;
+        }
 
-            this.model.name = this.name;
+        const updateMaterials = (childToReplace) => {
+            let child = childToReplace;
+            // Overwrite materials
+            const getReplacementMaterial = (name) => {
+                if (this.materials.get(name)) {
+                    // Add skinning if this is on a skinned mesh
+                    if(child.isSkinnedMesh)
+                        this.materials.get(name).instance.skinning = true
+                    return this.materials.get(name).instance;
+                }else{
+                    Log.push('warn', this, `Could not find material c:orange{${name}} for model ${this.modelName}`)
+                    return MaterialManager.get('NotFoundMaterial').instance;
+                }
+            }
 
-        })();
+            if (child.material.length) {
+                // Create new array of materials to deep clone them, otherwise the reference is kept between instances
+                let newMaterials = [];
+                // Check every materials
+                for (let m = 0; m < child.material.length; m++) {
+                    newMaterials.push(getReplacementMaterial(child.material[m].name));
+                }
+                child.material = newMaterials;
+            } else {
+                child.material = getReplacementMaterial(child.material.name)
+            }
+
+            return child;
+        }
+
+        this.model.traverse(child => {
+            if (child.isMesh || child.isSkinnedMesh) {
+                child.castShadow = this.hasShadows;
+                child.receiveShadow = this.hasShadows;
+                if (this.isStatic)
+                    child.matrixAutoUpdate = false;
+                child = updateMaterials(child);
+            } else {
+                child = updateLights(child);
+            }
+        });
+
+        this.model.name = this.name;
     }
 
     getChildModel(name) {
         let models = [];
-        return (async () => {
+        return (async _ => {
             await this.model.traverse((child) => {
                 if (child.name.indexOf(name) > -1) {
                     models.push(child);

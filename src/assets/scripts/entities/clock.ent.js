@@ -22,7 +22,7 @@ export class Clock extends Model {
             type: 'spot',
             parent: this,
             color: 'CBFFE4',
-            power: 6,
+            power: 2,
             fov: .4,
             castShadow: false,
         })

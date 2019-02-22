@@ -1,7 +1,7 @@
 import Material from '../engine/classes/material';
 
 export default new Material('Roof', {
-    color: '818F8F',
-    roughness: .8,
+    color: '748c8c',
+    roughness: .9,
     metalness: .6,
 })

@@ -25,6 +25,7 @@ export class City extends Model {
         this.addMaterial('Clouds');
         this.addMaterial('Leafs');
         this.addMaterial('Mountain');
+        this.addMaterial('Snow');
     }
 
     created() {
