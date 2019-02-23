@@ -38,7 +38,7 @@ class Engine {
         // this.renderer = new THREE.WebGLDeferredRenderer();
         this.renderer.setSize(this.width, this.height);
         this.renderer.autoClear = false;
-        this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = Math.pow(0.68, 5.0);
         this.renderer.physicallyCorrectLights = true;
         this.renderer.gammaFactor = 2.2;

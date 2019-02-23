@@ -55,6 +55,8 @@ export class Bonhomme extends Model {
         return (async () => {
             await super.created();
 
+            this.model.rotation.y += Math.PI;
+
             this.fbody = await this.getChildModel('Body_Female');
             this.mbody = await this.getChildModel('Body_Male');
             
@@ -63,8 +65,6 @@ export class Bonhomme extends Model {
             this.generateRandomLook();
 
             this.updateLook();
-
-            // console.log(this.animator)
 
             // let bone = await this.getChildModel('Body');
             // bone = bone.filter(item => item.type === 'Bone')[0];
@@ -136,11 +136,15 @@ export class Bonhomme extends Model {
         this.model.scale.setScalar(this.look.heightFactor);
 
         if (this.isFemale) {
-            this.fbody[0].visible = true;
-            this.mbody[0].visible = false;
+            if (this.fbody[0])
+                this.fbody[0].visible = true;
+            if (this.mbody[0])
+                this.mbody[0].visible = false;
         } else {
-            this.fbody[0].visible = false;
-            this.mbody[0].visible = true;
+            if (this.fbody[0])
+                this.fbody[0].visible = false;
+            if (this.mbody[0])
+                this.mbody[0].visible = true;
         }
 
         this.materials.get('Skin').params.color = this.look.skinColor.getHexString();

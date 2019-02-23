@@ -132,7 +132,7 @@ export default new Scene({
 
             this.bonhomme.model.rotation.y += 0.0005 * delta;
 
-            if (this.timeElapsed > 1000) {
+            if (this.timeElapsed > 2000) {
                 this.bonhomme.generateRandomLook();
                 this.bonhomme.updateLook();
                 this.timeElapsed = 0;
@@ -145,10 +145,10 @@ export default new Scene({
     onStart: async function () {
         // TODO: Fix fatal error, addToUpdate add the function to the main loop which is execute whether the scene is or isn't loaded or awaked.
         Engine.addToUpdate(this.uuid, this.update);
-        // await Engine.wait(1000)
-
         this.bonhomme.setVisibility(true);
-        // this.bonhomme.animator.play('Salute')
+        // await Engine.wait(3000)
+
+        this.bonhomme.animator.play('Salute', 0, true)
         
 
     },

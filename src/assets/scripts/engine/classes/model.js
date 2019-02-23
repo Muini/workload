@@ -41,10 +41,6 @@ export default class Model extends Entity{
             //Get the model from the assets manager
             const asset = await AssetsManager.getAsset('model', this.modelName);
             this.model = asset.model;
-            /*for (let i = 0; i < asset.model.children.length; i++) {
-                console.log(asset.model.children[i])
-                this.model.add(asset.model.children[i]);
-            }*/
             //Create an animator if there is animations
             if (asset.animations.length) {
                 this.animator = new Animator({

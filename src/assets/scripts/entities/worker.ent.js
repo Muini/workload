@@ -33,7 +33,7 @@ export class Worker extends Model {
             type: 'point',
             parent: this,
             color: 'fc7223',
-            power: 200,
+            power: 100,
             castShadow: false,
             active: false,
         })
@@ -191,7 +191,6 @@ export class Worker extends Model {
         .onUpdate((props, progress) => {
             this.model.position.y = props.y;
             this.lights.get('Desk_Spot').setPower(2 + (progress * 6));
-            // console.log(this.lights.get('Desk_Spot').params.power);
         })
         .onComplete(_ => {
             // Bonhomme arrive at work
@@ -245,12 +244,12 @@ export class Worker extends Model {
         this.isWorking = true;
         this.sounds.get('working').setRate(1.0 + (this.happiness / 10.));
         this.sounds.get('working').play();
-        // this.bonhomme.animator.play('Salute');
+        this.bonhomme.animator.play('Working', 0.6, true); //Temp
     }
 
     stopWorking() {
         if (!this.isWorking) return;
-        // this.animator.stop('Work');
+        this.bonhomme.animator.stop('Working', 0.1); //Temp
         this.sounds.get('working').stop();
         this.isWorking = false;
     }
@@ -297,7 +296,7 @@ export class Worker extends Model {
             this.stopWorking();
         // this.bonhomme.animator.stop();
         this.materials.get('Screen').params.emissive = 'ff0000';
-        this.materials.get('Screen').params.emissiveIntensity = 4.0;
+        this.materials.get('Screen').params.emissiveIntensity = 2.0;
         this.lights.get('Desk_Screen_Light').setColor('fa0200');
         this.lights.get('Desk_Screen_Light').setVisibility(true);
         this.lights.get('Desk_Light').setVisibility(false);

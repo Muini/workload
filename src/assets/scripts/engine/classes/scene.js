@@ -75,7 +75,7 @@ export default class Scene {
         return (async _ => {
             await Promise.all(this._children.map(async entity => { await entity.created() }))
             // for (const entity of this._children) { await entity.created(); }
-            Log.push('info', this, `Scene created c:salmon{${this._children.length}} entity(ies)`);
+            Log.push('info', this, `Scene ${this.name} created c:salmon{${this._children.length}} entity(ies)`);
             // return;
         })();
     }
@@ -84,7 +84,7 @@ export default class Scene {
         return (async _ => {
             await Promise.all(this._children.map(async entity => { await entity.awake() }))
             // for (const entity of this._children) { await entity.awake(); }
-            Log.push('info', this, `Scene awaked c:salmon{${this._children.length}} entity(ies)`);
+            Log.push('info', this, `Scene ${this.name} awaked c:salmon{${this._children.length}} entity(ies)`);
             // return;
         })();
     }
