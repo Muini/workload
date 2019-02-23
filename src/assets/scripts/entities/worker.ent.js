@@ -112,6 +112,16 @@ export class Worker extends Model {
         return (async _ => {
             await super.created();
 
+            this.desk = await this.getChildModel('Desk_Model');
+            this.desk = this.desk[0];
+            this.deskBoss = await this.getChildModel('Desk_Model_Boss');
+            this.deskBoss = this.deskBoss[0];
+
+            if (this.isTheBoss)
+                this.desk.visible = false;
+            else
+                this.deskBoss.visible = false;
+
             this.placeholder = await this.getChildModel('Placeholder');
             this.placeholder = this.placeholder[0];
 
@@ -152,10 +162,10 @@ export class Worker extends Model {
         })();
     }
 
-    onClick(e) {
-        if(this.isPlaceholder || this.isDead || this.isTheBoss) return;
-        this.die();
-    }
+    // onClick(e) {
+    //     if(this.isPlaceholder || this.isDead || this.isTheBoss) return;
+    //     this.die();
+    // }
 
     recruit() {
         this.addWorker.setActive(false);
@@ -212,11 +222,13 @@ export class Worker extends Model {
     arriveAtOffice(){
         this.turnLightsOn();
         //Anim in
+        this.bonhomme.animator.play('ArriveAtWork', 0.0, false).then(_ => {
+            this.turnScreenOn();
+            if(!this.isTheBoss)
+                this.startWorking();
+            this.isOff = false;
+        })
         this.bonhomme.arriveAtDesk();
-        this.turnScreenOn();
-        if(!this.isTheBoss)
-            this.startWorking();
-        this.isOff = false;
     }
 
     turnScreenOn(){
@@ -236,6 +248,7 @@ export class Worker extends Model {
 
     turnLightsOn(){
         this.lights.get('Desk_Spot').setVisibility(true);
+        if(this.isTheBoss) return;
         this.lights.get('Desk_Light').setVisibility(true);
     }
 
@@ -284,7 +297,7 @@ export class Worker extends Model {
         if(this.isOff) return;
 
         this.materials.get('Screen').params.emissiveIntensity = Random.float(8, 9);
-        this.lights.get('Desk_Screen_Light').setPower(Random.float(80, 100));
+        this.lights.get('Desk_Screen_Light').setPower(Random.float(40, 60));
 
         if(!this.isWorking) return;
         // Is working !

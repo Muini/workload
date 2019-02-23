@@ -25,7 +25,6 @@ export default class Animator {
             // this.instance.clipAction(clip);
             let action = new AnimationAction(this.instance, clip);
             action.weight = 0;
-            action.play();
             this._actions.set(clip.name, action);
         });
 
@@ -54,7 +53,7 @@ export default class Animator {
             action.paused = false;
             action.timeScale = 1;
             action.weight = 1;
-            // action.play();
+            action.play();
 
             if (this._currentAction)
                 action.crossFadeFrom(this._currentAction, fadeDuration, true);
@@ -65,6 +64,7 @@ export default class Animator {
             this._currentAction = action;
 
             this.instance.addEventListener('finished', _ => {
+                action.stop();
                 resolve();
             });
         })
@@ -78,9 +78,6 @@ export default class Animator {
             return reject();
         };
 
-        // console.log('stop action', action, duration)
-
-        // action.play();
         action.fadeOut(duration);
     }
 

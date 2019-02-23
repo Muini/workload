@@ -78,16 +78,16 @@ export default new Scene({
 
         this.clock = new Clock({ parent: this, position: new THREE.Vector3(0, 0.0, 3.0) });
 
-        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0) });
-        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 0.0) });
-        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(6.0, 0.0, 6.0) });
-        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-6.0, 0, 6.0) });
-        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(6.0, 0.0, 0.0) });
-        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-6.0, 0, 0.0) });
+        this.worker = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 12.0) });
+        this.worker2 = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 6.0) });
+        this.worker3 = new Worker({ parent: this, position: new THREE.Vector3(6.0, 0.0, 12.0) });
+        this.worker4 = new Worker({ parent: this, position: new THREE.Vector3(-6.0, 0, 12.0) });
+        this.worker5 = new Worker({ parent: this, position: new THREE.Vector3(6.0, 0.0, 6.0) });
+        this.worker6 = new Worker({ parent: this, position: new THREE.Vector3(-6.0, 0, 6.0) });
 
         this.boss = new Worker({
             parent: this,
-            position: new THREE.Vector3(0, 0.0, 12.0),
+            position: new THREE.Vector3(0, 0.0, 0.0),
             rotation: new THREE.Vector3(0, Math.PI, 0.0), 
             isTheBoss: true
         })

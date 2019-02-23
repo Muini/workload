@@ -55,8 +55,6 @@ export class Bonhomme extends Model {
         return (async () => {
             await super.created();
 
-            this.model.rotation.y += Math.PI;
-
             this.fbody = await this.getChildModel('Body_Female');
             this.mbody = await this.getChildModel('Body_Male');
             
