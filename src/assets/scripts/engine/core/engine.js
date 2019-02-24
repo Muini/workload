@@ -250,9 +250,10 @@ class Engine {
     }
 
     waitNextTick() {
-        return new Promise(async(resolve, reject) => {
-            await this.wait(0);
-            resolve();
+        return new Promise((resolve, reject) => {
+            this.wait(0).then(_ => {
+                resolve();
+            });
         });
     }
 

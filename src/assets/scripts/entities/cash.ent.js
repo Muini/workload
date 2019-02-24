@@ -66,8 +66,8 @@ export class Cash extends Model {
                     opacity: 0
                 }, 400)
                 .onUpdate((props, progress) => {
-                    // this.materials.get('Paper').params.opacity = props.opacity;
-                    // this.materials.get('Money').params.opacity = props.opacity;
+                    this.materials.get('Paper').params.opacity = props.opacity;
+                    this.materials.get('Money').params.opacity = props.opacity;
                     this.model.position.z = initialPosZ + ((1 - props.opacity) * 1.);
                 })
                 .onComplete(_ => {

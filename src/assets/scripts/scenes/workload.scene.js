@@ -97,7 +97,7 @@ export default new Scene({
         // await Engine.wait(1000)
 
         let tween = new Tween({ x:0, y:40, z:-60, aperture: 1.8 })
-            .to({ x:0, y:20, z:-30, aperture: 3.5 }, 2000)
+            .to({ x:0, y:23, z:-30, aperture: 3.5 }, 2000)
             // .repeat(Infinity)
             // .yoyo(true)
             .ease(Ease.Sine.Out)
@@ -110,13 +110,11 @@ export default new Scene({
             .onComplete(async _ => {
                 // this.addWorker.setActive(true);
                 this.RTSCameraMovement.setActive(true);
-                this.RTSCameraMovement.moveTo(new THREE.Vector3(0, 20, -30));
+                this.RTSCameraMovement.moveTo(new THREE.Vector3(0, 23, -30));
                 // await Engine.wait(3000)
                 // this.RTSCameraMovement.disableControls();
                 // this.RTSCameraMovement.moveTo(new THREE.Vector3(0, 20, -30));
                 // this.RTSCameraMovement.setFovTo(30);
-
-                await Engine.wait(1000)
 
                 this.boss.arriveAtOffice();
             })

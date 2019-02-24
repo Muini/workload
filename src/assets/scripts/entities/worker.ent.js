@@ -9,7 +9,7 @@ import { Ease, Tween } from '../engine/classes/tween';
 import DomEntity from '../engine/classes/domEntity';
 
 import { Light } from './default/light.ent';
-// import { PaperBlock } from './paperBlock.ent';
+import { PaperBlock } from './paperBlock.ent';
 import { CashPile } from './cashPile.ent';
 import { Bonhomme } from './bonhomme.ent';
 
@@ -77,7 +77,11 @@ export class Worker extends Model {
 
         this.cashPile = new CashPile({
             parent: this,
-            position: new THREE.Vector3(Random.float(-0.25, -0.75), 0, Random.float(-0.1, 0.1))
+            position: new THREE.Vector3(Random.float(-0.25, -0.75), 0, 1.0 + Random.float(-0.1, 0.1))
+        });
+        this.paperBlock = new PaperBlock({
+            parent: this,
+            position: new THREE.Vector3(Random.float(-0.4, 0.5), 0, Random.float(-0.1, 0.1))
         });
 
         new Sound({
@@ -85,7 +89,7 @@ export class Worker extends Model {
             url: '/static/sounds/worker-papermove.m4a',
             parent: this,
             loop: false,
-            volume: 0.4,
+            volume: 0.3,
         });
 
         new Sound({
@@ -93,7 +97,7 @@ export class Worker extends Model {
             url: '/static/sounds/worker-working.m4a',
             parent: this,
             loop: true,
-            volume: 0.5,
+            volume: 0.4,
         });
 
 
@@ -117,10 +121,18 @@ export class Worker extends Model {
             this.deskBoss = await this.getChildModel('Desk_Model_Boss');
             this.deskBoss = this.deskBoss[0];
 
-            if (this.isTheBoss)
+            let papersNbr = Random.int(1, 5);
+
+            if (this.isTheBoss){
                 this.desk.visible = false;
-            else
+                papersNbr = Random.int(3, 8);
+                this.paperBlock.model.position.set(3.25, 0.0, 0.0);
+            }else{
                 this.deskBoss.visible = false;
+            }
+
+            while (papersNbr--)
+                this.paperBlock.addPaper()
 
             this.placeholder = await this.getChildModel('Placeholder');
             this.placeholder = this.placeholder[0];
@@ -224,8 +236,7 @@ export class Worker extends Model {
         //Anim in
         this.bonhomme.animator.play('ArriveAtWork', 0.0, false).then(_ => {
             this.turnScreenOn();
-            if(!this.isTheBoss)
-                this.startWorking();
+            this.startWorking();
             this.isOff = false;
         })
         this.bonhomme.arriveAtDesk();
@@ -269,7 +280,8 @@ export class Worker extends Model {
 
     working(delta) {
         this.timeElapsed += delta;
-        // this.animator.setSpeed(this.workingSpeed * this.happiness * 3.0)
+        this.bonhomme.animator.setSpeed(this.workingSpeed * this.happiness * 2.0)
+        // this.lights.get('Desk_Light').setColor(new THREE.Color(1, 0.1 + (0.9 * this.happiness), 0.1 + (0.9 * this.happiness)).getHexString())
         if (this.timeElapsed > (1000 / (this.workingSpeed * this.happiness))) {
             this.timeElapsed = 0;
             // this.papersCount--;
@@ -299,7 +311,7 @@ export class Worker extends Model {
         this.materials.get('Screen').params.emissiveIntensity = Random.float(8, 9);
         this.lights.get('Desk_Screen_Light').setPower(Random.float(40, 60));
 
-        if(!this.isWorking) return;
+        if(!this.isWorking || this.isTheBoss) return;
         // Is working !
         this.working(delta);
     }

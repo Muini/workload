@@ -25,6 +25,7 @@ export default class Animator {
             // this.instance.clipAction(clip);
             let action = new AnimationAction(this.instance, clip);
             action.weight = 0;
+            action.clampWhenFinished = true;
             this._actions.set(clip.name, action);
         });
 
@@ -45,7 +46,7 @@ export default class Animator {
                 return reject();
             };
 
-            // console.log('play action', action, fadeDuration, isLooping)
+            // console.log('play action', action._clip.name, this._currentAction ? this._currentAction._clip.name : '')
 
             action.setLoop(isLooping ? THREE.LoopRepeat : THREE.LoopOnce)
             
@@ -60,11 +61,9 @@ export default class Animator {
             else
                 action.fadeIn(fadeDuration);
 
-
             this._currentAction = action;
 
             this.instance.addEventListener('finished', _ => {
-                action.stop();
                 resolve();
             });
         })

@@ -13,7 +13,7 @@ export class PaperBlock extends Entity {
         this.name = 'paper_block';
 
         this.papers = [];
-        this.papersMax = 30;
+        this.papersMax = 8;
         this.papersNbr = 0;
         
         this.paperHeight = .12;
