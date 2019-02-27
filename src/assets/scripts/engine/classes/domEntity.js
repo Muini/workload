@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import Engine from '../core/engine';
 import Entity from './entity';
+import Data from '../utils/data';
+import Log from '../utils/log';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
 
@@ -13,6 +15,8 @@ export default class DomEntity extends Entity {
         this.selector = opt.selector || undefined;
         this.follow = opt.follow !== undefined ? opt.follow : false;
         this.dom = undefined;
+
+        this.data = opt.data || new Data({});
         
         this.isDomEntity = true;
         this.debug = opt.debug !== undefined ? opt.debug : false;
@@ -33,7 +37,10 @@ export default class DomEntity extends Entity {
 
         if (this.selector) {
             this.initialDom = document.querySelector(this.selector);
-            if (!this.initialDom) return log.push('error', this, `Initial dom element for domEntity ${this.name} with selector ${this.selector} was not found in template`);
+            if (!this.initialDom){
+                Log.push('error', this, `Initial dom element for domEntity ${this.name} with selector ${this.selector} was not found in template`);
+                return;
+            }
             this.dom = this.initialDom.cloneNode(true);
         }
 
@@ -75,21 +82,19 @@ export default class DomEntity extends Entity {
             // Parse Dom to look for data
             await this.parseDom();
             // Watch data
-            for (let data in this.data) {
-                this.data.watch(data, (id, oldval, newval) => {
-                    if (newval !== oldval) {
-                        if (!this.isLoader){
-                            Engine.waitNextTick().then(_ => {
-                                this.updateData(id);
-                            });
-                        }else{
-                            requestAnimationFrame(_ => {
-                                this.updateData(id);
-                            })
-                        }
+            this.data.onDataUpdate = (param, oldval, newval) => {
+                if (newval !== oldval) {
+                    if (!this.isLoader){
+                        Engine.waitNextTick().then(_ => {
+                            this.updateData(param);
+                        });
+                    }else{
+                        requestAnimationFrame(_ => {
+                            this.updateData(param);
+                        })
                     }
-                    return newval;
-                });
+                }
+                return newval;
             }
 
             if (!this.isLoader && Engine.container.contains(this.initialDom))
@@ -130,7 +135,6 @@ export default class DomEntity extends Entity {
                         await this.updateData(vars[v]);
                     }
                 }
-
             }
             // find class vars
             // TODO: Parse every attributes to find variables
@@ -143,7 +147,7 @@ export default class DomEntity extends Entity {
     }
 
     updateData(data) {
-        return (async() => {
+        return (async _ => {
             if (!this._vars[data] || !this.isActive) return;
             for (let i = 0; i < this._vars[data].length; i++) {
                 let phrase = this._vars[data][i].exp.replace(mustachRegEx, (value) => {

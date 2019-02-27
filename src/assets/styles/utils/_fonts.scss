@@ -1,41 +1,27 @@
-.ft {
-    font-family: sans-serif;
+.u-ft {
+    font-family: $ft-serif;
     font-weight: 400;
     font-display: swap;
-    &_serif {
-        font-family: serif;
-        font-weight: 400;
-        font-display: swap;
-    }
-    &_title {
-        // letter-spacing: .1em;
-        text-transform: uppercase;
-        // font-variant: small-caps;
-    }
     /* Sizes */
     &_small {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 13px, 16px);
-        line-height: 1.6em;
-    }
-    &_normal {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 14px, 20px);
-        line-height: 1.6em;
-    }
-    &_medium {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 16px, 24px);
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 12px, 16px);
         line-height: 1.5em;
     }
+    &_normal {
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 16px, 20px);
+        line-height: 1.5em;
+    }
+    &_medium {
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 18px, 26px);
+        line-height: 1.2em;
+    }
     &_big {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 20px, 32px);
-        line-height: 1.4em;
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 24px, 48px);
+        line-height: 1.1em;
     }
     &_verybig {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 24px, 36px);
-        line-height: 1.4em;
-    }
-    &_huge {
-        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 30px, 42px);
-        line-height: 1.2em;
+        @include fluid-type( $mq-min-width, $mq-xxlarge-min, 32px, 72px);
+        line-height: 1.1em;
     }
     /* Color */
     &_white {
@@ -79,6 +65,15 @@
                 background-color: $c-black;
             }
         }
+    }
+    &_green{
+        color: $c-green;
+    }
+    &_red{
+        color: $c-red;
+    }
+    &_purple{
+        color: $c-purple;
     }
     /* States */
     &_caps {

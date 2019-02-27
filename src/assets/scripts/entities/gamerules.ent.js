@@ -17,15 +17,35 @@ export class Gamerules extends Entity {
             costForNewWorker: 10, //in k€
             workerProductivity: 6, //in k€
             timeIsGoingOn: false,
+            dayTimeElapsed: 0,
             gameTimeElapsed: 0,
-            timeOfTheDay: 0, //from 0 to 23
-            lengthOfADay: 900, //in ms
+            lengthOfADay: 1000, //in ms
+            timeOfTheDay: function(){
+                return Math.floor(this.dayTimeElapsed / this.lengthOfADay * 24);
+            },
+            isNight: function(){
+                if(this.timeOfTheDay < 7 || this.timeOfTheDay > 19){
+                    return true
+                }else{
+                    return false
+                }
+            }
         });
-        // console.log("CONNARD", this.data);
 
-        this.data.compute('timeOfTheDay', (newval) => {
-            return Math.floor(this.data.gameTimeElapsed / this.data.lengthOfADay * 24);
-        });
+        console.log('gamerules data', this.data)
+
+        this.onNewTurn = opt.onNewTurn || function(){};
+    }
+
+    endTheDay(){
+        this.gatherMoney();
+        this.canRecruit = true;
+        this.data.timeIsGoingOn = false;
+    }
+
+    startTheDay(){
+        this.canRecruit = false;
+        this.data.timeIsGoingOn = true;
     }
 
     gatherMoney(){
@@ -43,17 +63,30 @@ export class Gamerules extends Entity {
         return (async () => {
             await super.awake();
             // Is fired when the scene is starting
-            this.data.timeIsGoingOn = true;
+
+            // this.data.timeIsGoingOn = true;
+
         })();
     }
 
     update(time, delta) {
         super.update(time, delta);
 
-        // if(this.data.timeIsGoingOn){
-            // this.data.gameTimeElapsed += delta;
-        // }
-        // console.log(this.data.gameTimeElapsed, this.data.timeOfTheDay)
+        this.data.gameTimeElapsed += delta;
+
+        if(!this.data.timeIsGoingOn) return;
+
+        // Time is going on
+        this.data.dayTimeElapsed += delta;
+
+        // New turn
+        // console.log(this.data, this.data.dayTimeElapsed, this.data.turn, this.data.timeOfTheDay())
+        if(this.data.timeOfTheDay() >= 24){
+            this.data.dayTimeElapsed = 0;
+            this.data.turn++;
+            if(typeof this.onNewTurn === 'function')
+                this.onNewTurn();
+        }
     }
 
 }

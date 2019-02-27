@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import UUID from '../utils/uuid';
 import Log from '../utils/log';
+import Data from '../utils/data';
 import MaterialManager from '../core/materialManager';
 
 let noiseTexture = new THREE.TextureLoader().load('/static/img/noise.png');
@@ -13,7 +14,7 @@ export default class Material {
 
         this.name = name || 'unnamed material';
 
-        this.params = {
+        this.params = new Data({
             color: opt.color || '999999',
             map: opt.map || null,
             roughness: opt.roughness || 1.0,
@@ -29,7 +30,7 @@ export default class Material {
             fog: opt.fog !== undefined ? opt.fog : true,
             sway: opt.sway || 0.0,
             doublesided: opt.doublesided !== undefined ? opt.doublesided : false,
-        }
+        })
 
         this.isInstanced = !isCloning;
 
@@ -67,7 +68,7 @@ export default class Material {
 
                 shader = this.modifyFogShader(shader);
                 
-                // shader = this.modifyShadowShader(shader);
+                shader = this.modifyShadowShader(shader);
 
                 this.instance.uniforms = shader.uniforms;
 
@@ -80,7 +81,7 @@ export default class Material {
 
                 shader = this.modifyFogShader(shader);
 
-                // shader = this.modifyShadowShader(shader);
+                shader = this.modifyShadowShader(shader);
 
                 this.instance.uniforms = shader.uniforms;
 
@@ -150,20 +151,18 @@ export default class Material {
     }
 
     watchChanges() {
-        for (let param in this.params) {
-            this.params.watch(param, (id, oldval, newval) => {
-                if (param === 'color' || param === 'emissive') {
-                    this.instance[param].setHex('0x' + newval);
-                } else if (param === 'opacity') {
-                    this.instance['transparent'] = newval < 1.0;
-                    this.instance[param] = newval;
-                } else if (param === 'doublesided') {
-                    this.instance['side'] = newval ? THREE.DoubleSide : THREE.FrontSide;
-                } else {
-                    this.instance[param] = newval;
-                }
-                // this.params[id] = newval;
-            })
+        this.params.onDataUpdate = (param, oldval, newval) => {
+            if (param === 'color' || param === 'emissive') {
+                this.instance[param].setHex('0x' + newval);
+            } else if (param === 'opacity') {
+                this.instance['transparent'] = newval < 1.0;
+                this.instance[param] = newval;
+            } else if (param === 'doublesided') {
+                this.instance['side'] = newval ? THREE.DoubleSide : THREE.FrontSide;
+            } else {
+                this.instance[param] = newval;
+            }
+            // this.params[id] = newval;
         }
     }
 

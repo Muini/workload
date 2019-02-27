@@ -85,7 +85,13 @@ export default class Animator {
     }
 
     pauseCurrent() {
+        if(!this._currentAction) return;
         this._currentAction.paused = true;
+    }
+
+    continueCurrent() {
+        if (!this._currentAction) return;
+        this._currentAction.paused = false;
     }
 
     setSpeed(speed){

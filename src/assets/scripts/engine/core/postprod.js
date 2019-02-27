@@ -127,7 +127,7 @@ export default class PostProd {
 
         //Bloom
         if (this.passes.bloom.enabled) {
-            this.bloom = new THREE.UnrealBloomPass(new THREE.Vector2(this.width, this.height), this.passes.bloom.options[0], this.passes.bloom.options[1], this.passes.bloom.options[2]); //1.0, 9, 0.5, 512);
+            this.bloom = new THREE.UnrealBloomPass(new THREE.Vector2(this.width / 4.0, this.height / 4.0), this.passes.bloom.options[0], this.passes.bloom.options[1], this.passes.bloom.options[2]); //1.0, 9, 0.5, 512);
             this.bloom.name = "Bloom";
         }
 
@@ -137,7 +137,7 @@ export default class PostProd {
             THREE.FilmicShader.defines.STATIC_NOISE = this.passes.filmic.useStaticNoise ? 1 : 0;
 
             this.filmic = new THREE.ShaderPass(THREE.FilmicShader);
-            this.filmic.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+            this.filmic.uniforms['resolution'].value = new THREE.Vector2(this.width / 2.0, this.height / 2.0);
 
             this.filmic.uniforms['noiseStrength'].value = this.passes.filmic.noise;
 
@@ -199,7 +199,7 @@ export default class PostProd {
             ];
 
             this.blur = new THREE.ShaderPass(THREE.BlurSharpenShader);
-            this.blur.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+            this.blur.uniforms['resolution'].value = new THREE.Vector2(this.width / 2.0, this.height / 2.0);
 
             this.blur.uniforms['blurPos'].value = this.blurPos;
 
@@ -245,15 +245,14 @@ export default class PostProd {
             this.bokeh.uniforms['tDiffuse'].value = this.renderTarget.texture;
             this.composer.addPass(this.bokeh);
         }
-        
+        if (this.passes.fxaa.enabled) {
+            this.composer.addPass(this.fxaa);
+        }
         if (this.passes.filmic.enabled) {
             this.composer.addPass(this.filmic);
         }
         if (this.passes.bloom.enabled) {
             this.composer.addPass(this.bloom);
-        }
-        if (this.passes.fxaa.enabled) {
-            this.composer.addPass(this.fxaa);
         }
         if (this.passes.blur.enabled) {
             this.composer.addPass(this.blur);
@@ -349,10 +348,10 @@ export default class PostProd {
             this.fxaa.uniforms['resolution'].value = new THREE.Vector2(1 / this.width, 1 / this.height);
         }
         if (this.passes.filmic.enabled) {
-            this.filmic.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+            this.filmic.uniforms['resolution'].value = new THREE.Vector2(this.width / 2.0, this.height / 2.0);
         }
         if (this.passes.blur.enabled) {
-            this.blur.uniforms['resolution'].value = new THREE.Vector2(this.width, this.height);
+            this.blur.uniforms['resolution'].value = new THREE.Vector2(this.width / 2.0, this.height / 2.0);
         }
 
     }

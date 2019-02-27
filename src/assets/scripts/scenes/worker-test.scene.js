@@ -17,7 +17,7 @@ import { Bonhomme } from '../entities/bonhomme.ent';
 export default new Scene({
     name: 'worker-test',
     data: {},
-    setup: function() {
+    onInit: function () {
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
@@ -79,7 +79,7 @@ export default new Scene({
             color: '0033ff',
             power: 20.0,
             fov: Math.PI / 10,
-            castShadow: true,
+            castShadow: false,
             shadowMapSize: 128,
             position: { x:-10, y: 2, z: -10 }
         })
@@ -115,45 +115,37 @@ export default new Scene({
 
         // Music : Le Perv - Carpender Brut
         this.timeElapsed = 0;
-        this.update = (time, delta) => {
-            this.camera.instance.rotation.z = Math.sin(time * 0.0011) * 0.1;
-            this.camera.instance.position.z = Math.sin(time * 0.001) * 0.75;
-
-            this.spotLight.instance.position.z = Math.sin(time * 0.001) * 2.0;
-            this.rimLight.instance.position.z = Math.sin(time * 0.0015) * 3.0;
-
-            this.rimLightColor.setHSL(Math.sin(time * 0.0002), 0.8, 0.5);
-            this.rimLight.setColor(this.rimLightColor.getHexString())
-
-            if(this.textMaterial)
-                this.textMaterial.emissiveIntensity = 50.0 + ((Math.sin(time * 0.005) * 5.0));
-
-            this.timeElapsed += delta;
-
-            this.bonhomme.model.rotation.y += 0.0005 * delta;
-
-            if (this.timeElapsed > 2000) {
-                this.bonhomme.generateRandomLook();
-                this.bonhomme.updateLook();
-                this.timeElapsed = 0;
-            }
-        }
-        this.update = this.update.bind(this);
         // this.update(0, 0);
 
     },
     onStart: async function () {
-        // TODO: Fix fatal error, addToUpdate add the function to the main loop which is execute whether the scene is or isn't loaded or awaked.
-        Engine.addToUpdate(this.uuid, this.update);
         this.bonhomme.setVisibility(true);
         // await Engine.wait(3000)
-
         this.bonhomme.animator.play('Salute', 0, true)
-        
-
     },
-    // TODO: create a onDestroy function to remove added update function to the main loop
+    onUpdate: function (time, delta){
+        this.camera.instance.rotation.z = Math.sin(time * 0.0011) * 0.1;
+        this.camera.instance.position.z = Math.sin(time * 0.001) * 0.75;
+
+        this.spotLight.instance.position.z = Math.sin(time * 0.001) * 2.0;
+        this.rimLight.instance.position.z = Math.sin(time * 0.0015) * 3.0;
+
+        this.rimLightColor.setHSL(Math.sin(time * 0.0002), 0.8, 0.5);
+        this.rimLight.setColor(this.rimLightColor.getHexString())
+
+        if (this.textMaterial)
+            this.textMaterial.emissiveIntensity = 50.0 + ((Math.sin(time * 0.005) * 5.0));
+
+        this.timeElapsed += delta;
+
+        this.bonhomme.model.rotation.y += 0.0005 * delta;
+
+        if (this.timeElapsed > 2000) {
+            this.bonhomme.generateRandomLook();
+            this.bonhomme.updateLook();
+            this.timeElapsed = 0;
+        }
+    }
     // onDestroy: async function(){
-    //     Engine.removeFromUpdate(this.uuid, this.update);
     // }
 });

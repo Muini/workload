@@ -10,8 +10,10 @@ export default class Scene {
     constructor(opt = {
         name,
         data,
-        setup,
+        onInit,
         onStart,
+        onUpdate,
+        onDestroy
     }) {
         this.uuid = UUID();
         this.name = opt.name || 'unamed scene';
@@ -20,8 +22,10 @@ export default class Scene {
             this.name = 'global2'
         }
         this.data = opt.data || {};
-        this.setup = opt.setup || function() {};
+        this.onInit = opt.onInit || function() {};
         this.onStart = opt.onStart || function() {};
+        this.onUpdate = opt.onUpdate || undefined;
+        this.onDestroy = opt.onDestroy || function() {};
 
         this.onPreloaded = function() {};
 
@@ -54,7 +58,7 @@ export default class Scene {
     // TODO: Create default setup with sky, sun, plane, all optionnal
     initScene() {
         return (async () => {
-            await this.setup();
+            await this.onInit();
             return;
         })();
     }
@@ -142,8 +146,8 @@ export default class Scene {
 
     start() {
         return (async _ => {
-            Engine.addToResize(this.uuid, this.resize.bind(this));
-            // this.resize();
+            this.resize = this.resize.bind(this)
+            Engine.addToResize(this.uuid, this.resize);
 
             await this.awakeEntities();
 
@@ -153,9 +157,12 @@ export default class Scene {
 
             this.isPlaying = true;
 
-            // Engine.waitNextTick().then(_ => {
             this.onStart();
-            // });
+
+            if(this.onUpdate !== undefined && typeof this.onUpdate === 'function'){
+                this.onUpdate = this.onUpdate.bind(this)
+                Engine.addToUpdate(this.uuid, this.onUpdate);
+            }
         })();
     }
 
@@ -170,7 +177,10 @@ export default class Scene {
         this.sounds.forEach(elem => elem.stop());
 
         this.isPlaying = false;
+
         Engine.removeFromResize(this.uuid);
+        if (this.onUpdate !== undefined && typeof this.onUpdate === 'function')
+            Engine.removeFromUpdate(this.uuid);
     }
 
     unload() {

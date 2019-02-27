@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import Engine from '../../engine/core/engine';
 import Entity from '../../engine/classes/entity';
+import Data from '../../engine/utils/data';
 import Log from '../../engine/utils/log';
 
 // TODO: make the camera virtual, only data driven. If active, it updates the scene camera
@@ -9,14 +10,14 @@ export class Camera extends Entity {
     constructor(opt = {}) {
         super(opt);
 
-        this.params = {
+        this.params = new Data({
             near: opt.near || 1.0,
             far: opt.far || 1000.0,
             focalLength: opt.focalLength || 30,
             aperture: opt.aperture || 2.8,
             focus: opt.focus || 100.0,
             threshold: 0.01,
-        }
+        })
 
         //Init variables
         this.name = 'Camera controller';
@@ -38,15 +39,13 @@ export class Camera extends Entity {
     }
 
     watchParams(){
-        for(const param in this.params){
-            this.params.watch(param, (item, oldval, newval) => {
-                if(item == 'focalLength'){
-                    this.instance.setFocalLength(newval);
-                }else{
-                    this.instance[item] = newval;
-                }
-                this.updateBokehShader(item);
-            });
+        this.params.onDataUpdate = (item, oldval, newval) => {
+            if (item == 'focalLength') {
+                this.instance.setFocalLength(newval);
+            } else {
+                this.instance[item] = newval;
+            }
+            this.updateBokehShader(item);
         }
     }
 

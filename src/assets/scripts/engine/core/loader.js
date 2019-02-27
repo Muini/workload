@@ -1,20 +1,20 @@
 import Engine from './engine';
 import DomEntity from '../classes/domEntity';
+import Data from '../utils/data';
 
 class Loader extends DomEntity {
     constructor() {
         super({
-            selector: '.loader'
+            selector: '.loader',
+            data: new Data({
+                percentage: 0,
+                chunkLoaded: 0,
+                chunkToLoad: 0,
+                chunkPercentage: 0,
+            })
         });
 
         this.isLoader = true;
-
-        this.data = {
-            percentage: 0,
-            chunkLoaded: 0,
-            chunkToLoad: 0,
-            chunkPercentage: 0,
-        }
 
         this.dom = this.initialDom;
 

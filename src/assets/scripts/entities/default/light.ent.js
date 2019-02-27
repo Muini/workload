@@ -65,6 +65,8 @@ export class Light extends Entity{
                 break;
         }
         this.instance.name = this.name;
+        if(this.instance.shadow)
+            this.instance.shadow.bias = 0.0001;
 
         if (!this.instance.isHemisphereLight){
             this.instance.shadow.mapSize.y = this.params.shadowMapSize / Quality.settings.shadows.resolutionDivider;

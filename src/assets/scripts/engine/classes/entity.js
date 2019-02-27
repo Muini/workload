@@ -20,7 +20,6 @@ export default class Entity {
 
         this.sounds = new Map();
         this.lights = new Map();
-        // this.data = new Data();
 
         this.isStatic = false;
         this.isActive = opt.active === undefined ? true : opt.active;

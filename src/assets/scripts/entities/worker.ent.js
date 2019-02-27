@@ -7,6 +7,7 @@ import Model from '../engine/classes/model';
 import Random from '../engine/utils/random';
 import { Ease, Tween } from '../engine/classes/tween';
 import DomEntity from '../engine/classes/domEntity';
+import Data from '../engine/utils/data';
 
 import { Light } from './default/light.ent';
 import { PaperBlock } from './paperBlock.ent';
@@ -67,7 +68,9 @@ export class Worker extends Model {
         this.timeElapsed = 0;
 
         this.isPlaceholder = this.isTheBoss ? false : true;
+        this.canRecruitWorker = false;
         this.isWorking = false;
+        this.isPaused = true;
         this.isOff = this.isTheBoss ? false : true;
         this.isDead = false;
 
@@ -101,14 +104,17 @@ export class Worker extends Model {
         });
 
 
-        this.addWorker = new DomEntity({
+        this.workerUtils = new DomEntity({
             parent: this,
-            selector: '.hud-add-worker',
-            name: 'Add Worker',
-            debug: false,
+            selector: '.worker-utils',
+            name: 'Worker Utils',
+            data: new Data({
+                isRecruited: false
+            }),
+            debug: true,
             follow: true,
             position: new THREE.Vector3(0, 4, 0),
-            active: this.isTheBoss ? false : true,
+            active: false,
         });
     }
 
@@ -118,13 +124,14 @@ export class Worker extends Model {
 
             this.desk = await this.getChildModel('Desk_Model');
             this.desk = this.desk[0];
+            this.desk.visible = false;
+
             this.deskBoss = await this.getChildModel('Desk_Model_Boss');
             this.deskBoss = this.deskBoss[0];
 
             let papersNbr = Random.int(1, 5);
-
+            
             if (this.isTheBoss){
-                this.desk.visible = false;
                 papersNbr = Random.int(3, 8);
                 this.paperBlock.model.position.set(3.25, 0.0, 0.0);
             }else{
@@ -144,13 +151,16 @@ export class Worker extends Model {
             this.model.position.y -= 3;
             this.placeholder.position.y += 3;
             
-            this.addWorker.onClick = _ => {
-                this.recruit();
+            this.workerUtils.onClick = _ => {
+                if(!this.workerUtils.data.isRecruited)
+                    this.recruit();
             }
-            this.addWorker.onHover = _ => {
+            this.workerUtils.onHover = _ => {
+                if(this.workerUtils.data.isRecruited) return;
                 this.isHoveringPlaceholder = true;
             }
-            this.addWorker.onOutHover = _ => {
+            this.workerUtils.onOutHover = _ => {
+                if (this.workerUtils.data.isRecruited) return;
                 this.isHoveringPlaceholder = false;
             }
 
@@ -179,8 +189,26 @@ export class Worker extends Model {
     //     this.die();
     // }
 
+    pause(){
+        this.isPaused = true;
+        this.bonhomme.animator.pauseCurrent();
+    }
+
+    continue(){
+        this.bonhomme.animator.continueCurrent();
+        this.isPaused = false;
+    }
+
+    canRecruit(bool){
+        if (!this.isPlaceholder) return;
+        this.workerUtils.setVisibility(bool);
+        this.canRecruitWorker = bool;
+    }
+
     recruit() {
-        this.addWorker.setActive(false);
+        if(!this.canRecruitWorker) return;
+        // this.workerUtils.setActive(false);
+        this.workerUtils.data.isRecruited = true;
         this.isPlaceholder = false;
         // Anim out placeholder
         this.materials.get('Placeholder').params.emissiveIntensity = 6.0;
@@ -198,6 +226,7 @@ export class Worker extends Model {
         .onComplete(_ => {
             // Remove placeholder
             this.placeholder.visible = false;
+            this.desk.visible = true;
             this.lights.get('Desk_Spot').setVisibility(true);
             deskAnimIn.start();
         })
@@ -222,8 +251,11 @@ export class Worker extends Model {
         placeholderAnimOut.start();
     }
 
+    assignNewWorkHours(startHour, endHour){}
+
     leaveOffice(){
         this.stopWorking();
+        this.sounds.get('working').stop();
         this.turnScreenOff();
         //Anim out
         this.bonhomme.leaveFromDesk();
@@ -232,14 +264,19 @@ export class Worker extends Model {
     }
 
     arriveAtOffice(){
-        this.turnLightsOn();
-        //Anim in
-        this.bonhomme.animator.play('ArriveAtWork', 0.0, false).then(_ => {
-            this.turnScreenOn();
-            this.startWorking();
-            this.isOff = false;
+        return new Promise((resolve, reject) => {
+            this.turnLightsOn();
+            //Anim in
+            this.bonhomme.animator.play('ArriveAtWork', 0.0, false).then(_ => {
+                this.turnScreenOn();
+                // Worker will wait a bit before start working ?
+                // await Engine.wait(100 - (100 * this.happiness))
+                this.startWorking();
+                this.isOff = false;
+                resolve();
+            })
+            this.bonhomme.arriveAtDesk();
         })
-        this.bonhomme.arriveAtDesk();
     }
 
     turnScreenOn(){
@@ -264,7 +301,7 @@ export class Worker extends Model {
     }
 
     startWorking() {
-        if (this.isWorking) return;
+        if (this.isWorking || this.isOff || this.isPlaceholder) return;
         this.isWorking = true;
         this.sounds.get('working').setRate(1.0 + (this.happiness / 10.));
         this.sounds.get('working').play();
@@ -272,9 +309,9 @@ export class Worker extends Model {
     }
 
     stopWorking() {
-        if (!this.isWorking) return;
+        if (!this.isWorking || this.isOff || this.isPlaceholder) return;
         this.bonhomme.animator.stop('Working', 0.1); //Temp
-        this.sounds.get('working').stop();
+        this.sounds.get('working').pause();
         this.isWorking = false;
     }
 
@@ -296,7 +333,7 @@ export class Worker extends Model {
         super.update(time, delta);
 
         if (this.isPlaceholder) {
-            this.materials.get('Placeholder').params.emissiveIntensity = (this.isHoveringPlaceholder ? 1.0 : 0.0) + (Math.sin(time * 0.001) * 0.1);
+            this.materials.get('Placeholder').params.emissiveIntensity = (this.isHoveringPlaceholder ? 1.0 : 0.0) + (Math.sin(time * 0.001 * (this.canRecruitWorker ? 3.0 : 1.0)) * 0.1);
             return;
         }
 
@@ -304,6 +341,9 @@ export class Worker extends Model {
             this.lights.get('Desk_Screen_Light').setPower(Random.float(40, 60));
             return;
         }
+
+        // Player is in new turn
+        if(this.isPaused) return;
 
         // I'm off ! Yeay !
         if(this.isOff) return;

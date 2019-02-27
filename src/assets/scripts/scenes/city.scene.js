@@ -25,7 +25,7 @@ import { BlurDom } from '../entities/default/blur.dom.ent';
 export default new Scene({
     name: 'city',
     data: {},
-    setup: function() {
+    onInit: function() {
         // Create & Add camera
         this.camera = new Camera({
             parent: this,
@@ -149,18 +149,8 @@ export default new Scene({
             volume: 0.4,
         });
 
-        this.startButton = new BlurDom({
-            selector: '.btn-start',
-            parent: this,
-            active: false,
-        })
         this.title = new BlurDom({
             selector: '.title',
-            parent: this,
-            active: false
-        });
-        this.subtitle = new BlurDom({
-            selector: '.subtitle',
             parent: this,
             active: false
         });
@@ -219,7 +209,8 @@ export default new Scene({
                 SceneManager.next();
             });
 
-        this.startButton.onClick = async e => {
+        this.title.onClick = async e => {
+            if (e.target.nodeName != 'A') return;
             if(!Log.debug){
                 const i = document.documentElement;
                 if (i.requestFullscreen) {
@@ -233,22 +224,15 @@ export default new Scene({
                 }
             }
             this.simpleCameraMovement.disableControls();
-            this.startButton.setActive(false);
+            this.title.setActive(false);
             tween2.start();
             await Engine.wait(1000);
-            this.subtitle.setVisibility(false);
-            await Engine.wait(300);
-            this.title.setVisibility(false);
         }
 
         await Engine.wait(1000);
         tween.start();
         await Engine.wait(1000);
         this.title.setActive(true);
-        await Engine.wait(2000);
-        this.subtitle.setActive(true);
-        await Engine.wait(2000);
-        this.startButton.setActive(true);
 
         this.simpleCameraMovement.enableControls();
 

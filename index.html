@@ -59,27 +59,44 @@
 <body>
     <main id="main" role="main">
         <section id="film">
+
             <section class="hud loader">
                 <div class="animation">
                     <div class="bar"><span class="progress"></span></div>
                 </div>
                 <div class="percent">{{ percentage }}%</div>
             </section>
-            <div class="hud hud-add-worker">
-                <p class="c-btn"><svg x="0px" y="0px" viewBox="0 0 100 125" enable-background="new 0 0 100 100" xml:space="preserve"><path d="M35.918,50.153c7.043,0,12.753-6.77,12.753-15.122c0-8.35-5.71-12.914-12.753-12.914s-12.753,4.564-12.753,12.914  C23.165,43.384,28.875,50.153,35.918,50.153z M50.808,57.316H21.028C14.938,57.316,10,62.253,10,68.346v12.466  c27.214,20.674,51.836,0,51.836,0V68.346C61.836,62.253,56.897,57.316,50.808,57.316z M77.104,35.562V22.667h-4.876v12.896H59.333  v4.875h12.896v12.896h4.876V40.438H90v-4.875H77.104z"/></svg></p>
-            </div>
-            <div class="hud hud-test">
-                <p>Score : {{ score }}</p>
-            </div>
+            
             <div class="hud title">
-                <h1>Workload</h1>
+                <h1 class="u-ft u-ft_verybig u-ft_white">Workload</h1>
+                <p class="u-ft u-ft_normal u-ft_white">A game by <span>Corentin Flach</span></p>
+                <a class="u-ft u-ft_normal u-ft_white c-btn">Start</a>
             </div>
-            <div class="hud subtitle">
-                <p>A game by <span>Corentin FLACH</span></p>
+
+            <div class="hud worker-utils u-ft_normal">
+                <div class="c-btn">
+                    <div class="add-worker">
+                        <svg x="0px" y="0px" viewBox="0 0 100 125" enable-background="new 0 0 100 100" xml:space="preserve"><path d="M35.918,50.153c7.043,0,12.753-6.77,12.753-15.122c0-8.35-5.71-12.914-12.753-12.914s-12.753,4.564-12.753,12.914  C23.165,43.384,28.875,50.153,35.918,50.153z M50.808,57.316H21.028C14.938,57.316,10,62.253,10,68.346v12.466  c27.214,20.674,51.836,0,51.836,0V68.346C61.836,62.253,56.897,57.316,50.808,57.316z M77.104,35.562V22.667h-4.876v12.896H59.333  v4.875h12.896v12.896h4.876V40.438H90v-4.875H77.104z"/></svg>
+                    </div>
+                    <div class="select-hours">
+                        <svg></svg>
+                    </div>
+                </div>
+                <div class="c-slider">
+                    
+                </div>
             </div>
-            <div class="hud btn-start">
-                <a class="c-btn">Start</a>
+            <div class="hud current-status u-ft">
+                <p class="u-ft_normal u-ft_white">Day {{ currentDay }}</p>
+                <p class="u-ft_verybig u-ft_white"><span class="u-ft_green">{{ currentMoney }}</span> k$</p>
+                <p class="u-ft_normal u-ft_white"><span class="u-ft_purple">{{ wokersNbr }}</span> employes</p>
             </div>
+            <div class="hud next-status u-ft">
+                <p class="u-ft_normal u-ft_white">Next costs</p>
+                <p class="u-ft_verybig u-ft_white"><span class="u-ft_red">-{{ nextCosts }}</span> k$</p>
+                <p class="u-ft_normal u-ft_white"><span class="u-ft_purple">+{{ recruitNbr }}</span> employes</p>
+            </div>
+
         </section>
     </main>
     <!-- built files will be auto injected -->

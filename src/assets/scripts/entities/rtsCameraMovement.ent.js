@@ -76,7 +76,7 @@ export class RTSCameraMovement extends Entity {
         if(this.canMove){
             this.target.fov -= Input.mouse.wheelDelta * this.sensitivity / 100;
             if(this.target.fov <= 12) this.target.fov = 12;
-            if(this.target.fov >= 30) this.target.fov = 30;
+            if(this.target.fov >= 20) this.target.fov = 20;
             if(this.isDown){
                 this.target.position.z += (Input.mouse.y - this.lastPos.y) * this.sensitivity / 10
                 this.target.position.x += (Input.mouse.x - this.lastPos.x) * this.sensitivity / 10

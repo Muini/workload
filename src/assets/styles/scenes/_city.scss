@@ -1,25 +1,16 @@
 .hud{
     &.title {
-        @include fluid-type($mq-min-width, $mq-xxlarge-min, 30px, 60px);
         top: 8vw;
         left: 8vw;
-        color: white;
-        font-family: 'Quattrocento', serif;
         padding-bottom: .1em;
         text-align: left;
     }
 
     &.subtitle {
-        @include fluid-type($mq-min-width, $mq-xxlarge-min, 14px, 22px);
         left: 8vw;
         top: 8vw;
         transform: translateY(5vw);
-        
-        color: white;
-        font-family: 'Quattrocento', serif;
-        line-height: 1.4em;
         text-align: left;
-
         span {
             // color: orange
         }
@@ -29,11 +20,7 @@
         left: 8vw;
         top: 8vw;
         transform: translateY(9vw);
-
         a {
-            @include fluid-type($mq-min-width, $mq-xxlarge-min, 14px, 22px); // width: 100%;
-            color: white;
-            font-family: 'Quattrocento', serif;
             text-align: left;
         }
     }

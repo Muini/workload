@@ -1,5 +1,16 @@
 $c-white: #ffffff;
 $c-black: #000000;
-$c-gray: #333;
-$c-lightgray: #777;
+$c-gray: #333333;
+$c-lightgray: #777777;
 $c-blue: #4989dd;
+$c-green: #9cd45b;
+$c-purple: #b27cdf;
+$c-red: #d4695b;
+
+$ft-serif: 'Quattrocento', serif;
+
+$site-base: 1;
+$space-s: calc(#{$site-base}vh + #{$site-base}vw);
+$space-m: calc(#{$site-base * 2}vh + #{$site-base * 2}vw);
+$space-l: calc(#{$site-base * 4}vh + #{$site-base * 4}vw);
+$space-xl: calc(#{$site-base * 8}vh + #{$site-base * 8}vw);

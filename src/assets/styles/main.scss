@@ -42,22 +42,7 @@ body {
     z-index: 2;
     top: 0;
     left: 0;
-    // background-color: rgba(255, 255, 255, 0.1);
     user-select: none;
-}
-
-.hud-test {
-    position: absolute;
-    left: 40%;
-    bottom: 28%;
-    z-index: 1;
-    transform: translate(-50%, -50%);
-    color: rgba(255, 255, 255, .8);
-    @include fluid-type( $mq-min-width, $mq-xxlarge-min, 12px, 22px);
-    font-weight: 300;
-    padding: .5em 1em;
-    // border-right: 2px solid rgba(255, 255, 255, .8);
-    // background: rgba(10, 30, 50, .4);
 }
 
 ::selection {

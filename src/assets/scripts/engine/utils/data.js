@@ -1,35 +1,16 @@
-import Log from './log';
+// import Log from './log';
+// import '../utils/watch-polyfill';
+import WatchJS from 'melanke-watchjs';
+const watch = WatchJS.watch;
 
-export default class Data {
-    constructor(data = {}) {
-        // TODO: Data class that handles datas through the engine. Can be used in object / scenes & global app
-        
-        this._updateFct = {};
+export default function Data(data){
 
-        // this.onDataUpdate = this.onDataUpdate.bind(this);
-        for(let dataName in data){
-            // console.log(dataName, data[dataName]);
-            this[dataName] = data[dataName];
-            this.watch(dataName, this.onDataUpdate)
-            // this.data.updateFct[data] = function (){};
-        }
+    data.onDataUpdate = function(param, oldval, newval){};
 
-        // console.log(this);
-    }
+    watch(data, (name, type, newval, oldval) => {
+        if(typeof data.onDataUpdate === 'function')
+        data.onDataUpdate(name, oldval, newval);
+    });
 
-    onDataUpdate(data, oldval, newval){
-        // console.log('data update', data, oldval, newval);
-        if (typeof this._updateFct[data] === 'function') {
-            data = this._updateFct[data](newval);
-        }else{
-            data = newval;
-        }
-    }
-
-    compute(data, fct){
-        // console.log('compute', data, fct);
-        // if (!this.data[data]) return Log.push('error', this.constructor.name, `Data ${data} is not existing`);
-        this._updateFct[data] = fct;
-    }
-
+    return data
 }

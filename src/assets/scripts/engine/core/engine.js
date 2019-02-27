@@ -8,7 +8,6 @@ import PostProd from './postprod';
 import SceneManager from './sceneManager';
 import SoundManager from './soundManager';
 
-import '../utils/watch-polyfill';
 import UUID from '../utils/uuid';
 
 class Engine {
@@ -115,8 +114,8 @@ class Engine {
 
             if (this.hasPostProd) {
                 this.postprod = await new PostProd({
-                    width: this.width,
-                    height: this.height,
+                    width: this.width / 1.5,
+                    height: this.height / 1.5,
                     pixelDensity: this.pixelDensity,
                     camera: this.mainCamera,
                     scene: undefined,
@@ -134,7 +133,7 @@ class Engine {
                             // noise: 0.05, 
                             noise: 0.1, 
                             useStaticNoise: true,
-                            rgbSplit: Quality.score > 400 ? 6.0 : 0.0, //30
+                            rgbSplit: 6.0, //30
                             // vignette: Quality.score >= 1000 ? 20.0 : 0.0,
                             vignette: 30.0,
                             // vignetteOffset: 0.15,

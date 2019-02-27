@@ -1,22 +1,17 @@
-.hud{
-    &-add-worker {
-        @include fluid-type($mq-min-width, $mq-xxlarge-min, 14px, 22px); // width: 100%;
-        color: white;
-        font-family: 'Quattrocento', serif;
-        p{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 2.5em;
-            height: 2.5em;
-            border-radius: 100%;
-            padding: 0;
-            svg{
-                width: 70%;
-                height: 70%;
-                fill: white;
-                transform: translate(10%, 10%)
-            }
+.worker-utils {
+    p{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 2.5em;
+        height: 2.5em;
+        border-radius: 100%;
+        padding: 0;
+        svg{
+            width: 70%;
+            height: 70%;
+            fill: white;
+            transform: translate(10%, 10%)
         }
     }
 }
