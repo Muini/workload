@@ -63,9 +63,6 @@ export class Gamerules extends Entity {
         return (async () => {
             await super.awake();
             // Is fired when the scene is starting
-
-            // this.data.timeIsGoingOn = true;
-
         })();
     }
 

@@ -12,6 +12,7 @@ export default class Entity {
         position,
         rotation,
         active,
+        visible,
     }) {
         this.uuid = UUID();
         this.name = opt.name || 'unnamed entity';
@@ -23,7 +24,7 @@ export default class Entity {
 
         this.isStatic = false;
         this.isActive = opt.active === undefined ? true : opt.active;
-        this.isVisible = false;
+        this.isVisible = opt.visible === undefined ? true: opt.visible;
 
         this.isEntity = true;
 

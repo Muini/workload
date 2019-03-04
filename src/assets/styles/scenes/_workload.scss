@@ -1,5 +1,5 @@
 .worker-utils {
-    p{
+    .c-btn {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -8,10 +8,13 @@
         border-radius: 100%;
         padding: 0;
         svg{
+            position: absolute;
+            top: 50%;
+            left: 50%;
             width: 70%;
             height: 70%;
             fill: white;
-            transform: translate(10%, 10%)
+            transform: translate(-50%, -50%) translate(10%, 10%)
         }
     }
 }

@@ -56,24 +56,26 @@ export default class DomEntity extends Entity {
     setVisibility(bool) {
         super.setVisibility(bool);
         if (!this.dom) return;
-        if (bool) {
-            if (!this.isLoader) {
-                Engine.waitNextTick().then(_ => {
-                    this.dom.style['display'] = bool ? 'flex' : 'none';
-                });
-            } else {
-                requestAnimationFrame(_ => {
-                    this.dom.style['display'] = bool ? 'flex' : 'none';
-                });
-            }
-
-        } else {
-            this.dom.style['display'] = bool ? 'flex' : 'none';
+        this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+        if(bool == false){
+            this.dom.classList.add('is-hidden')
+        }else{
+            this.dom.classList.remove('is-hidden')
         }
     }
 
     setActive(bool) {
         super.setActive(bool);
+        if (!this.dom) return;
+        if (!this.isLoader) {
+            Engine.waitNextTick().then(_ => {
+                this.dom.style['display'] = bool ? 'flex' : 'none';
+            });
+        } else {
+            requestAnimationFrame(_ => {
+                this.dom.style['display'] = bool ? 'flex' : 'none';
+            });
+        }
     }
 
     created() {
@@ -96,6 +98,9 @@ export default class DomEntity extends Entity {
                 }
                 return newval;
             }
+
+            this.setActive(this.isActive);
+            this.setVisibility(this.isVisible);
 
             if (!this.isLoader && Engine.container.contains(this.initialDom))
                 Engine.container.removeChild(this.initialDom);

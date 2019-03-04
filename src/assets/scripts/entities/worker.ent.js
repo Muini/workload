@@ -111,10 +111,11 @@ export class Worker extends Model {
             data: new Data({
                 isRecruited: false
             }),
-            debug: true,
+            // debug: true,
             follow: true,
             position: new THREE.Vector3(0, 4, 0),
-            active: false,
+            active: true,
+            visible: false,
         });
     }
 
@@ -134,6 +135,7 @@ export class Worker extends Model {
             if (this.isTheBoss){
                 papersNbr = Random.int(3, 8);
                 this.paperBlock.model.position.set(3.25, 0.0, 0.0);
+                this.workerUtils.setActive(false);
             }else{
                 this.deskBoss.visible = false;
             }
