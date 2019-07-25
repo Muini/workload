@@ -9,8 +9,23 @@ export default function Data(data){
 
     watch(data, (name, type, newval, oldval) => {
         if(typeof data.onDataUpdate === 'function')
-        data.onDataUpdate(name, oldval, newval);
+            data.onDataUpdate(name, oldval, newval);
     });
+
+    /*let test = {};
+
+    for(let key in data){
+        Object.assign(test, {
+            get [key](){
+                return data[key]
+            },
+            set [key](val){
+                console.log('you set the', key, 'to', val)
+                data[key] = val;
+            }
+        });
+    }*/
+    // console.log(test);
 
     return data
 }

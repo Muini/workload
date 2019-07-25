@@ -114,8 +114,8 @@ class Engine {
 
             if (this.hasPostProd) {
                 this.postprod = await new PostProd({
-                    width: this.width / 1.5,
-                    height: this.height / 1.5,
+                    width: this.width,
+                    height: this.height,
                     pixelDensity: this.pixelDensity,
                     camera: this.mainCamera,
                     scene: undefined,

@@ -1,27 +1,39 @@
 .hud{
     &.title {
-        top: 8vw;
-        left: 8vw;
+        top: 50%;
+        left: 50%;
         padding-bottom: .1em;
-        text-align: left;
-    }
+        text-align: center;
+        transform: translate(-50%, -50%);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
 
-    &.subtitle {
-        left: 8vw;
-        top: 8vw;
-        transform: translateY(5vw);
-        text-align: left;
-        span {
-            // color: orange
+        h1{
+            margin-bottom: .05em;
+            transition: opacity 3225ms linear, transform 3225ms $easeOutExpo;
+        }
+        p{
+            margin-bottom: 2em;
+            transition: opacity 3225ms linear, transform 3225ms $easeOutExpo;
+            transition-delay: 1225ms;
+        }
+        .c-btn{
+            width: 5em;
+            transition: opacity 1225ms linear, transform 1225ms $easeOutExpo;
+            transition-delay: 4225ms;
         }
     }
 
-    &.btn-start {
-        left: 8vw;
-        top: 8vw;
-        transform: translateY(9vw);
-        a {
-            text-align: left;
+
+    &.is-hidden{
+        h1,p,.c-btn{
+            opacity: 0;
+            transform: translateY(-.5em);
+            transition-duration: 1225ms;
+            transition-delay: 0ms;
+            transition-timing-function: $easeInExpo;
         }
+
     }
 }

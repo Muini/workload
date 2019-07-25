@@ -5,6 +5,7 @@ import Data from '../utils/data';
 import Log from '../utils/log';
 
 const mustachRegEx = new RegExp(/{{\s*[\w\.]+\s*}}/g);
+const mustachInHtmlRegEx = new RegExp(/<[^>]*>\s*{{\s*[\w\.]+\s*}}\s*<[^>]*>/g);
 
 export default class DomEntity extends Entity {
     constructor(opt) {
@@ -56,7 +57,7 @@ export default class DomEntity extends Entity {
     setVisibility(bool) {
         super.setVisibility(bool);
         if (!this.dom) return;
-        this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
+        // this.dom.style['visibility'] = bool ? 'visible' : 'hidden';
         if(bool == false){
             this.dom.classList.add('is-hidden')
         }else{
@@ -99,9 +100,6 @@ export default class DomEntity extends Entity {
                 return newval;
             }
 
-            this.setActive(this.isActive);
-            this.setVisibility(this.isVisible);
-
             if (!this.isLoader && Engine.container.contains(this.initialDom))
                 Engine.container.removeChild(this.initialDom);
 
@@ -113,6 +111,7 @@ export default class DomEntity extends Entity {
     awake() {
         return (async() => {
             await super.awake();
+
             if(!this.isLoader)
                 Engine.container.appendChild(this.dom);
         })();
@@ -123,7 +122,7 @@ export default class DomEntity extends Entity {
             // find text vars
             let texts = await this.dom.querySelectorAll('p,div,span');
             for (let i = 0; i < texts.length; i++) {
-                let data = texts[i].textContent;
+                let data = texts[i].innerHTML.replace(mustachInHtmlRegEx, "");
                 let vars = data.match(mustachRegEx);
                 if (vars) {
                     vars = vars.map(function(x) {
@@ -144,8 +143,6 @@ export default class DomEntity extends Entity {
             // find class vars
             // TODO: Parse every attributes to find variables
             // let classes = await this.dom.querySelectorAll('*[]');
-            
-            // console.log(texts, this._vars);
 
             this._shouldUpdateVars = true;
         })();

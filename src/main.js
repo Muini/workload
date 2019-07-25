@@ -53,6 +53,6 @@ if ('serviceWorker' in navigator) {
 // Load fonts
 WebFont.load({
     google: {
-        families: ['Open Sans', 'Quattrocento']
+        families: [/*'Open Sans', */'Quattrocento']
     }
 });

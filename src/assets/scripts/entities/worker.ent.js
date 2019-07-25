@@ -76,7 +76,7 @@ export class Worker extends Model {
 
         this.numberOfWorkingHours = 8.0; // 8 hours per day. Up to 24 !
         this.workingSpeed = 1.0; // Will depend on happiness
-        this.happiness = 0.5;
+        this.happiness = Random.float(0.4, 0.6);
 
         this.cashPile = new CashPile({
             parent: this,
@@ -92,7 +92,15 @@ export class Worker extends Model {
             url: '/static/sounds/worker-papermove.m4a',
             parent: this,
             loop: false,
-            volume: 0.3,
+            volume: 0.4,
+        });
+
+        new Sound({
+            name: 'click',
+            url: '/static/sounds/click.m4a',
+            parent: this,
+            loop: false,
+            volume: 0.6,
         });
 
         new Sound({
@@ -100,7 +108,7 @@ export class Worker extends Model {
             url: '/static/sounds/worker-working.m4a',
             parent: this,
             loop: true,
-            volume: 0.4,
+            volume: 0.5,
         });
 
 
@@ -154,6 +162,7 @@ export class Worker extends Model {
             this.placeholder.position.y += 3;
             
             this.workerUtils.onClick = _ => {
+                this.sounds.get('click').play();
                 if(!this.workerUtils.data.isRecruited)
                     this.recruit();
             }
@@ -194,11 +203,15 @@ export class Worker extends Model {
     pause(){
         this.isPaused = true;
         this.bonhomme.animator.pauseCurrent();
+        if(this.isWorking)
+            this.sounds.get('working').pause();
     }
 
     continue(){
         this.bonhomme.animator.continueCurrent();
         this.isPaused = false;
+        if (this.isWorking)
+            this.sounds.get('working').play();
     }
 
     canRecruit(bool){
@@ -209,7 +222,7 @@ export class Worker extends Model {
 
     recruit() {
         if(!this.canRecruitWorker) return;
-        // this.workerUtils.setActive(false);
+        this.workerUtils.setActive(false);
         this.workerUtils.data.isRecruited = true;
         this.isPlaceholder = false;
         // Anim out placeholder
@@ -273,8 +286,8 @@ export class Worker extends Model {
                 this.turnScreenOn();
                 // Worker will wait a bit before start working ?
                 // await Engine.wait(100 - (100 * this.happiness))
-                this.startWorking();
                 this.isOff = false;
+                this.startWorking();
                 resolve();
             })
             this.bonhomme.arriveAtDesk();
@@ -306,13 +319,17 @@ export class Worker extends Model {
         if (this.isWorking || this.isOff || this.isPlaceholder) return;
         this.isWorking = true;
         this.sounds.get('working').setRate(1.0 + (this.happiness / 10.));
-        this.sounds.get('working').play();
+        if (!this.isPaused)
+            this.sounds.get('working').play();
         this.bonhomme.animator.play('Working', 0.6, true); //Temp
+        if (this.isPaused)
+            this.bonhomme.animator.pauseCurrent();
     }
 
     stopWorking() {
         if (!this.isWorking || this.isOff || this.isPlaceholder) return;
         this.bonhomme.animator.stop('Working', 0.1); //Temp
+        // this.bonhomme.animator.pauseCurrent();
         this.sounds.get('working').pause();
         this.isWorking = false;
     }
@@ -353,7 +370,7 @@ export class Worker extends Model {
         this.materials.get('Screen').params.emissiveIntensity = Random.float(8, 9);
         this.lights.get('Desk_Screen_Light').setPower(Random.float(40, 60));
 
-        if(!this.isWorking || this.isTheBoss) return;
+        if (!this.isWorking || this.isTheBoss) return;
         // Is working !
         this.working(delta);
     }

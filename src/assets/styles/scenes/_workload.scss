@@ -1,4 +1,6 @@
 .worker-utils {
+    transform: scale(1);
+    transition: visibility 625ms, transform 625ms $easeOutExpo;
     .c-btn {
         display: flex;
         justify-content: center;
@@ -15,6 +17,56 @@
             height: 70%;
             fill: white;
             transform: translate(-50%, -50%) translate(10%, 10%)
+        }
+    }
+
+    &.is-hidden {
+        visibility: hidden;
+        transform: scale(0);
+    }
+}
+
+.current-status, .next-status{
+    top: 50%;
+    transform: translateY(-50%);
+    left: $space-m;
+    flex-direction: column;
+    transition: visibility 950ms linear;
+    z-index: 1;
+    p {
+        line-height: 1em;
+        opacity: 1;
+        transform: translateX(0);
+        transition: opacity 625ms linear, transform 625ms $easeOutExpo;
+        &:nth-child(1){
+        }
+        &:nth-child(2){
+            transition-delay: 125ms;
+            margin-bottom: $space-s;
+        }
+        &:nth-child(3) {
+            transition-delay: 325ms;
+        }
+    }
+
+    &.is-hidden{
+        p{
+            opacity: 0;
+            transform: translateX(5vw);
+            transition-delay: 0ms;
+            transition-duration: 325ms;
+            transition-timing-function: $easeInExpo;
+        }
+    }
+}
+
+.next-status{
+    left: inherit;
+    right: $space-m;
+    text-align: right;
+    &.is-hidden {
+        p {
+            transform: translateX(-5vw);
         }
     }
 }

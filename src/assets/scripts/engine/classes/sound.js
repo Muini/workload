@@ -15,6 +15,7 @@ export default class Sound {
     }) {
         this.uuid = UUID();
         this.name = opt.name || null;
+
         this._howl = new Howl({
             src: [opt.url],
             autoplay: false,

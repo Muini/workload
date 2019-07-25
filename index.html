@@ -64,7 +64,7 @@
                 <div class="animation">
                     <div class="bar"><span class="progress"></span></div>
                 </div>
-                <div class="percent">{{ percentage }}%</div>
+                <!-- <div class="percent">{{ percentage }}%</div> -->
             </section>
             
             <div class="hud title">
@@ -93,8 +93,8 @@
             </div>
             <div class="hud next-status u-ft">
                 <p class="u-ft_normal u-ft_white">Next costs</p>
-                <p class="u-ft_verybig u-ft_white"><span class="u-ft_red">-{{ nextCosts }}</span> k$</p>
-                <p class="u-ft_normal u-ft_white"><span class="u-ft_purple">+{{ recruitNbr }}</span> employes</p>
+                <p class="u-ft_verybig u-ft_white"><span class="u-ft_red">{{ nextCosts }}</span> k$</p>
+                <p class="u-ft_normal u-ft_white"><span class="u-ft_purple">{{ recruitNbr }}</span> employes</p>
             </div>
 
         </section>

@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import Engine from '../engine/core/engine';
 import MaterialManager from '../engine/core/materialManager';
 import Scene from '../engine/classes/scene';
+import Sound from '../engine/classes/sound';
 import { Ease, Tween } from '../engine/classes/tween';
 import DomEntity from '../engine/classes/domEntity';
 
@@ -89,12 +90,51 @@ export default new Scene({
             parent: this,
             data: new Data({
                 currentDay: 1,
-                currentMoney: 10,
+                currentMoney: this.gamerules.data.safeMoney,
                 wokersNbr: 0
             }),
-            active: true
+            active: true,
+            visible: false
         });
-        // this.currentStatus.setVisibility(false);
+        /*this.gamerules.data.safeMoney.onDataUpdate(_ => {
+            this.currentStatus.data.currentMoney = this.gamerules.data.safeMoney;
+        })*/
+
+        this.nextStatus = new DomEntity({
+            selector: '.next-status',
+            name: 'Next status infos',
+            parent: this,
+            data: new Data({
+                nextCosts: -8,
+                recruitNbr: '+1'
+            }),
+            active: true,
+            visible: false
+        });
+
+        this.endTurnSound = new Sound({
+            name: 'endTurn',
+            parent: this,
+            url: '/static/sounds/endturn.m4a',
+            loop: false,
+            volume: 0.4,
+        });
+
+        this.citySound = new Sound({
+            name: 'city-loop',
+            parent: this,
+            url: '/static/sounds/city-loop.m4a',
+            loop: true,
+            volume: 0.2,
+        });
+
+        this.mainMusic = new Sound({
+            name: 'music',
+            parent: this,
+            url: '/static/sounds/workload_music_by_jeremy_blake.m4a',
+            loop: true,
+            volume: 0.5,
+        });
 
         this.workers = [6];
         this.workers[0] = new Worker({ parent: this, position: new THREE.Vector3(0, 0.0, 12.0) });
@@ -114,6 +154,8 @@ export default new Scene({
     onUpdate: function(time, delta){
     },
     onStart: async function() {
+
+        this.citySound.play(1000);
 
         this.onNewTurnAnimationIn = new Tween({ pro: 0, }).to({ pro: 1, }, 2000)
             .ease(Ease.Expo.Out)
@@ -136,6 +178,7 @@ export default new Scene({
             // Make the screen black and white 
             console.log('New turn', this.gamerules.data.turn)
             this.onNewTurnAnimationIn.start();
+            this.endTurnSound.play();
 
             // Block controls
             this.RTSCameraMovement.disableControls();
@@ -145,34 +188,45 @@ export default new Scene({
             // Pause the game
             for (let w = 0; w < this.workers.length; w++) {
                 const worker = this.workers[w];
-                worker.stopWorking();
+                worker.pause()
                 worker.canRecruit(true);
             }
-            this.boss.stopWorking();
+            this.boss.pause();
             this.clock.isTurning = false;
+
+            // Show HUD
+            this.currentStatus.setVisibility(true);
+            this.nextStatus.setVisibility(true);
 
             // Gather all the money created by workers
             this.gamerules.endTheDay();
 
+            await Engine.wait(3000)
+
+            this.gamerules.data.safeMoney += 10;
+
             // Set Timeout if turn is > 2
-            // await Engine.wait(10000 - (1000 * this.gamerules.data.turn));
-            // // Else let the player decide when to start the day
+            await Engine.wait(10000 - (1000 * this.gamerules.data.turn));
+            // Else let the player decide when to start the day
 
-            // // Start the new turn
-            // this.gamerules.startTheDay();
+            // Start the new turn
+            this.gamerules.startTheDay();
 
-            // // Continue the game
-            // for (let w = 0; w < this.workers.length; w++) {
-            //     const worker = this.workers[w];
-            //     worker.startWorking();
-            //     worker.canRecruit(false);
-            // }
-            // this.boss.startWorking();
-            // this.clock.resetTime();
-            // this.clock.isTurning = true;
-            // this.onNewTurnAnimationOut.start();
-            // this.RTSCameraMovement.setFovTo(20);
-            // this.RTSCameraMovement.enableControls();
+            // Continue the game
+            for (let w = 0; w < this.workers.length; w++) {
+                const worker = this.workers[w];
+                worker.continue()
+                worker.canRecruit(false);
+            }
+            this.boss.continue();
+            this.clock.resetTime();
+            this.clock.isTurning = true;
+            this.onNewTurnAnimationOut.start();
+            this.RTSCameraMovement.setFovTo(20);
+            this.RTSCameraMovement.enableControls();
+            // Hide HUD
+            this.currentStatus.setVisibility(false);
+            this.nextStatus.setVisibility(false);
 
         }
 
@@ -208,8 +262,11 @@ export default new Scene({
                 // this.RTSCameraMovement.setFovTo(30);
 
                 await this.boss.arriveAtOffice();
+                this.boss.continue();
 
                 Engine.wait(3000);
+
+                this.mainMusic.play(3000);
                 
                 this.gamerules.startTheDay();
                 this.clock.isTurning = true;

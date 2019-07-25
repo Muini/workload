@@ -163,6 +163,7 @@ export default class Scene {
                 this.onUpdate = this.onUpdate.bind(this)
                 Engine.addToUpdate(this.uuid, this.onUpdate);
             }
+
         })();
     }
 

@@ -57,10 +57,13 @@ class Quality{
             // Global settings
             global: {
                 pixelDensity: (() => {
+                    // return Math.min(Math.max(this.score / (this.isMobile ? 300 : 1200) > window.devicePixelRatio ? window.devicePixelRatio : this.score / (this.isMobile ? 300 : 1200), 0.5), 2.0);
                     if ((this.isMobile || this.isDesktop) && this.score > 500 ) {
-                        return (window.devicePixelRatio > 2.0 ? 2.0 : window.devicePixelRatio);
+                        return (window.devicePixelRatio > 1.5 ? 1.5 : window.devicePixelRatio);
                     } else if ((this.isTablet || this.isLaptop) && this.score > 1500) {
                         return (window.devicePixelRatio > 1.5 ? 1.5 : window.devicePixelRatio);
+                    /*} else if (this.score < 400) {
+                        return (window.devicePixelRatio > 0.75 ? 0.75 : window.devicePixelRatio);*/
                     } else
                         return 1.0;
                 })(),

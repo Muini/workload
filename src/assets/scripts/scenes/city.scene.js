@@ -146,13 +146,38 @@ export default new Scene({
             parent: this,
             url: '/static/sounds/city-loop.m4a',
             loop: true,
+            volume: 0.8,
+        });
+
+        this.whooshSound = new Sound({
+            name: 'whoosh',
+            parent: this,
+            url: '/static/sounds/whoosh-slow.m4a',
+            loop: false,
             volume: 0.4,
+        });
+
+        this.clickSound = new Sound({
+            name: 'click',
+            parent: this,
+            url: '/static/sounds/click.m4a',
+            loop: false,
+            volume: 0.6,
+        });
+
+        this.mainMusic = new Sound({
+            name: 'music',
+            parent: this,
+            url: '/static/sounds/workload_music_by_jeremy_blake.m4a',
+            loop: true,
+            volume: 0.6,
         });
 
         this.title = new BlurDom({
             selector: '.title',
             parent: this,
-            active: false
+            active: true,
+            visible: false,
         });
 
         this.simpleCameraMovement = new SimpleCameraMovement({
@@ -169,7 +194,8 @@ export default new Scene({
 
         this.simpleCameraMovement.disableControls();
 
-        // this.citySound.play(1000);
+        this.citySound.play(5000);
+        this.mainMusic.play(1000);
 
         let tween = new Tween({
                 y: 125,
@@ -186,6 +212,8 @@ export default new Scene({
             })
             .onComplete(_ => {
                 // console.log('complete')
+
+                this.simpleCameraMovement.enableControls();
             });
 
         let tween2 = new Tween({
@@ -223,18 +251,20 @@ export default new Scene({
                     i.msRequestFullscreen();
                 }
             }
+            this.clickSound.play();
             this.simpleCameraMovement.disableControls();
-            this.title.setActive(false);
+            this.title.setVisibility(false);
             tween2.start();
-            await Engine.wait(1000);
+            await Engine.wait(2000);
+            this.whooshSound.play(100);
+            this.mainMusic.stop(600);
         }
 
         await Engine.wait(1000);
         tween.start();
-        await Engine.wait(1000);
-        this.title.setActive(true);
-
-        this.simpleCameraMovement.enableControls();
+        await Engine.wait(2000);
+        this.whooshSound.play(100);
+        this.title.setVisibility(true);
 
     }
 })

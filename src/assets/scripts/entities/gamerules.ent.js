@@ -19,7 +19,7 @@ export class Gamerules extends Entity {
             timeIsGoingOn: false,
             dayTimeElapsed: 0,
             gameTimeElapsed: 0,
-            lengthOfADay: 1000, //in ms
+            lengthOfADay: 10000, //in ms
             timeOfTheDay: function(){
                 return Math.floor(this.dayTimeElapsed / this.lengthOfADay * 24);
             },

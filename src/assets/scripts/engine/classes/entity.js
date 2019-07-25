@@ -67,7 +67,8 @@ export default class Entity {
                 this._isUpdating = false;
             }
         }
-        this.setVisibility(bool);
+        if(this.isVisible && !bool)
+            this.setVisibility(this.isVisible);
     }
 
     stopAllSounds() {
@@ -120,6 +121,7 @@ export default class Entity {
     awake() {
         return (async _ => {
             this.setActive(this.isActive);
+            this.setVisibility(this.isVisible);
             // Awake children now
             if (this._children.length > 0){
                 await Promise.all(this._children.map(async child => { await child.awake() }))
